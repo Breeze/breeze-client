@@ -1,0 +1,28 @@
+{
+    "compileOnSave": true,
+    "compilerOptions": {
+        "declaration": true,
+        "declarationDir": "temp",
+        "target": "es5",
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "stripInternal": true,
+        "sourceMap": true,
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
+        "removeComments": false,
+        "noImplicitAny": true,
+        "strictNullChecks": true,
+        "suppressImplicitAnyIndexErrors": true,
+        "noUnusedLocals": false,
+        "lib": ["es5", "es2015.promise", "webworker"]
+    },
+    "exclude": [
+        "node_modules",
+        "temp",
+        "build",
+        "lib",
+        "rollup"
+    ]
+
+}

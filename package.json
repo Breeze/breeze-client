@@ -1,0 +1,78 @@
+{
+  "name": "breeze-client",
+  "version": "2.0.0-alpha.1",
+  "description": "Breeze for JavaScript clients",
+  "main": "breeze.base.debug.js",
+  "files": [
+    "breeze.base*.js",
+    "adapter*.js"
+  ],
+  "dependencies": {},
+  "devDependencies": {
+    "@types/jasmine": "^2.8.2",
+    "@types/node": "^6.0.45",
+    "fs-extra": "^4.0.3",
+    "jasmine": "^2.8.0",
+    "lodash": "^4.17.4",
+    "q": "^1.5.1",
+    "dts-bundle": "^0.7.3",
+    "dts-builder": "^1.1.3",
+    "rimraf": "^2.6.2",
+    "rollup": "^0.52.1",
+    "rollup-plugin-multi-entry": "^2.0.2",
+    "ts-loader": "^3.2.0",
+    "typescript": "^2.6.2",
+    "typedoc": "^0.9.0",
+    "tslint": "^5.8.0",
+    "uglify-js": "^3.2.1"
+  },
+  "scripts": {
+    "postinstall": "node postinstall.js",
+    "build": "npm run rollup-all && node buildpkg.js && cd build && npm pack",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "clean": "rimraf temp && rimraf src/*.js* && rimraf src/*.d.ts && rimraf build/*.js* && rimraf build/*.tgz",
+    "tsc": "tsc",
+    "watch-tsc": "tsc -w",
+    "dts-builder": "tsc && node rollup/dts-builder.js",
+    "dts-bundle": "tsc && dts-bundle --name breeze --main temp/src/breeze.d.ts --out ../../build/breeze-dts.d.ts --outputAsModuleFolder",
+    "tsc-es5": "tsc --target es5 --allowJs",
+    "tsc-2015": "tsc -p tsconfig.es2015.json",
+    "minify": "uglifyjs --verbose --config-file rollup/uglify-options.json",
+    "prerollup": "npm run tsc-2015",
+    "prerollup-adapters": "npm run tsc-2015",
+    "rollup": "rollup",
+    "typedoc": "typedoc --out ./temp/docs/ --exclude xx  --excludePrivate --excludeNotExported  --tsConfig ./tsconfig.typedoc.json --mode file --readme ./readme.doc.md ./src/breeze.ts && node rollup/copyIfDifferent.js temp/docs docs ",
+    "rollup-full": "npm run rollup -- -c ./rollup/rollup.full.js && npm run tsc-es5 -- --out build/breeze.debug.js temp/breeze.full.es2015.js && npm run minify -- --output build/breeze.min.js build/breeze.debug.js",
+    "rollup-base": "npm run rollup -- -c ./rollup/rollup.base.js && npm run tsc-es5 -- --out build/breeze.base.debug.js temp/breeze.base.es2015.js && npm run minify -- --output build/breeze.base.min.js build/breeze.base.debug.js",
+    "rollup-ajax-angular": "node rollup/rollup-module.js adapter-ajax-angular",
+    "rollup-ajax-jquery": "node rollup/rollup-module.js adapter-ajax-jquery",
+    "rollup-data-odata": "node rollup/rollup-module.js adapter-data-service-odata",
+    "rollup-data-webapi": "node rollup/rollup-module.js adapter-data-service-webapi",
+    "rollup-model-backing": "node rollup/rollup-module.js adapter-model-library-backing-store",
+    "rollup-model-ko": "node rollup/rollup-module.js adapter-model-library-ko",
+    "rollup-uri-json": "node rollup/rollup-module.js adapter-uri-builder-json",
+    "rollup-uri-odata": "node rollup/rollup-module.js adapter-uri-builder-odata",
+    "rollup-adapters": "npm run rollup-ajax-angular && npm run rollup-ajax-jquery && npm run rollup-data-odata && npm run rollup-data-webapi && npm run rollup-model-backing && npm run rollup-model-ko && npm run rollup-uri-json && npm run rollup-uri-odata",
+    "rollup-all": "npm run rollup-full && npm run rollup-base && npm run rollup-adapters"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Breeze/breeze-client.git"
+  },
+  "author": {
+    "name": "IdeaBlade",
+    "email": "jayt@ideablade.com",
+    "url": "https://www.ideablade.com/"
+  },
+  "contributors": [
+    "Jay Traband",
+    "Steve Schmitt",
+    "Marcel Good",
+    "Ward Bell"
+  ],
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Breeze/breeze-client/issues"
+  },
+  "homepage": "https://github.com/Breeze/breeze-client#readme"
+}
