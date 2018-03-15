@@ -733,13 +733,15 @@ function mergeStructuralType(stype: StructuralType, json: any) {
 
 function mergeProps(stype: StructuralType, jsonProps: any[]) {
   if (!jsonProps) return;
-  jsonProps.forEach(function (jsonProp) {
+  jsonProps.forEach((jsonProp) => {
     let propName = jsonProp.name;
     if (!propName) {
       if (jsonProp.nameOnServer) {
         propName = stype.metadataStore.namingConvention.serverPropertyNameToClient(jsonProp.nameOnServer, {});
       } else {
-        throw new Error("Unable to complete 'importMetadata' - cannot locate a 'name' or 'nameOnServer' for one of the imported property nodes");
+        // backslash-quote works around compiler bug
+        const msg = "Unable to complete \'importMetadata\' - cannot locate a \'name\' or \'nameOnServer\' for one of the imported property nodes";
+        throw new Error(msg);
       }
     }
     if (jsonProp.custom) {
@@ -1355,12 +1357,13 @@ export class EntityType {
   // TODO: have this return empty array instead of null and fix consumers.
   // TODO: think about renaming with '_' prefix.
   getPropertiesOnPath(propertyPath: string, useServerName: boolean, throwIfNotFound: boolean = false) {
-    let propertyNames = (Array.isArray(propertyPath)) ? propertyPath : propertyPath.trim().split('.');
+    let propertyNames: string[] = (Array.isArray(propertyPath)) ? propertyPath : propertyPath.trim().split('.');
 
     let ok = true;
-    let parentType = this as StructuralType;
     let key = useServerName ? "nameOnServer" : "name";
-    let props = propertyNames.map((propName) => {
+    
+    const getProps = (propName: string) => {
+      let parentType = this as StructuralType;
       let prop = core.arrayFirst(parentType.getProperties(), core.propEq(key, propName));
       if (prop) {
         parentType = (prop instanceof NavigationProperty) ? prop.entityType : prop.dataType as ComplexType;
@@ -1371,7 +1374,9 @@ export class EntityType {
         ok = false;
       }
       return prop;
-    }) as EntityProperty[];
+    };
+
+    let props = propertyNames.map(getProps) as EntityProperty[];
     return ok ? props : null;
   }
 

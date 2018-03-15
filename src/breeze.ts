@@ -24,7 +24,8 @@ import { config, IBaseAdapter } from './config';
 import { core } from './core';
 import { makeRelationArray, makePrimitiveArray, makeComplexArray } from './array';
 
-// import { BreezeConfig } from './config';
+import { BreezeConfig } from './config';
+export { BreezeConfig } from './config';
 // import { IComplexArray } from './complex-array';
 // import { IConfigParam } from './assert-param';
 // import { IRelationArray } from './relation-array';
@@ -146,7 +147,7 @@ export const breeze = {
   makeComplexArray: makeComplexArray,
   makePrimitiveArray: makePrimitiveArray,
   makeRelationArray: makeRelationArray,
-  version: "2.0.0-alpha.1"
+  version: "2.0.0-alpha.3"
 };
 
 breeze.assertConfig = assertConfig as any;

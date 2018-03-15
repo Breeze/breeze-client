@@ -548,9 +548,9 @@ export class EntityManager {
       .or().isNonEmptyArray().isString()
       .or().isOptional().check();
 
-    assertParam(exportConfig, "exportConfig").isObject()
-      .or().isBoolean()
-      .or().isOptional().check();
+    // assertParam(exportConfig, "exportConfig").isObject()
+    //   .or().isBoolean()
+    //   .or().isOptional().check();
 
     if (exportConfig == null) {
       exportConfig = { includeMetadata: true, asString: true };
