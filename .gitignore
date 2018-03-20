@@ -15,9 +15,12 @@ packages
 _temp
 Unused
 TestResults
+.vscode
 
+src/**/*.d.ts
 src/**/*.js
 src/**/*.js.map
+spec/**/*.d.ts
 spec/**/*.js
 spec/**/*.js.map
 build/**/*

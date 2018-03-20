@@ -42,7 +42,9 @@ function createPackageJson() {
     "typings": "breeze-client.d.ts",
   }
 
-  const newPackageJson = { ...copyProps, ...outputProperties };
+  // const newPackageJson = { ...copyProps, ...outputProperties };
+  const newPackageJson = copyProps;
+  Object.keys(outputProperties).forEach(k => newPackageJson[k] = outputProperties[k]);
   fs.writeJsonSync(path.join(DEST, PACKAGE_JSON), newPackageJson, { spaces: 2 });
 }
 
