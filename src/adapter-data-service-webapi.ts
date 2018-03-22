@@ -1,7 +1,7 @@
 ﻿import * as breeze from './breeze'; // TODO: think about this approach for plugin modules.
-import { JsonResultsAdapter, IKeyMapping } from './breeze';
+import { JsonResultsAdapter, KeyMapping } from './breeze';
 
-/** @hidden @internal */
+/** @hidden */
 export class DataServiceWebApiAdapter extends breeze.AbstractDataServiceAdapter {
 
   constructor() {
@@ -10,7 +10,7 @@ export class DataServiceWebApiAdapter extends breeze.AbstractDataServiceAdapter 
   }
 
   /** @hidden @internal */
-  _prepareSaveBundle(saveContext: breeze.ISaveContext, saveBundle: breeze.ISaveBundle) {
+  _prepareSaveBundle(saveContext: breeze.SaveContext, saveBundle: breeze.SaveBundle) {
     let changeRequestInterceptor = this._createChangeRequestInterceptor(saveContext, saveBundle);
     let em = saveContext.entityManager;
     let metadataStore = em.metadataStore;
@@ -45,11 +45,11 @@ export class DataServiceWebApiAdapter extends breeze.AbstractDataServiceAdapter 
   }
 
   /** @hidden @internal */
-  _prepareSaveResult(saveContext: breeze.ISaveContext, data: any) {
+  _prepareSaveResult(saveContext: breeze.SaveContext, data: any) {
     // use the jsonResultAdapter to extractResults and extractKeyMappings
     let jra = saveContext.dataService.jsonResultsAdapter || this.jsonResultsAdapter;
     let entities = jra.extractSaveResults(data) || [];
-    let keyMappings: IKeyMapping[] = jra.extractKeyMappings(data) || [];
+    let keyMappings: KeyMapping[] = jra.extractKeyMappings(data) || [];
     let deletedKeys = jra.extractDeletedKeys ? (jra.extractDeletedKeys(data)) || [] : [];
 
     if (keyMappings.length) {
@@ -80,7 +80,7 @@ export class DataServiceWebApiAdapter extends breeze.AbstractDataServiceAdapter 
 
     name: "webApi_default",
 
-    visitNode: function (node: any, mappingContext: breeze.MappingContext, nodeContext: breeze.INodeContext) {
+    visitNode: function (node: any, mappingContext: breeze.MappingContext, nodeContext: breeze.NodeContext) {
       if (node == null) return {};
       let entityTypeName = breeze.MetadataStore.normalizeTypeName(node.$type);
       let entityType = entityTypeName && mappingContext.entityManager.metadataStore.getEntityType(entityTypeName, true);

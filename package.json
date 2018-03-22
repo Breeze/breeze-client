@@ -39,7 +39,7 @@
     "build-package": "tsb -p tsconfig.build.json && node tools/packager.js",
     "publish": "npm publish ./dist",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "clean": "rimraf temp && rimraf src/*.js* && rimraf src/*.d.ts && rimraf build/*.js* && rimraf build/*.tgz",
+    "clean": "rimraf temp && rimraf src/*.js* && rimraf src/*.d.ts && rimraf build/*.js* && rimraf build/*.tgz && rimraf dist",
     "tsc": "tsc",
     "watch-tsc": "tsc -w",
     "dts-builder": "tsc && node rollup/dts-builder.js",

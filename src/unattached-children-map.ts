@@ -1,12 +1,12 @@
 import { core } from './core';
-import { IEntity } from './entity-aspect';
+import { Entity } from './entity-aspect';
 import { NavigationProperty } from './entity-metadata';
 import { EntityKey } from './entity-key';
 
 /** @hidden @internal */
 export interface INavTuple {
   navigationProperty: NavigationProperty;
-  children: IEntity[];
+  children: Entity[];
 }
 
 /** @hidden @internal */
@@ -16,7 +16,7 @@ export class UnattachedChildrenMap {
   map: { [index: string]: INavTuple[] } = {};
 
 
-  addChild(parentEntityKey: EntityKey, navigationProperty: NavigationProperty, child: IEntity) {
+  addChild(parentEntityKey: EntityKey, navigationProperty: NavigationProperty, child: Entity) {
     let tuple = this.getTuple(parentEntityKey, navigationProperty);
     if (!tuple) {
       tuple = { navigationProperty: navigationProperty, children: [] };

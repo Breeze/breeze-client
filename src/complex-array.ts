@@ -1,14 +1,14 @@
 import { core  } from './core';
-import { IObservableArray, observableArray } from './observable-array';
+import { ObservableArray, observableArray } from './observable-array';
 import { BreezeEvent } from './event';
-import { IComplexObject, IStructuralObject } from './entity-aspect';
+import { ComplexObject, StructuralObject } from './entity-aspect';
 import { DataProperty } from './entity-metadata';
 
 // TODO: mixin impl is not very typesafe
 
-export interface IComplexArray extends IObservableArray {
-  [index: number]: IComplexObject;
-  parent?: IStructuralObject;
+export interface ComplexArray extends ObservableArray {
+  [index: number]: ComplexObject;
+  parent?: StructuralObject;
   parentProperty?: DataProperty;
 }
 
@@ -69,11 +69,11 @@ let complexArrayMixin = {
   _rejectChanges: function() {
     if (!this._origValues) return;
     let that = this;
-    this.forEach(function (co: IComplexObject) {
+    this.forEach(function (co: ComplexObject) {
       clearAspect(co, that);
     });
     this.length = 0;
-    this._origValues.forEach(function (co: IComplexObject) {
+    this._origValues.forEach(function (co: ComplexObject) {
       that.push(co);
     });
   },
@@ -86,7 +86,7 @@ let complexArrayMixin = {
 // local functions
 
 
-function getGoodAdds(complexArray: IComplexArray, adds: IComplexObject[]) {
+function getGoodAdds(complexArray: ComplexArray, adds: ComplexObject[]) {
   // remove any that are already added here
   return adds.filter(function (a) {
     // return a.parent !== complexArray.parent;  // TODO: check if this is actually a bug in original breezejs ???
@@ -94,7 +94,7 @@ function getGoodAdds(complexArray: IComplexArray, adds: IComplexObject[]) {
   });
 }
 
-function processAdds(complexArray: IComplexArray, adds: IComplexObject[]) {
+function processAdds(complexArray: ComplexArray, adds: ComplexObject[]) {
   adds.forEach(function (a) {
     // if (a.parent != null) { // TODO: check if this is actually a bug in original breezejs ???
     if (a.complexAspect && a.complexAspect.parent != null) {
@@ -104,13 +104,13 @@ function processAdds(complexArray: IComplexArray, adds: IComplexObject[]) {
   });
 }
 
-function processRemoves(complexArray: IComplexArray, removes: IComplexObject[]) {
+function processRemoves(complexArray: ComplexArray, removes: ComplexObject[]) {
   removes.forEach(function (a) {
     clearAspect(a, complexArray);
   });
 }
 
-function clearAspect(co: IComplexObject, arr: IComplexArray) {
+function clearAspect(co: ComplexObject, arr: ComplexArray) {
   let coAspect = co.complexAspect;
   // if not already attached - exit
   if (coAspect.parent !== arr.parent) return null;
@@ -120,7 +120,7 @@ function clearAspect(co: IComplexObject, arr: IComplexArray) {
   return coAspect;
 }
 
-function setAspect(co: IComplexObject, arr: IComplexArray) {
+function setAspect(co: ComplexObject, arr: ComplexArray) {
   let coAspect = co.complexAspect;
   // if already attached - exit
   if (coAspect.parent === arr.parent) return null;
@@ -133,13 +133,13 @@ function setAspect(co: IComplexObject, arr: IComplexArray) {
 
 /** For use by breeze plugin authors only. The class is for use in building a [[IModelLibraryAdapter]] implementation. 
 @adapter (see [[IModelLibraryAdapter]])    
-@hidden @internal 
+@hidden 
 */
-export function makeComplexArray(arr: any[], parent: IStructuralObject, parentProperty: DataProperty) {
+export function makeComplexArray(arr: any[], parent: StructuralObject, parentProperty: DataProperty) {
   let arrX = arr as any;
   observableArray.initializeParent(arrX, parent, parentProperty);
   arrX.arrayChanged = new BreezeEvent("arrayChanged", arrX);
   core.extend(arrX, observableArray.mixin);
-  return core.extend(arrX, complexArrayMixin) as IComplexArray;
+  return core.extend(arrX, complexArrayMixin) as ComplexArray;
 }
 

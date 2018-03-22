@@ -1,4 +1,4 @@
-﻿import { IEntity } from './entity-aspect';
+﻿import { Entity } from './entity-aspect';
 import { EntityType, DataProperty  } from './entity-metadata';
 import { EntityKey } from './entity-key';
 import { EntityState } from './entity-state';
@@ -10,7 +10,7 @@ export class EntityGroup {
   entityManager: EntityManager;
   entityType: EntityType;
   _indexMap: Object; //  = {};
-  _entities: (IEntity | null)[];
+  _entities: (Entity | null)[];
   _emptyIndexes: number[];
 
   constructor(entityManager: EntityManager, entityType: EntityType) {
@@ -21,10 +21,10 @@ export class EntityGroup {
     this._indexMap = {};
     this._entities = [];
     this._emptyIndexes = [];
-  };
+  }
 
 
-  attachEntity(entity: IEntity, entityState: EntityState, mergeStrategy?: MergeStrategy) {
+  attachEntity(entity: Entity, entityState: EntityState, mergeStrategy?: MergeStrategy) {
     // entity should already have an aspect.
     let aspect = entity.entityAspect;
 
@@ -37,7 +37,7 @@ export class EntityGroup {
     let ix = this._indexMap[keyInGroup];
     if (ix >= 0) {
       // safecast because key was found not ix will not return a null
-      let targetEntity = this._entities[ix] as IEntity;
+      let targetEntity = this._entities[ix] as Entity;
       let targetEntityState = targetEntity.entityAspect.entityState;
       let wasUnchanged = targetEntityState.isUnchanged();
       if (targetEntity === entity) {
@@ -65,9 +65,9 @@ export class EntityGroup {
       aspect.entityManager = this.entityManager;
       return entity;
     }
-  };
+  }
 
-  detachEntity(entity: IEntity) {
+  detachEntity(entity: Entity) {
     // by this point we have already determined that this entity
     // belongs to this group.
     let aspect = entity.entityAspect;
@@ -81,7 +81,7 @@ export class EntityGroup {
     this._emptyIndexes.push(ix);
     this._entities[ix] = null;
     return entity;
-  };
+  }
 
 
   // returns entity based on an entity key defined either as an array of key values or an EntityKey
@@ -97,7 +97,7 @@ export class EntityGroup {
     let r = (ix !== undefined) ? this._entities[ix] : undefined;
     // coerce null to undefined
     return r == null ? undefined : r;
-  };
+  }
 
   hasChanges() {
     let entities = this._entities;
@@ -109,12 +109,12 @@ export class EntityGroup {
       }
     }
     return false;
-  };
+  }
 
   getChanges() {
     let entities = this._entities;
     let unchanged = EntityState.Unchanged;
-    let changes: IEntity[] = [];
+    let changes: Entity[] = [];
     for (let i = 0, len = entities.length; i < len; i++) {
       let e = entities[i];
       if (e && e.entityAspect.entityState !== unchanged) {
@@ -126,7 +126,7 @@ export class EntityGroup {
 
   getEntities(entityStates: EntityState[]) {
     let filter = getFilter(entityStates);
-    return this._entities.filter(filter) as IEntity[];
+    return this._entities.filter(filter) as Entity[];
   }
 
   _checkOperation(operationName: string) {
@@ -169,7 +169,7 @@ export class EntityGroup {
     if (ix === undefined) {
       throw new Error("Internal Error in key fixup - unable to locate entity");
     }
-    let entity = this._entities[ix] as IEntity;
+    let entity = this._entities[ix] as Entity;
     let keyPropName = entity.entityType.keyProperties[0].name;
     // fks on related entities will automatically get updated by this as well
     entity.setProperty(keyPropName, realValue);
@@ -188,16 +188,16 @@ export class EntityGroup {
 
 function getFilter(entityStates: EntityState[]) {
   if (entityStates.length === 0) {
-    return function (e: IEntity) {
+    return function (e: Entity) {
       return !!e;
     };
   } else if (entityStates.length === 1) {
     let entityState = entityStates[0];
-    return function (e: IEntity) {
+    return function (e: Entity) {
       return !!e && e.entityAspect.entityState === entityState;
     };
   } else {
-    return function (e: IEntity) {
+    return function (e: Entity) {
       return !!e && -1 !== entityStates.indexOf(e.entityAspect.entityState);
     };
   }

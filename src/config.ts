@@ -3,11 +3,11 @@ import { assertParam  } from './assert-param';
 import { BreezeEvent } from './event';
 
 /** @hidden */
-export interface IAdapterCtor<T extends IBaseAdapter> { new (...args: any[]): T; }
+export interface AdapterCtor<T extends BaseAdapter> { new (...args: any[]): T; }
 /** @hidden */
-export interface IDef<T extends IBaseAdapter> { ctor: IAdapterCtor<T>; defaultInstance?: T; }
+export interface IDef<T extends BaseAdapter> { ctor: AdapterCtor<T>; defaultInstance?: T; }
 
-export class InterfaceDef<T extends IBaseAdapter> {
+export class InterfaceDef<T extends BaseAdapter> {
 
     name: string;
     defaultInstance?: T;
@@ -21,7 +21,7 @@ export class InterfaceDef<T extends IBaseAdapter> {
     }
 
     /** Define an implementation of the given adaptername */
-    registerCtor(adapterName: string, ctor: IAdapterCtor<T>): void {
+    registerCtor(adapterName: string, ctor: AdapterCtor<T>): void {
         this._implMap[adapterName.toLowerCase()] = { ctor: ctor, defaultInstance: undefined };
     }
 
@@ -43,7 +43,7 @@ export class InterfaceDef<T extends IBaseAdapter> {
     }
 }
 
-export interface IBaseAdapter {
+export interface BaseAdapter {
     /** @hidden @internal */
     _$impl?: any;
     name: string;
@@ -55,7 +55,7 @@ export class BreezeConfig {
     functionRegistry = {};
     typeRegistry = {};
     objectRegistry = {};
-    interfaceInitialized: BreezeEvent<{ interfaceName: string, instance: IBaseAdapter, isDefault: boolean }>;
+    interfaceInitialized: BreezeEvent<{ interfaceName: string, instance: BaseAdapter, isDefault: boolean }>;
 
     stringifyPad = '';
     /** @hidden @internal */
@@ -72,7 +72,7 @@ export class BreezeConfig {
     @param interfaceName {String} - one of the following interface names "ajax", "dataService" or "modelLibrary"
     @param adapterCtor {Function} - an ctor function that returns an instance of the specified interface.
     **/
-    registerAdapter<T extends IBaseAdapter>(interfaceName: string, adapterCtor: IAdapterCtor<T>) {
+    registerAdapter<T extends BaseAdapter>(interfaceName: string, adapterCtor: AdapterCtor<T>) {
         assertParam(interfaceName, "interfaceName").isNonEmptyString().check();
         assertParam(adapterCtor, "adapterCtor").isFunction().check();
         // this impl will be thrown away after the name is retrieved.
@@ -138,7 +138,7 @@ export class BreezeConfig {
     @return {an instance of the specified adapter}
     @internal
     **/
-    getAdapterInstance<T extends IBaseAdapter>(interfaceName: string, adapterName?: string) {
+    getAdapterInstance<T extends BaseAdapter>(interfaceName: string, adapterName?: string) {
         let idef = this.getInterfaceDef<T>(interfaceName);
         let impl: IDef<T>;
 
@@ -177,7 +177,7 @@ export class BreezeConfig {
         return this.functionRegistry[fnName];
     }
 
-    getInterfaceDef<T extends IBaseAdapter>(interfaceName: string) {
+    getInterfaceDef<T extends BaseAdapter>(interfaceName: string) {
         let lcName = interfaceName.toLowerCase();
         // source may be null
         let kv = core.objectFirst(this._interfaceRegistry || {}, function (k, v) {
@@ -215,7 +215,7 @@ export class BreezeConfig {
     }
 
     /** @hidden @internal */
-    _initializeAdapterInstanceCore<T extends IBaseAdapter>(interfaceDef: InterfaceDef<T>, impl: IDef<T>, isDefault: boolean) {
+    _initializeAdapterInstanceCore<T extends BaseAdapter>(interfaceDef: InterfaceDef<T>, impl: IDef<T>, isDefault: boolean) {
         let instance: T;
         let inst = impl.defaultInstance;
         if (!inst) {

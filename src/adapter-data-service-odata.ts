@@ -1,5 +1,5 @@
 ﻿import * as breeze from './breeze';
-import { IQueryResult, ISaveResult } from './entity-manager';
+import { QueryResult, SaveResult } from './entity-manager';
 import { JsonResultsAdapter } from './data-service';
 
 let core = breeze.core;
@@ -9,12 +9,12 @@ declare var document: any;
 declare var url: any; // needed to access node's url.parse
 declare var OData: any;
 
-interface ODataSaveContext extends breeze.ISaveContext {
+interface ODataSaveContext extends breeze.SaveContext {
   tempKeys: breeze.EntityKey[];
-  contentKeys: breeze.IEntity[];
+  contentKeys: breeze.Entity[];
 }
 
-/** @hidden @internal */
+/** @hidden */
 export class DataServiceODataAdapter extends breeze.AbstractDataServiceAdapter {
   name: string;
   relativeUrl: boolean | ((ds: breeze.DataService, url: string) => string);
@@ -124,7 +124,7 @@ export class DataServiceODataAdapter extends breeze.AbstractDataServiceAdapter {
       url = url + sep + paramString;
     }
 
-    let promise = new Promise<IQueryResult>((resolve, reject) => {
+    let promise = new Promise<QueryResult>((resolve, reject) => {
       OData.read({
         requestUri: url,
         headers: core.extend({}, this.headers)
@@ -155,7 +155,7 @@ export class DataServiceODataAdapter extends breeze.AbstractDataServiceAdapter {
   }
 
 
-  saveChanges(odataSaveContext: breeze.ISaveContext, saveBundle: breeze.ISaveBundle): Promise<ISaveResult> {
+  saveChanges(odataSaveContext: breeze.SaveContext, saveBundle: breeze.SaveBundle): Promise<SaveResult> {
     let adapter = odataSaveContext.adapter = this;
     let saveContext = odataSaveContext as ODataSaveContext;
     let url: string;
@@ -173,7 +173,7 @@ export class DataServiceODataAdapter extends breeze.AbstractDataServiceAdapter {
     let requestData = createChangeRequests(saveContext, saveBundle);
     let tempKeys = saveContext.tempKeys;
     let contentKeys = saveContext.contentKeys;
-    let promise = new Promise<breeze.ISaveResult>((resolve, reject) => {
+    let promise = new Promise<breeze.SaveResult>((resolve, reject) => {
       OData.request({
         headers: core.extend({}, this.headers),
         requestUri: url,
@@ -181,8 +181,8 @@ export class DataServiceODataAdapter extends breeze.AbstractDataServiceAdapter {
         data: requestData
       }, function (data: any, response: any) {
         let entities: any[] = [];
-        let keyMappings: breeze.IKeyMapping[] = [];
-        let saveResult: breeze.ISaveResult = { entities: entities, keyMappings: keyMappings };
+        let keyMappings: breeze.KeyMapping[] = [];
+        let saveResult: breeze.SaveResult = { entities: entities, keyMappings: keyMappings };
         data.__batchResponses.forEach(function (br: any) {
           br.__changeResponses.forEach(function (cr: any) {
             let response = cr.response || cr;
@@ -229,7 +229,7 @@ export class DataServiceODataAdapter extends breeze.AbstractDataServiceAdapter {
   jsonResultsAdapter: JsonResultsAdapter = new breeze.JsonResultsAdapter({
     name: "OData_default",
 
-    visitNode: function (node: any, mappingContext: breeze.MappingContext, nodeContext: breeze.INodeContext) {
+    visitNode: function (node: any, mappingContext: breeze.MappingContext, nodeContext: breeze.NodeContext) {
       let result: any = {};
       if (node == null) return result;
       let metadata = node.__metadata;
@@ -336,11 +336,11 @@ function transformValue(prop: breeze.DataProperty, val: any) {
   return val;
 }
 
-function createChangeRequests(saveContext: ODataSaveContext, saveBundle: breeze.ISaveBundle) {
+function createChangeRequests(saveContext: ODataSaveContext, saveBundle: breeze.SaveBundle) {
   let changeRequestInterceptor = (saveContext.adapter as DataServiceODataAdapter)._createChangeRequestInterceptor(saveContext, saveBundle);
   let changeRequests: any[] = [];
   let tempKeys: breeze.EntityKey[] = [];
-  let contentKeys: breeze.IEntity[] = [];
+  let contentKeys: breeze.Entity[] = [];
   let entityManager = saveContext.entityManager;
   let helper = entityManager.helper;
   let id = 0;
@@ -427,7 +427,7 @@ function fmtProperty(prop: breeze.DataProperty, aspect: breeze.EntityAspect) {
 function createError(error: any, url: string) {
   // OData errors can have the message buried very deeply - and nonobviously
   // this code is tricky so be careful changing the response.body parsing.
-  let result = new Error() as breeze.IServerError;
+  let result = new Error() as breeze.ServerError;
   let response = error && error.response;
   if (!response) {
     // in case DataJS returns "No handler for this data"

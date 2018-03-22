@@ -1,13 +1,13 @@
 ﻿import * as breeze from './breeze';
 
-export class UriBuilderJsonAdapter implements breeze.IUriBuilderAdapter {
+export class UriBuilderJsonAdapter implements breeze.UriBuilderAdapter {
   name: string;
 
   constructor() {
     this.name = "json";
-  };
+  }
 
-  initialize() {};
+  initialize() {}
 
   buildUri(entityQuery: breeze.EntityQuery, metadataStore: breeze.MetadataStore) {
     // force entityType validation;
@@ -21,7 +21,7 @@ export class UriBuilderJsonAdapter implements breeze.IUriBuilderAdapter {
     let urlBody = encodeURIComponent(jsonString);
     return entityQuery.resourceName + "?" + urlBody;
 
-  };
+  }
 
 }
 

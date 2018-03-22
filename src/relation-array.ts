@@ -1,7 +1,7 @@
 import { core, Callback, ErrorCallback } from './core';
-import { IObservableArray, observableArray } from './observable-array';
+import { ObservableArray, observableArray } from './observable-array';
 import { BreezeEvent } from './event';
-import { IEntity  } from './entity-aspect';
+import { Entity  } from './entity-aspect';
 import { DataProperty, NavigationProperty } from './entity-metadata';
 import { EntityState } from './entity-state';
 import { EntityQuery } from './entity-query';
@@ -9,13 +9,13 @@ import { EntityQuery } from './entity-query';
 // TODO: mixin impl is not very typesafe
 
 /** @hidden */
-export interface IRelationArray extends IObservableArray {
-  [index: number]: IEntity;
-  parentEntity: IEntity;
+export interface RelationArray extends ObservableArray {
+  [index: number]: Entity;
+  parentEntity: Entity;
   parentProperty?: DataProperty;
   navigationProperty: NavigationProperty;
   _inProgress?: boolean;
-  _addsInProcess: IEntity[];
+  _addsInProcess: Entity[];
 }
 
 let relationArrayMixin = {
@@ -75,21 +75,21 @@ let relationArrayMixin = {
   },
 
   // virtual impls
-  _getGoodAdds: function(adds: IEntity[]) {
+  _getGoodAdds: function(adds: Entity[]) {
     return getGoodAdds(this, adds);
   },
 
-  _processAdds: function(adds: IEntity[]) {
+  _processAdds: function(adds: Entity[]) {
     processAdds(this, adds);
   },
 
-  _processRemoves: function(removes: IEntity[]) {
+  _processRemoves: function(removes: Entity[]) {
     processRemoves(this, removes);
   }
 
 };
 
-function getGoodAdds(relationArray: IRelationArray, adds: IEntity[]) {
+function getGoodAdds(relationArray: RelationArray, adds: Entity[]) {
   let goodAdds = checkForDups(relationArray, adds);
   if (!goodAdds.length) {
     return goodAdds;
@@ -113,7 +113,7 @@ function getGoodAdds(relationArray: IRelationArray, adds: IEntity[]) {
   return goodAdds;
 }
 
-function processAdds(relationArray: IRelationArray, adds: IEntity[]) {
+function processAdds(relationArray: RelationArray, adds: Entity[]) {
   let parentEntity = relationArray.parentEntity;
   let np = relationArray.navigationProperty;
   let addsInProcess = relationArray._addsInProcess;
@@ -140,7 +140,7 @@ function processAdds(relationArray: IRelationArray, adds: IEntity[]) {
 
 }
 
-function processRemoves(relationArray: IRelationArray, removes: IEntity[]) {
+function processRemoves(relationArray: RelationArray, removes: Entity[]) {
   let inp = relationArray.navigationProperty.inverse;
   if (inp) {
     removes.forEach(function (childEntity) {
@@ -149,12 +149,12 @@ function processRemoves(relationArray: IRelationArray, removes: IEntity[]) {
   }
 }
 
-function checkForDups(relationArray: IRelationArray, adds: IEntity[]) {
+function checkForDups(relationArray: RelationArray, adds: Entity[]) {
   // don't allow dups in this array. - also prevents recursion
   let parentEntity = relationArray.parentEntity;
   let navProp = relationArray.navigationProperty;
   let inverseProp = navProp.inverse;
-  let goodAdds: IEntity[];
+  let goodAdds: Entity[];
   if (inverseProp) {
     goodAdds = adds.filter(function (a) {
       if (relationArray._addsInProcess.indexOf(a) >= 0) {
@@ -185,9 +185,9 @@ function checkForDups(relationArray: IRelationArray, adds: IEntity[]) {
 
 /** For use by breeze plugin authors only. The class is for use in building a [[IModelLibraryAdapter]] implementation. 
 @adapter (see [[IModelLibraryAdapter]])    
-@hidden @internal 
+@hidden 
 */
-export function makeRelationArray(arr: any[], parentEntity: IEntity, navigationProperty: NavigationProperty): IRelationArray {
+export function makeRelationArray(arr: any[], parentEntity: Entity, navigationProperty: NavigationProperty): RelationArray {
   let arrX = arr as any;
   arrX.parentEntity = parentEntity;
   arrX.navigationProperty = navigationProperty;
@@ -196,5 +196,5 @@ export function makeRelationArray(arr: any[], parentEntity: IEntity, navigationP
   arrX._addsInProcess = [];
   // need to use mixins here instead of inheritance because we are starting from an existing array object.
   core.extend(arrX, observableArray.mixin);
-  return core.extend(arrX, relationArrayMixin) as IRelationArray;
+  return core.extend(arrX, relationArrayMixin) as RelationArray;
 }

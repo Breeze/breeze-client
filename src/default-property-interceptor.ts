@@ -1,12 +1,12 @@
 ﻿import { core } from './core';
 import { ComplexType, DataProperty, NavigationProperty, EntityProperty } from './entity-metadata';
 import { EntityKey } from './entity-key';
-import { EntityAspect, ComplexAspect, IEntity, IStructuralObject } from './entity-aspect';
+import { EntityAspect, ComplexAspect, Entity, StructuralObject } from './entity-aspect';
 import { EntityState } from './entity-state';
 import { EntityAction } from './entity-action';
 
 /** @hidden @internal */
-export function defaultPropertyInterceptor(this: IStructuralObject, property: EntityProperty, newValue: any, rawAccessorFn: Function) {
+export function defaultPropertyInterceptor(this: StructuralObject, property: EntityProperty, newValue: any, rawAccessorFn: Function) {
   // 'this' is the entity itself in this context.
 
   if (newValue === undefined) newValue = null;
@@ -84,7 +84,7 @@ export function defaultPropertyInterceptor(this: IStructuralObject, property: En
 }
 
 interface IContext {
-  parent: IStructuralObject;
+  parent: StructuralObject;
   property: EntityProperty;
   propertyName: string;
   entityAspect: EntityAspect;
@@ -120,7 +120,7 @@ function setDpValueSimple(context: IContext, rawAccessorFn: any) {
   if (property.isPartOfKey && entityManager && !entityManager.isLoading) {
     // 'entityType' on the next line be null for complex properties but it will only be ref'd within this
     // fn when the property is part of the key
-    let entityType = (parent as IEntity).entityType;
+    let entityType = (parent as Entity).entityType;
     let keyProps = entityType.keyProperties;
     let values = keyProps.map(function (p) {
       if (p === property) {
@@ -133,7 +133,7 @@ function setDpValueSimple(context: IContext, rawAccessorFn: any) {
     if (entityManager.findEntityByKey(newKey)) {
       throw new Error("An entity with this key is already in the cache: " + newKey.toString());
     }
-    let oldKey = (parent as IEntity).entityAspect.getKey();
+    let oldKey = (parent as Entity).entityAspect.getKey();
     let eg = entityManager._findEntityGroup(entityType);
     eg._replaceKey(oldKey, newKey);
   }
@@ -161,7 +161,7 @@ function setDpValueSimple(context: IContext, rawAccessorFn: any) {
         parent.setProperty(relatedNavProp.name, relatedEntity);
       } else {
         // it may not have been fetched yet in which case we want to add it as an unattachedChild.
-        entityManager._unattachedChildrenMap.addChild(key, relatedNavProp, parent as IEntity);
+        entityManager._unattachedChildrenMap.addChild(key, relatedNavProp, parent as Entity);
         parent.setProperty(relatedNavProp.name, null);
       }
     } else {
@@ -213,7 +213,7 @@ function setDpValueSimple(context: IContext, rawAccessorFn: any) {
         }
       } else {
         // it may not have been fetched yet in which case we want to add it as an unattachedChild.
-        entityManager._unattachedChildrenMap.addChild(key, invNavProp, parent as IEntity);
+        entityManager._unattachedChildrenMap.addChild(key, invNavProp, parent as Entity);
       }
     }
 
@@ -226,7 +226,7 @@ function setDpValueSimple(context: IContext, rawAccessorFn: any) {
   // if (property.isPartOfKey && (!this.complexAspect)) {
   if (property.isPartOfKey) {
     // propogate pk change to all related entities;
-    let entityType = (parent as IEntity).entityType;
+    let entityType = (parent as Entity).entityType;
     let propertyIx = entityType.keyProperties.indexOf(property);
     // this part handles order.orderId => orderDetail.orderId
     // but won't handle product.productId => orderDetail.productId because product
@@ -297,7 +297,7 @@ function setDpValueComplex(context: IContext, rawAccessorFn: Function) {
 
 function setNpValue(context: IContext, rawAccessorFn: Function) {
 
-  let parent = context.parent as IEntity;
+  let parent = context.parent as Entity;
   let property = context.property as NavigationProperty;
   let entityAspect = context.entityAspect;
   let oldValue = context.oldValue;

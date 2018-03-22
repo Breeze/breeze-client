@@ -2,10 +2,10 @@
 
 let core = breeze.core;
 
-export class AjaxAngularAdapter implements breeze.IAjaxAdapter {
+export class AjaxAngularAdapter implements breeze.AjaxAdapter {
   name: string;
   defaultSettings: { headers?: any };
-  requestInterceptor?: (() => breeze.IChangeRequestInterceptor) | breeze.IChangeRequestInterceptor;
+  requestInterceptor?: (() => breeze.ChangeRequestInterceptor) | breeze.ChangeRequestInterceptor;
   $http: any;
   $rootScope: any;
   constructor() {

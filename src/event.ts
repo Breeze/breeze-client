@@ -28,7 +28,7 @@ function fallbackErrorHandler(e: Error) {
 
 
 /** @hidden @internal */
-export interface ISubscription {
+export interface Subscription {
   unsubKey: number;
   callback: (data: any) => any;
 }
@@ -47,7 +47,7 @@ export class BreezeEvent<T> {
   publisher: Object;
 
   /** @hidden @internal */
-  _subscribers: ISubscription[];
+  _subscribers: Subscription[];
   /** @hidden @internal */
   _defaultErrorCallback: (e: Error) => any;
 

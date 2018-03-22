@@ -11,19 +11,19 @@ export const INT32_MAX = 2147483647;
 export const BYTE_MIN = 0;
 export const BYTE_MAX = 255;
 
-export interface IValidationContext {
+export interface ValidationContext {
   property?: any;
   propertyName?: string;
   value?: any;
 }
 
-export interface IValidationFn {
+export interface ValidationFn {
     (value: any, context?: any): boolean;
 }
 
 // add common props and methods for every validator 'context' here.
 let rootContext = {
-  displayName: function (context: IValidationContext) {
+  displayName: function (context: ValidationContext) {
     if (context.property) {
       return context.property.resolveProperty("displayName") || context.propertyName || context.property.name;
     } else {
@@ -172,12 +172,12 @@ export class Validator {
   _$typeName: string; // on proto
 
   name: string;
-  valFn: IValidationFn;
-  context: IValidationContext;
+  valFn: ValidationFn;
+  context: ValidationContext;
   currentContext: any;
   private _baseContext: any;
 
-  constructor(name: string, valFn: IValidationFn, context?: any) {
+  constructor(name: string, valFn: ValidationFn, context?: any) {
     // _baseContext is what will get serialized
     this._baseContext = context || {};
     this._baseContext.name = name;
@@ -229,7 +229,7 @@ export class Validator {
   @return {ValidationError|null} A ValidationError if validation fails, null otherwise
   **/
   validate(value: any, additionalContext: any) {
-    let currentContext: IValidationContext; // { value?: Object };
+    let currentContext: ValidationContext; // { value?: Object };
     if (additionalContext) {
       currentContext = core.extend(Object.create(this.context), additionalContext);
     } else {
@@ -325,7 +325,7 @@ export class Validator {
   @param validatorFactory {Function} A function that optionally takes a context property and returns a Validator instance.
   @param name {String} The name of the validator.
   **/
-  public static registerFactory(validatorFn: IValidationFn, name: string) {
+  public static registerFactory(validatorFn: ValidationFn, name: string) {
     config.registerFunction(validatorFn, "Validator." + name);
   }
 

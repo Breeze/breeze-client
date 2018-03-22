@@ -3,10 +3,10 @@
 declare var jQuery: any;
 let core = breeze.core;
 
-export class AjaxJQueryAdapter implements breeze.IAjaxAdapter {
+export class AjaxJQueryAdapter implements breeze.AjaxAdapter {
   name: string;
   defaultSettings: { headers?: any };
-  requestInterceptor?: (() => breeze.IChangeRequestInterceptor) | breeze.IChangeRequestInterceptor;
+  requestInterceptor?: (() => breeze.ChangeRequestInterceptor) | breeze.ChangeRequestInterceptor;
   jQuery: any;
 
   constructor() {

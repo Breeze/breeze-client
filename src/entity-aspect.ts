@@ -1,4 +1,4 @@
-﻿import { IValidationErrorsChangedEventArgs } from './entity-aspect';
+﻿import { ValidationErrorsChangedEventArgs } from './entity-aspect';
 import { core } from './core';
 import { config } from './config';
 import { BreezeEvent } from './event';
@@ -8,14 +8,16 @@ import { EntityAction } from './entity-action';
 import { EntityType, ComplexType, DataProperty, NavigationProperty, EntityProperty } from './entity-metadata';
 import { EntityKey } from './entity-key';
 import { EntityGroup } from './entity-group';
-import { EntityManager, IQueryResult, QueryErrorCallback, QuerySuccessCallback } from './entity-manager';
+import { EntityManager, QueryResult, QueryErrorCallback, QuerySuccessCallback } from './entity-manager';
 import { Validator, ValidationError } from './validate';
 import { EntityQuery } from './entity-query';
 
-export interface IEntity {
+export interface Entity {
   entityAspect: EntityAspect;
   entityType: EntityType;
+  /** @internal */
   getProperty(prop: string): any;
+  /** @internal */
   setProperty(prop: any, value: any): void;
   /** @hidden @internal */
   prototype: { _$typeName: string };
@@ -23,7 +25,7 @@ export interface IEntity {
   _$entityType: EntityType;
 }
 
-export interface IComplexObject {
+export interface ComplexObject {
   complexAspect: ComplexAspect;
   complexType: ComplexType;
   getProperty(prop: string): any;
@@ -32,19 +34,19 @@ export interface IComplexObject {
   prototype: { _$typeName: string };
 }
 
-export type IStructuralObject = IEntity | IComplexObject;
+export type StructuralObject = Entity | ComplexObject;
 
-export interface IPropertyChangedEventArgs {
-  entity: IEntity;
+export interface PropertyChangedEventArgs {
+  entity: Entity;
   propertyName: string | null;
-  parent?: IStructuralObject;
+  parent?: StructuralObject;
   property?: EntityProperty;
   oldValue?: any;
   newValue?: any;
 }
 
-export interface IValidationErrorsChangedEventArgs {
-  entity: IEntity;
+export interface ValidationErrorsChangedEventArgs {
+  entity: Entity;
   added: ValidationError[];
   removed: ValidationError[];
 }
@@ -65,7 +67,7 @@ a query, import or [[EntityManager.createEntity]] call.
 **/
 export class EntityAspect {
   /** The Entity that this aspect is associated with. __Read Only__  **/
-  entity?: IEntity;
+  entity?: Entity;
   /** The [[EntityManager]] that contains this entity. __Read Only__ **/
   entityManager?: EntityManager;
   /**  @hidden @internal */
@@ -106,7 +108,7 @@ export class EntityAspect {
 >      });
   @event
   **/
-  validationErrorsChanged: BreezeEvent<IValidationErrorsChangedEventArgs>;
+  validationErrorsChanged: BreezeEvent<ValidationErrorsChangedEventArgs>;
   /**
   A [[BreezeEvent]] that fires whenever a value of one of this entity's properties change.
   @eventArgs -
@@ -131,7 +133,7 @@ export class EntityAspect {
   >      });
   @event
   **/
-  propertyChanged: BreezeEvent<IPropertyChangedEventArgs>;
+  propertyChanged: BreezeEvent<PropertyChangedEventArgs>;
 
   /** @hidden @internal */
   _validationErrors: { [index: string]: ValidationError };
@@ -146,11 +148,11 @@ export class EntityAspect {
   /** @hidden @internal */
   _inProcess: any[]; // used in defaultPropertyInterceptor for temp storage.
   /** @hidden @internal */
-  _inProcessEntity?: IEntity; // used in EntityManager
+  _inProcessEntity?: Entity; // used in EntityManager
   /** @hidden @internal */
   static _nullInstance = new EntityAspect(); // TODO: determine if this works
   /** @hidden @internal */
-  constructor(entity?: IEntity) {
+  constructor(entity?: Entity) {
 
     // if called without new
     // if (!(this instanceof EntityAspect)) {
@@ -193,12 +195,12 @@ export class EntityAspect {
 
   /** @hidden @internal */
   // type-guard
-  static isEntity(obj: IStructuralObject): obj is IEntity {
+  static isEntity(obj: StructuralObject): obj is Entity {
     return (obj as any).entityAspect != null;
   }
 
   // No longer used
-  // static createFrom(entity: IEntity): EntityAspect {
+  // static createFrom(entity: Entity): EntityAspect {
   //   if (entity == null) {
   //     return EntityAspect._nullInstance;
   //   } else if (entity.entityAspect) {
@@ -214,7 +216,7 @@ export class EntityAspect {
   The propertyPath can be either a string delimited with '.' or a string array.  
   **/
   // used by EntityQuery and Predicate
-  static getPropertyPathValue(obj: IEntity, propertyPath: string | string[]) {
+  static getPropertyPathValue(obj: Entity, propertyPath: string | string[]) {
     let properties = Array.isArray(propertyPath) ? propertyPath : propertyPath.split(".");
     if (properties.length === 1) {
       return obj.getProperty(propertyPath as string);
@@ -416,8 +418,8 @@ export class EntityAspect {
     return true;
   }
 
-  loadNavigationProperty(navigationProperty: string, callback?: QuerySuccessCallback, errorCallback?: QueryErrorCallback): Promise<IQueryResult>
-  loadNavigationProperty(navigationProperty: NavigationProperty, callback?: QuerySuccessCallback, errorCallback?: QueryErrorCallback): Promise<IQueryResult>;
+  loadNavigationProperty(navigationProperty: string, callback?: QuerySuccessCallback, errorCallback?: QueryErrorCallback): Promise<QueryResult>
+  loadNavigationProperty(navigationProperty: NavigationProperty, callback?: QuerySuccessCallback, errorCallback?: QueryErrorCallback): Promise<QueryResult>;
   /**
   Performs a query for the value of a specified [[NavigationProperty]]. __Async__
   >      emp.entityAspect.loadNavigationProperty("Orders").then(function (data) {
@@ -772,7 +774,7 @@ function rejectChangesCore(target: any) {
   });
 }
 
-function removeFromRelations(entity: IEntity, entityState: EntityState) {
+function removeFromRelations(entity: Entity, entityState: EntityState) {
   // remove this entity from any collections.
   // mark the entity deleted or detached
 
@@ -786,7 +788,7 @@ function removeFromRelations(entity: IEntity, entityState: EntityState) {
   }
 }
 
-function removeFromRelationsCore(entity: IEntity) {
+function removeFromRelationsCore(entity: Entity) {
   entity.entityType.navigationProperties.forEach(function (np) {
     let inverseNp = np.inverse;
     let npValue = entity.getProperty(np.name);
@@ -889,19 +891,19 @@ entity via either a query, import or EntityManager.createEntity call.
 export class ComplexAspect {
 
   /** The complex object that this aspect is associated with. __Read Only__ */
-  complexObject: IComplexObject;
+  complexObject: ComplexObject;
   /** The 'original values' of this complex object where they are different from the 'current values'.
   This is a map where the key is a property name and the value is the 'original value' of the property.
   __Read Only__ */
   originalValues: {};
   /** The parent object that to which this aspect belongs; this will either be an entity or another complex object. __Read Only__ */
-  parent?: IStructuralObject;
+  parent?: StructuralObject;
   /** The [[DataProperty]] on the 'parent' that contains this complex object. __Read Only__ */
   parentProperty?: DataProperty;
   extraMetadata?: any;
 
   /** You will rarely, if ever, create a ComplexAspect directly. */
-  constructor(complexObject: IComplexObject, parent: IStructuralObject, parentProperty: DataProperty) {
+  constructor(complexObject: ComplexObject, parent: StructuralObject, parentProperty: DataProperty) {
     if (!complexObject) {
       throw new Error("The  ComplexAspect ctor requires an entity as its only argument.");
     }

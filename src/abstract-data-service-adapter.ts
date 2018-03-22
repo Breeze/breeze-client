@@ -1,24 +1,24 @@
 ﻿import { core } from './core';
 import { config } from './config';
 import { EntityQuery } from './entity-query';
-import { IDataServiceAdapter, IAjaxAdapter, IChangeRequestInterceptorCtor, IChangeRequestInterceptor } from './interface-registry';
-import { IEntity } from './entity-aspect';
+import { DataServiceAdapter, AjaxAdapter, ChangeRequestInterceptorCtor, ChangeRequestInterceptor } from './interface-registry';
+import { Entity } from './entity-aspect';
 import { MappingContext } from './mapping-context';
 import { DataService, JsonResultsAdapter } from './data-service';
-import { IHttpResponse, ISaveContext, ISaveBundle, IServerError, ISaveResult, ISaveErrorFromServer, IQueryResult } from './entity-manager';
+import { HttpResponse, SaveContext, SaveBundle, ServerError, SaveResult, SaveErrorFromServer, QueryResult } from './entity-manager';
 import { MetadataStore } from './entity-metadata';
 
 /** For use by breeze plugin authors only.  The class is used as the base class for most [[IDataServiceAdapter]] implementations
 @adapter (see [[IDataServiceAdapter]])    
 @hidden
 */
-export abstract class AbstractDataServiceAdapter implements IDataServiceAdapter {
+export abstract class AbstractDataServiceAdapter implements DataServiceAdapter {
   /** @hidden @internal */
   _$impl?: any;
   /** The name of this adapter. */
   name: string;
   /** The [[IAjaxAdapter]] used by this [[IDataServiceAdapter]]. */
-  ajaxImpl: IAjaxAdapter;
+  ajaxImpl: AjaxAdapter;
 
   constructor() {
   }
@@ -32,7 +32,7 @@ export abstract class AbstractDataServiceAdapter implements IDataServiceAdapter 
   }
 
   initialize() {
-    this.ajaxImpl = config.getAdapterInstance<IAjaxAdapter>("ajax") !;
+    this.ajaxImpl = config.getAdapterInstance<AjaxAdapter>("ajax") !;
 
     // don't cache 'ajax' because then we would need to ".bind" it, and don't want to because of brower support issues.
     if (this.ajaxImpl && this.ajaxImpl.ajax) {
@@ -51,7 +51,7 @@ export abstract class AbstractDataServiceAdapter implements IDataServiceAdapter 
         type: "GET",
         url: url,
         dataType: 'json',
-        success: (httpResponse: IHttpResponse) => {
+        success: (httpResponse: HttpResponse) => {
 
           // might have been fetched by another query
           if (metadataStore.hasMetadataFor(serviceName)) {
@@ -75,7 +75,7 @@ export abstract class AbstractDataServiceAdapter implements IDataServiceAdapter 
           resolve(metadata);
 
         },
-        error: (httpResponse: IHttpResponse) => {
+        error: (httpResponse: HttpResponse) => {
           handleHttpError(reject, httpResponse, "Metadata query failed for: " + url);
         }
       });
@@ -85,7 +85,7 @@ export abstract class AbstractDataServiceAdapter implements IDataServiceAdapter 
 
   executeQuery(mappingContext: MappingContext) {
     mappingContext.adapter = this;
-    let promise = new Promise<IQueryResult>((resolve, reject) => {
+    let promise = new Promise<QueryResult>((resolve, reject) => {
       let url = mappingContext.getUrl();
 
       let params = {
@@ -93,10 +93,10 @@ export abstract class AbstractDataServiceAdapter implements IDataServiceAdapter 
         url: url,
         params: (mappingContext.query as EntityQuery).parameters,
         dataType: 'json',
-        success: function (httpResponse: IHttpResponse) {
+        success: function (httpResponse: HttpResponse) {
           let data = httpResponse.data;
           try {
-            let rData: IQueryResult;
+            let rData: QueryResult;
             let results = data && (data.results || data.Results);
             if (results) {
               rData = { results: results, inlineCount: data.inlineCount || data.InlineCount, 
@@ -115,7 +115,7 @@ export abstract class AbstractDataServiceAdapter implements IDataServiceAdapter 
           }
 
         },
-        error: function (httpResponse: IHttpResponse) {
+        error: function (httpResponse: HttpResponse) {
           handleHttpError(reject, httpResponse);
         },
         crossDomain: false
@@ -129,21 +129,21 @@ export abstract class AbstractDataServiceAdapter implements IDataServiceAdapter 
     return promise;
   }
 
-  saveChanges(saveContext: ISaveContext, saveBundle: ISaveBundle) {
+  saveChanges(saveContext: SaveContext, saveBundle: SaveBundle) {
     let adapter = saveContext.adapter = this;
 
     let saveBundleSer = adapter._prepareSaveBundle(saveContext, saveBundle);
     let bundle = JSON.stringify(saveBundleSer);
 
     let url = saveContext.dataService.qualifyUrl(saveContext.resourceName);
-    let promise = new Promise<ISaveResult>((resolve, reject) => {
+    let promise = new Promise<SaveResult>((resolve, reject) => {
       this.ajaxImpl.ajax({
         type: "POST",
         url: url,
         dataType: 'json',
         contentType: "application/json",
         data: bundle,
-        success: function (httpResponse: IHttpResponse) {
+        success: function (httpResponse: HttpResponse) {
           httpResponse.saveContext = saveContext;
           let data = httpResponse.data;
           if (data.Errors || data.errors) {
@@ -154,7 +154,7 @@ export abstract class AbstractDataServiceAdapter implements IDataServiceAdapter 
             resolve(saveResult);
           }
         },
-        error: function (httpResponse: IHttpResponse) {
+        error: function (httpResponse: HttpResponse) {
           httpResponse.saveContext = saveContext;
           handleHttpError(reject, httpResponse);
         }
@@ -167,7 +167,7 @@ export abstract class AbstractDataServiceAdapter implements IDataServiceAdapter 
   /** Abstract method that needs to be overwritten in any concrete DataServiceAdapter subclass. 
   The return value from this method should be a serializable object that will be sent to the server after calling JSON.stringify on it.
   */
-  _prepareSaveBundle(saveContext: ISaveContext, saveBundle: ISaveBundle): any {
+  _prepareSaveBundle(saveContext: SaveContext, saveBundle: SaveBundle): any {
     // The implementor should call _createChangeRequestInterceptor
     throw new Error("Need a concrete implementation of _prepareSaveBundle");
   }
@@ -198,10 +198,10 @@ export abstract class AbstractDataServiceAdapter implements IDataServiceAdapter 
   @param saveBundle - Contains the array of entities-to-be-saved (AKA, the entity change-set).
   @return Constructor for a "ChangeRequestInterceptor".
   **/
-  changeRequestInterceptor: IChangeRequestInterceptorCtor = DefaultChangeRequestInterceptor;
+  changeRequestInterceptor: ChangeRequestInterceptorCtor = DefaultChangeRequestInterceptor;
 
   /** @hidden @internal */
-  _createChangeRequestInterceptor(saveContext: ISaveContext, saveBundle: ISaveBundle) {
+  _createChangeRequestInterceptor(saveContext: SaveContext, saveBundle: SaveBundle) {
     let adapter = saveContext.adapter!;
     let cri = adapter.changeRequestInterceptor;
     let isFn = core.isFunction;
@@ -218,14 +218,14 @@ export abstract class AbstractDataServiceAdapter implements IDataServiceAdapter 
       }
       return interceptor;
     } else {
-      return new DefaultChangeRequestInterceptor(saveContext, saveBundle) as IChangeRequestInterceptor;
+      return new DefaultChangeRequestInterceptor(saveContext, saveBundle) as ChangeRequestInterceptor;
     }
   }
 
   /** Abstract method that needs to be overwritten in any concrete DataServiceAdapter sublclass. 
   This method needs to take the result returned the server and convert it into an ISaveResult. 
   */
-  _prepareSaveResult(saveContext: ISaveContext, data: any): ISaveResult {
+  _prepareSaveResult(saveContext: SaveContext, data: any): SaveResult {
     throw new Error("Need a concrete implementation of _prepareSaveResult");
   }
 
@@ -234,7 +234,7 @@ export abstract class AbstractDataServiceAdapter implements IDataServiceAdapter 
   http connection issues. 
   */
   // Put this at the bottom of your http error analysis
-  static _catchNoConnectionError(err: IServerError) {
+  static _catchNoConnectionError(err: ServerError) {
     if (err.status === 0 && err.message == null) {
       err.message = "HTTP response status 0 and no message.  " +
         "Likely did not or could not reach server. Is the server running?";
@@ -250,7 +250,7 @@ export abstract class AbstractDataServiceAdapter implements IDataServiceAdapter 
   });
 }
 
-function handleHttpError(reject: (reason?: any) => void, httpResponse: IHttpResponse, messagePrefix?: string) {
+function handleHttpError(reject: (reason?: any) => void, httpResponse: HttpResponse, messagePrefix?: string) {
   let err = createError(httpResponse);
   AbstractDataServiceAdapter._catchNoConnectionError(err);
   if (messagePrefix) {
@@ -259,8 +259,8 @@ function handleHttpError(reject: (reason?: any) => void, httpResponse: IHttpResp
   reject(err);
 }
 
-function createError(httpResponse: IHttpResponse) {
-  let err = new Error() as IServerError;
+function createError(httpResponse: HttpResponse) {
+  let err = new Error() as ServerError;
   err.httpResponse = httpResponse;
   err.status = httpResponse.status;
 
@@ -319,7 +319,7 @@ function createError(httpResponse: IHttpResponse) {
     entityErrors.forEach(function (e) {
       e.propertyName = e.propertyName && propNameFn(e.propertyName);
     });
-    (err as ISaveErrorFromServer).entityErrors = entityErrors;
+    (err as SaveErrorFromServer).entityErrors = entityErrors;
   }
 
   err.message = message || "Server side errors encountered - see the entityErrors collection on this object for more detail";
@@ -329,11 +329,11 @@ function createError(httpResponse: IHttpResponse) {
 
 /** This is a default, no-op implementation that developers can replace. */
 class DefaultChangeRequestInterceptor {
-  constructor(saveContext: ISaveContext, saveBundle: ISaveBundle) {
+  constructor(saveContext: SaveContext, saveBundle: SaveBundle) {
 
   }
 
-  getRequest(request: any, entity: IEntity, index: number) {
+  getRequest(request: any, entity: Entity, index: number) {
     return request;
   }
 

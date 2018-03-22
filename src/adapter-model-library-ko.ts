@@ -10,11 +10,11 @@ let core = breeze.core;
 let canIsolateES5Props = core.isES5Supported;
 let ko: any;
 
-export class ModelLibraryKnockoutAdapter implements breeze.IModelLibraryAdapter {
+export class ModelLibraryKnockoutAdapter implements breeze.ModelLibraryAdapter {
   name: string;
   constructor() {
     this.name = "ko";
-  };
+  }
 
   initialize() {
     ko = core.requireLib("ko;knockout", "The Knockout library");
@@ -41,7 +41,7 @@ export class ModelLibraryKnockoutAdapter implements breeze.IModelLibraryAdapter 
       return result;
     };
 
-  };
+  }
 
   getTrackablePropertyNames(entity: any) {
     let names: string[] = [];
@@ -62,7 +62,7 @@ export class ModelLibraryKnockoutAdapter implements breeze.IModelLibraryAdapter 
       }
     }
     return names;
-  };
+  }
 
   initializeEntityPrototype(proto: any) {
 
@@ -80,7 +80,7 @@ export class ModelLibraryKnockoutAdapter implements breeze.IModelLibraryAdapter 
       isolateES5Props(proto);
     }
 
-  };
+  }
 
   startTracking(entity: any, proto: any) {
     // create ko's for each property and assign defaultValues
@@ -172,7 +172,7 @@ export class ModelLibraryKnockoutAdapter implements breeze.IModelLibraryAdapter 
 
     });
 
-  };
+  }
 }
 
 breeze.config.registerAdapter("modelLibrary", ModelLibraryKnockoutAdapter);

@@ -1,25 +1,25 @@
 import { core } from './core';
 import { assertConfig } from './assert-param';
-import { config, InterfaceDef, IBaseAdapter } from './config';
+import { config, InterfaceDef, BaseAdapter } from './config';
 import { MappingContext } from './mapping-context';
 import { EntityQuery } from './entity-query';
 import { MetadataStore } from './entity-metadata';
 import { JsonResultsAdapter, DataService } from './data-service';
-import { IEntity } from './entity-aspect';
-import { ISaveContext, ISaveBundle, IQueryResult, ISaveResult } from './entity-manager';
+import { Entity } from './entity-aspect';
+import { SaveContext, SaveBundle, QueryResult, SaveResult } from './entity-manager';
 
 export interface InterfaceRegistryConfig {
-    ajax?: InterfaceDef<IAjaxAdapter>;
-    modelLibrary?: InterfaceDef<IModelLibraryAdapter>;
-    dataService?: InterfaceDef<IDataServiceAdapter>;
-    uriBuilder?: InterfaceDef<IUriBuilderAdapter>;
+    ajax?: InterfaceDef<AjaxAdapter>;
+    modelLibrary?: InterfaceDef<ModelLibraryAdapter>;
+    dataService?: InterfaceDef<DataServiceAdapter>;
+    uriBuilder?: InterfaceDef<UriBuilderAdapter>;
 }
 
 export class InterfaceRegistry {
-    ajax = new InterfaceDef<IAjaxAdapter>("ajax");
-    modelLibrary = new InterfaceDef<IModelLibraryAdapter>("modelLibrary");
-    dataService = new InterfaceDef<IDataServiceAdapter>("dataService");
-    uriBuilder = new InterfaceDef<IUriBuilderAdapter>("uriBuilder");
+    ajax = new InterfaceDef<AjaxAdapter>("ajax");
+    modelLibrary = new InterfaceDef<ModelLibraryAdapter>("modelLibrary");
+    dataService = new InterfaceDef<DataServiceAdapter>("dataService");
+    uriBuilder = new InterfaceDef<UriBuilderAdapter>("uriBuilder");
 }
 
 // This module describes the interfaceRegistry by extending config
@@ -74,38 +74,38 @@ config.initializeAdapterInstances = function (irConfig: InterfaceRegistryConfig)
 };
 
 
-export interface IAjaxAdapter extends IBaseAdapter {
+export interface AjaxAdapter extends BaseAdapter {
     ajax(config: any): void;
 }
 
-export interface IModelLibraryAdapter extends IBaseAdapter {
+export interface ModelLibraryAdapter extends BaseAdapter {
     getTrackablePropertyNames: (entity: any) => string[];
     initializeEntityPrototype(proto: Object): void;
     startTracking(entity: any, entityCtor: Function): void;
     createCtor?: Function;
 }
 
-export interface IDataServiceAdapter extends IBaseAdapter {
+export interface DataServiceAdapter extends BaseAdapter {
     fetchMetadata(metadataStore: MetadataStore, dataService: DataService): Promise<any>;  // result of Promise is either rawMetadata or a string explaining why not.
-    executeQuery(mappingContext: MappingContext): Promise<IQueryResult>;   // result of executeQuery will get passed to JsonResultsAdapter extractResults method
-    saveChanges(saveContext: ISaveContext, saveBundle: ISaveBundle): Promise<ISaveResult>;
-    changeRequestInterceptor: IChangeRequestInterceptorCtor;
+    executeQuery(mappingContext: MappingContext): Promise<QueryResult>;   // result of executeQuery will get passed to JsonResultsAdapter extractResults method
+    saveChanges(saveContext: SaveContext, saveBundle: SaveBundle): Promise<SaveResult>;
+    changeRequestInterceptor: ChangeRequestInterceptorCtor;
     jsonResultsAdapter: JsonResultsAdapter;
 }
 
 
 
-export interface IUriBuilderAdapter extends IBaseAdapter {
+export interface UriBuilderAdapter extends BaseAdapter {
     buildUri(query: EntityQuery, metadataStore: MetadataStore): string;
 }
 
 // -----------------------------------
 
-export interface IChangeRequestInterceptorCtor {
-    new (saveContext: ISaveContext, saveBundle: ISaveBundle): IChangeRequestInterceptor;
+export interface ChangeRequestInterceptorCtor {
+    new (saveContext: SaveContext, saveBundle: SaveBundle): ChangeRequestInterceptor;
 }
 
-export interface IChangeRequestInterceptor {
+export interface ChangeRequestInterceptor {
     oneTime?: boolean;
     /**
      Prepare and return the save data for an entity change-set.
@@ -127,7 +127,7 @@ export interface IChangeRequestInterceptor {
      @param index {Integer} The zero-based index of this entity in the change-set array
      @return {Function} The potentially revised request.
      **/
-    getRequest(request: any, entity: IEntity, index: number): any;
+    getRequest(request: any, entity: Entity, index: number): any;
 
     /**
      Last chance to change anything about the 'requests' array

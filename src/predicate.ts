@@ -1,46 +1,46 @@
 ﻿import { core } from './core';
 import { EntityType, StructuralType, DataProperty  } from './entity-metadata';
-import { IQueryOp } from './entity-query';
+import { QueryOp } from './entity-query';
 import { DataType  } from './data-type';
-import { EntityAspect, IEntity } from './entity-aspect';
+import { EntityAspect, Entity } from './entity-aspect';
 import { LocalQueryComparisonOptions } from './local-query-comparison-options';
 
-export interface IOp {
+export interface Op {
   key: string;
   aliases?: string[];
   isFunction?: boolean;
 }
 
 /** @hidden @internal */
-export interface IOpMap {
-  [key: string]: IOp;
+export interface OpMap {
+  [key: string]: Op;
 }
 
 /** For use by breeze plugin authors only. The class is for use in building a [[IUriBuilderAdapter]] implementation. 
 @adapter (see [[IUriBuilderAdapter]])    
-@hidden @internal 
+@hidden 
 */
-export interface IVisitor {
+export interface Visitor {
 
 }
 
 /** For use by breeze plugin authors only. The class is for use in building a [[IUriBuilderAdapter]] implementation. 
 @adapter (see [[IUriBuilderAdapter]])    
-@hidden @internal 
+@hidden 
 */
-export interface IVisitContext {
+export interface VisitContext {
   entityType?: EntityType;
   // usesNameOnServer?: boolean;
   toNameOnServer?: boolean;
   useExplicitDataType?: boolean;
-  visitor?: IVisitor;
+  visitor?: Visitor;
 }
 
 /** For use by breeze plugin authors only. The class is for use in building a [[IUriBuilderAdapter]] implementation. 
 @adapter (see [[IUriBuilderAdapter]])    
-@hidden @internal 
+@hidden 
 */
-export interface IExpressionContext {
+export interface ExpressionContext {
   entityType?: EntityType;
   usesNameOnServer?: boolean;
   dataType?: DataType | string;
@@ -53,11 +53,11 @@ Used to define a 'where' predicate for an [[EntityQuery]].  Predicates are immut
 method that would modify a Predicate actually returns a new Predicate.
 **/
 export class Predicate {
-  op: IOp;
+  op: Op;
   /** @hidden @internal */
   _entityType?: EntityType;
   /** @hidden @internal */
-  aliasMap: IOpMap;
+  aliasMap: OpMap;
   visitorMethodName: string;
 
 
@@ -290,7 +290,7 @@ export class Predicate {
   @adapter (see [[IUriBuilderAdapter]])    
   @hidden @internal 
   */
-  toJSONExt(context: IVisitContext) {
+  toJSONExt(context: VisitContext) {
     return this.visit(context, toJSONVisitor);
   }
 
@@ -298,7 +298,7 @@ export class Predicate {
   @adapter (see [[IUriBuilderAdapter]])    
   @hidden @internal 
   */
-  toFunction(context: IVisitContext) {
+  toFunction(context: VisitContext) {
     return this.visit(context, toFunctionVisitor);
   }
 
@@ -310,7 +310,7 @@ export class Predicate {
   @adapter (see [[IUriBuilderAdapter]])    
   @hidden @internal 
   */
-  visit(context: IVisitContext, visitor?: IVisitor) {
+  visit(context: VisitContext, visitor?: Visitor) {
     if (core.isEmpty(context)) {
       context = { entityType: undefined };
     } else if (context instanceof EntityType) {
@@ -346,12 +346,12 @@ export class Predicate {
     this.visitorMethodName = visitorMethodName;
     let aliasMap = this.aliasMap = {};
     for (let op in opMap ) {
-      updateAliasMap(aliasMap, op, opMap[op] as IOp);
+      updateAliasMap(aliasMap, op, opMap[op] as Op);
     }
   }
 
   /** @hidden @internal */
-  _resolveOp(op: string | IQueryOp, okIfNotFound?: boolean) {
+  _resolveOp(op: string | QueryOp, okIfNotFound?: boolean) {
     let opStr = (typeof op === "string") ? op : op.operator;
     let result = this.aliasMap[opStr.toLowerCase()];
     if (!result && !okIfNotFound) {
@@ -453,7 +453,7 @@ function argsForAndOrPredicates(obj: {}, args: any[]) {
   return [obj].concat(preds);
 }
 
-function updateAliasMap(aliasMap: IOpMap, opStr: string, op: IOp) {
+function updateAliasMap(aliasMap: OpMap, opStr: string, op: Op) {
   let key = opStr.toLowerCase();
   op.key = key;
   aliasMap[key] = op;
@@ -483,9 +483,9 @@ PassthruPredicate.prototype._initialize('passthruPredicate');
 @hidden 
 */
 export class UnaryPredicate extends Predicate {
-  op: IOp;
+  op: Op;
   pred: Predicate;
-  constructor(op: string | IQueryOp, ...args: any[]) {
+  constructor(op: string | QueryOp, ...args: any[]) {
     super();
     this.op = this._resolveOp(op);
     this.pred = new Predicate(args);
@@ -502,15 +502,15 @@ UnaryPredicate.prototype._initialize('unaryPredicate', {
 
 /** For use by breeze plugin authors only. The class is for use in building a [[IUriBuilderAdapter]] implementation. 
 @adapter (see [[IUriBuilderAdapter]])    
-@hidden @internal 
+@hidden 
 */
 export class BinaryPredicate extends Predicate {
-  op: IOp;
+  op: Op;
   expr1Source: any;
   expr2Source: any;
   expr1?: PredicateExpression;
   expr2?: PredicateExpression;
-  constructor(op: string | IQueryOp, expr1: any, expr2: any) {
+  constructor(op: string | QueryOp, expr1: any, expr2: any) {
     super();
     // 5 public props op, expr1Source, expr2Source, expr1, expr2
     this.op = this._resolveOp(op);
@@ -588,9 +588,9 @@ BinaryPredicate.prototype._initialize('binaryPredicate', {
 @hidden
 */
 export class AndOrPredicate extends Predicate {
-  op: IOp;
+  op: Op;
   preds: Predicate[];
-  constructor(op: string | IQueryOp, preds: any[]) {
+  constructor(op: string | QueryOp, preds: any[]) {
     super();
     this.op = this._resolveOp(op);
     if (preds.length === 1 && Array.isArray(preds[0])) {
@@ -628,13 +628,13 @@ AndOrPredicate.prototype._initialize("andOrPredicate", {
 @hidden 
 */
 export class AnyAllPredicate extends Predicate {
-  op: IOp;
+  op: Op;
   /** @internal */
   expr: PredicateExpression;
   exprSource: string;
   pred: Predicate;
   // 4 public props: op, exprSource, expr, pred
-  constructor(op: string | IQueryOp, expr: string, pred: any) {
+  constructor(op: string | QueryOp, expr: string, pred: any) {
     super();
     this.op = this._resolveOp(op);
     this.exprSource = expr;
@@ -643,7 +643,7 @@ export class AnyAllPredicate extends Predicate {
   }
 
   _validate(entityType: EntityType, usesNameOnServer: boolean) {
-    this.expr = createExpr(this.exprSource, { entityType: entityType, usesNameOnServer: usesNameOnServer } as IExpressionContext);
+    this.expr = createExpr(this.exprSource, { entityType: entityType, usesNameOnServer: usesNameOnServer } as ExpressionContext);
     // can't really know the predicateEntityType unless the original entity type was known.
     if (entityType == null || entityType.isAnonymous) {
       this.expr.dataType = undefined;
@@ -658,7 +658,7 @@ AnyAllPredicate.prototype._initialize("anyAllPredicate", {
   'all': { aliases: ["every"] }
 });
 
-/** @hidden @internal */
+/** @hidden */
 export class PredicateExpression {
   visitorMethodName: string;
   visit: Function; // TODO
@@ -677,7 +677,7 @@ export class PredicateExpression {
 
 /** For use by breeze plugin authors only. The class is for use in building a [[IUriBuilderAdapter]] implementation. 
 @adapter (see [[IUriBuilderAdapter]])    
-@hidden @internal 
+@hidden 
 */
 export class LitExpr extends PredicateExpression {
   value: any;
@@ -730,7 +730,7 @@ function resolveDataType(dataType?: DataType | string) {
 
 /** For use by breeze plugin authors only. The class is for use in building a [[IUriBuilderAdapter]] implementation. 
 @adapter (see [[IUriBuilderAdapter]])    
-@hidden @internal 
+@hidden 
 */
 export class PropExpr extends PredicateExpression {
   propertyPath: string;
@@ -769,7 +769,7 @@ export class PropExpr extends PredicateExpression {
 
 /** For use by breeze plugin authors only. The class is for use in building a [[IUriBuilderAdapter]] implementation. 
 @adapter (see [[IUriBuilderAdapter]])    
-@hidden @internal 
+@hidden 
 */
 export class FnExpr extends PredicateExpression {
   fnName: string;
@@ -911,7 +911,7 @@ let RX_COMMA_DELIM1 = /('[^']*'|[^,]+)/g;
 let RX_COMMA_DELIM2 = /("[^"]*"|[^,]+)/g;
 let DELIM = String.fromCharCode(191);
 
-function createExpr(source: any, exprContext: IExpressionContext) {
+function createExpr(source: any, exprContext: ExpressionContext) {
   let entityType = exprContext.entityType;
 
   // the right hand side of an 'in' clause
@@ -967,7 +967,7 @@ function createExpr(source: any, exprContext: IExpressionContext) {
   }
 }
 
-function parseExpr(source: string, tokens: string[], exprContext: IExpressionContext): PredicateExpression {
+function parseExpr(source: string, tokens: string[], exprContext: ExpressionContext): PredicateExpression {
   let parts = source.split(DELIM);
   if (parts.length === 1) {
     return parseLitOrPropExpr(parts[0], exprContext);
@@ -976,7 +976,7 @@ function parseExpr(source: string, tokens: string[], exprContext: IExpressionCon
   }
 }
 
-function parseLitOrPropExpr(value: string, exprContext: IExpressionContext): PredicateExpression {
+function parseLitOrPropExpr(value: string, exprContext: ExpressionContext): PredicateExpression {
   value = value.trim();
   // value is either a string, a quoted string, a number, a bool value, or a date
   // if a string ( not a quoted string) then this represents a property name ( 1st ) or a lit string ( 2nd)
@@ -1008,7 +1008,7 @@ function parseLitOrPropExpr(value: string, exprContext: IExpressionContext): Pre
   }
 }
 
-function parseFnExpr(source: string, parts: string[], tokens: string[], exprContext: IExpressionContext) {
+function parseFnExpr(source: string, parts: string[], tokens: string[], exprContext: ExpressionContext) {
   try {
     let fnName = parts[0].trim().toLowerCase();
 
@@ -1018,7 +1018,7 @@ function parseFnExpr(source: string, parts: string[], tokens: string[], exprCont
     }
     let commaMatchStr = source.indexOf("'") >= 0 ? RX_COMMA_DELIM1 : RX_COMMA_DELIM2;
     let args = argSource.match(commaMatchStr);
-    let newContext = core.extend({}, exprContext) as IExpressionContext;
+    let newContext = core.extend({}, exprContext) as ExpressionContext;
     // a dataType of Undefined on a context basically means not to try parsing
     // the value if the expr is a literal
     newContext.dataType = DataType.Undefined;
@@ -1045,7 +1045,7 @@ let toFunctionVisitor = {
     throw new Error("Cannot execute an PassthruPredicate expression against the local cache: " + this.value);
   },
 
-  unaryPredicate: function (this: UnaryPredicate, context: IVisitContext) {
+  unaryPredicate: function (this: UnaryPredicate, context: VisitContext) {
     let predFn = this.pred.visit(context);
     switch (this.op.key) {
       case "not":
@@ -1057,7 +1057,7 @@ let toFunctionVisitor = {
     }
   },
 
-  binaryPredicate: function (this: BinaryPredicate, context: IVisitContext) {
+  binaryPredicate: function (this: BinaryPredicate, context: VisitContext) {
     let expr1Fn = this.expr1!.visit(context);
     let expr2Fn = this.expr2!.visit(context);
     let dataType = this.expr1!.dataType || this.expr2!.dataType;
@@ -1066,12 +1066,12 @@ let toFunctionVisitor = {
     if (predFn == null) {
       throw new Error("Invalid binaryPredicate operator:" + this.op.key);
     }
-    return function (entity: IEntity) {
+    return function (entity: Entity) {
       return predFn!(expr1Fn(entity), expr2Fn(entity));
     };
   },
 
-  andOrPredicate: function (this: AndOrPredicate, context: IVisitContext) {
+  andOrPredicate: function (this: AndOrPredicate, context: VisitContext) {
     let predFns = this.preds.map((pred) => {
       return pred.visit(context);
     });
@@ -1095,9 +1095,9 @@ let toFunctionVisitor = {
     }
   },
 
-  anyAllPredicate: function (this: AnyAllPredicate, context: IVisitContext) {
+  anyAllPredicate: function (this: AnyAllPredicate, context: VisitContext) {
     let exprFn = this.expr.visit(context);
-    let newContext = core.extend({}, context) as IVisitContext;
+    let newContext = core.extend({}, context) as VisitContext;
     newContext.entityType = this.expr.dataType as EntityType;
     let predFn = this.pred.visit(newContext);
     let anyAllPredFn = getAnyAllPredicateFn(this.op);
@@ -1121,13 +1121,13 @@ let toFunctionVisitor = {
         return entity.getProperty(propertyPath);
       };
     } else {
-      return function (entity: IEntity) {
+      return function (entity: Entity) {
         return EntityAspect.getPropertyPathValue(entity, properties);
       };
     }
   },
 
-  fnExpr: function (this: FnExpr, context: IExpressionContext) {
+  fnExpr: function (this: FnExpr, context: ExpressionContext) {
     let exprFns = this.exprs.map(function (expr) {
       return expr.visit(context);
     });
@@ -1144,7 +1144,7 @@ let toFunctionVisitor = {
 
 };
 
-function getAnyAllPredicateFn(op: IOp): (v1: any[], v2: any) => boolean {
+function getAnyAllPredicateFn(op: Op): (v1: any[], v2: any) => boolean {
   switch (op.key) {
     case "any":
       return function (v1, v2) {
@@ -1282,14 +1282,14 @@ let toJSONVisitor = {
     return this.value;
   },
 
-  unaryPredicate: function (this: UnaryPredicate, context: IVisitContext) {
+  unaryPredicate: function (this: UnaryPredicate, context: VisitContext) {
     let predVal = this.pred.visit(context);
     let json = {};
     json[this.op.key] = predVal;
     return json;
   },
 
-  binaryPredicate: function (this: BinaryPredicate, context: IVisitContext) {
+  binaryPredicate: function (this: BinaryPredicate, context: VisitContext) {
     let expr1Val = this.expr1!.visit(context);
     let expr2Val = this.expr2!.visit(context);
     let json = {};
@@ -1306,7 +1306,7 @@ let toJSONVisitor = {
     return json;
   },
 
-  andOrPredicate: function (this: AndOrPredicate, context: IVisitContext) {
+  andOrPredicate: function (this: AndOrPredicate, context: VisitContext) {
     let predVals = this.preds.map(function (pred) {
       return pred.visit(context);
     });
@@ -1327,9 +1327,9 @@ let toJSONVisitor = {
     return json;
   },
 
-  anyAllPredicate: function (this: AnyAllPredicate, context: IVisitContext) {
+  anyAllPredicate: function (this: AnyAllPredicate, context: VisitContext) {
     let exprVal = this.expr.visit(context);
-    let newContext = core.extend({}, context) as IVisitContext;
+    let newContext = core.extend({}, context) as VisitContext;
     newContext.entityType = this.expr.dataType as EntityType;
     let predVal = this.pred.visit(newContext);
     let json = {};
@@ -1339,7 +1339,7 @@ let toJSONVisitor = {
     return json;
   },
 
-  litExpr: function (this: LitExpr, context: IVisitContext) {
+  litExpr: function (this: LitExpr, context: VisitContext) {
     if (this.hasExplicitDataType || context.useExplicitDataType) {
       return { value: this.value, dataType: this.dataType.name };
     } else {
@@ -1347,7 +1347,7 @@ let toJSONVisitor = {
     }
   },
 
-  propExpr: function (this: PropExpr, context: IVisitContext) {
+  propExpr: function (this: PropExpr, context: VisitContext) {
     if (context.toNameOnServer) {
       return context.entityType!.clientPropertyPathToServer(this.propertyPath);
     } else {
@@ -1355,7 +1355,7 @@ let toJSONVisitor = {
     }
   },
 
-  fnExpr: function (this: FnExpr, context: IVisitContext) {
+  fnExpr: function (this: FnExpr, context: VisitContext) {
     let exprVals = this.exprs.map(function (expr) {
       return expr.visit(context);
     });

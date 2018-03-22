@@ -1,21 +1,21 @@
-﻿import { IQueryOp } from './entity-query';
+﻿import { QueryOp } from './entity-query';
 import { core, Callback, ErrorCallback } from './core';
 import { assertParam } from './assert-param';
 import { DataType } from './data-type';
-import { EntityAspect, IEntity } from './entity-aspect';
+import { EntityAspect, Entity } from './entity-aspect';
 import { EntityKey } from './entity-key';
 import { BreezeEnum } from './enum';
 import { DataService, JsonResultsAdapter } from './data-service';
-import { EntityManager, IQueryResult } from './entity-manager';
+import { EntityManager, QueryResult } from './entity-manager';
 import { MetadataStore, EntityType, NavigationProperty, EntityProperty } from './entity-metadata';
 import { QueryOptions, MergeStrategy, FetchStrategy } from './query-options';
 import { Predicate } from './predicate';
 
-export interface IRecursiveArray<T> {
-  [i: number]: T | IRecursiveArray<T>;
+export interface RecursiveArray<T> {
+  [i: number]: T | RecursiveArray<T>;
 }
 
-export interface IEntityQueryJsonContext {
+export interface EntityQueryJsonContext {
   entityType?: EntityType;
   propertyPathFn?: Function; // TODO
   toNameOnServer?: boolean;
@@ -147,7 +147,7 @@ export class EntityQuery {
   where(property: string, operator: FilterQueryOp, value: any): EntityQuery;
   where(property: string, filterop: FilterQueryOp, property2: string, filterop2: FilterQueryOp, value: any): EntityQuery;  // for any/all clauses
   where(property: string, filterop: string, property2: string, filterop2: string, value: any): EntityQuery;  // for any/all clauses
-  where(anArray: IRecursiveArray<string | number | FilterQueryOp | Predicate>): EntityQuery;
+  where(anArray: RecursiveArray<string | number | FilterQueryOp | Predicate>): EntityQuery;
   /**
   Returns a new query with an added filter criteria; Can be called multiple times which means to 'and' with any existing
   Predicate or can be called with null to clear all predicates.
@@ -508,7 +508,7 @@ export class EntityQuery {
   @param errorCallback - Function called on failure.
   @return Promise
   **/
-  execute(callback?: Callback, errorCallback?: ErrorCallback): Promise<IQueryResult> {
+  execute(callback?: Callback, errorCallback?: ErrorCallback): Promise<QueryResult> {
     if (!this.entityManager) {
       throw new Error("An EntityQuery must have its EntityManager property set before calling 'execute'");
     }
@@ -537,7 +537,7 @@ export class EntityQuery {
   /** Typically only for use when building UriBuilderAdapters.  
   @hidden @internal  
   */
-  toJSONExt(context?: IEntityQueryJsonContext) {
+  toJSONExt(context?: EntityQueryJsonContext) {
     context = context || {};
     context.entityType = context.entityType || this.fromEntityType;
     context.propertyPathFn = context.toNameOnServer ? context.entityType!.clientPropertyPathToServer.bind(context.entityType) : core.identity;
@@ -567,8 +567,8 @@ export class EntityQuery {
 
   }
 
-  static fromEntities(entity: IEntity): EntityQuery;
-  static fromEntities(entities: IEntity[]): EntityQuery;
+  static fromEntities(entity: Entity): EntityQuery;
+  static fromEntities(entities: Entity[]): EntityQuery;
   /**
   Static method that creates an EntityQuery that will allow 'requerying' an entity or a collection of entities by primary key. This can be useful
   to force a requery of selected entities, or to restrict an existing collection of entities according to some filter.
@@ -590,7 +590,7 @@ export class EntityQuery {
   will create a query that will return an array containing a single customer entity.
   @param entities - The entities for which we want to create an EntityQuery.
   **/
-  static fromEntities(entities: IEntity | IEntity[]) {
+  static fromEntities(entities: Entity | Entity[]) {
     assertParam(entities, "entities").isEntity().or().isNonEmptyArray().isEntity().check();
     let ents = (Array.isArray(entities)) ? entities : [entities];
 
@@ -645,7 +645,7 @@ export class EntityQuery {
   @param entity - The Entity whose navigation property will be queried.
   @param navigationProperty - The [[NavigationProperty]] or name of the NavigationProperty to be queried.
   **/
-  static fromEntityNavigation = function (entity: IEntity, navigationProperty: NavigationProperty | string) {
+  static fromEntityNavigation = function (entity: Entity, navigationProperty: NavigationProperty | string) {
     assertParam(entity, "entity").isEntity().check();
     let navProperty = entity.entityType._checkNavProperty(navigationProperty);
     let q = new EntityQuery(navProperty.entityType.defaultResourceName);
@@ -833,7 +833,7 @@ function normalizePropertyPaths(propertyPaths: string | string[]) {
   return propertyPaths;
 }
 
-function buildPredicate(entity: IEntity) {
+function buildPredicate(entity: Entity) {
   let entityType = entity.entityType;
   let predParts = entityType.keyProperties.map(function (kp) {
     return Predicate.create(kp.name, FilterQueryOp.Equals, entity.getProperty(kp.name));
@@ -851,7 +851,7 @@ function buildKeyPredicate(entityKey: EntityKey) {
   return pred;
 }
 
-function buildNavigationPredicate(entity: IEntity, navigationProperty: NavigationProperty) {
+function buildNavigationPredicate(entity: Entity, navigationProperty: NavigationProperty) {
   if (navigationProperty.isScalar) {
     if (navigationProperty.foreignKeyNames.length === 0) return null;
     let relatedKeyValues = navigationProperty.foreignKeyNames.map((fkName) => {
@@ -872,7 +872,7 @@ function buildNavigationPredicate(entity: IEntity, navigationProperty: Navigatio
 }
 
 /** Base class for BooleanQueryOp and FilterQueryOp */
-export interface IQueryOp {
+export interface QueryOp {
   /** The operator for this enum. */
   operator: string;
 }
@@ -883,7 +883,7 @@ export interface IQueryOp {
 FilterQueryOp is an 'Enum' containing all of the valid  [[Predicate]]
 filter operators for an [[EntityQuery]].
 **/
-export class FilterQueryOp extends BreezeEnum implements IQueryOp {
+export class FilterQueryOp extends BreezeEnum implements QueryOp {
   /** The operator for this enum. */
   operator: string;
 
@@ -921,7 +921,7 @@ FilterQueryOp.resolveSymbols();
  BooleanQueryOp is an 'Enum' containing all of the valid  boolean
 operators for an [[EntityQuery]].
 **/
-export class BooleanQueryOp extends BreezeEnum implements IQueryOp {
+export class BooleanQueryOp extends BreezeEnum implements QueryOp {
   /** The operator for this enum. */
   operator: string;
 
@@ -995,7 +995,7 @@ export class OrderByClause {
     };
   }
 
-  toJSONExt(context: IEntityQueryJsonContext) {
+  toJSONExt(context: EntityQueryJsonContext) {
     return this.items.map(function (item) {
       return context.propertyPathFn!(item.propertyPath) + (item.isDesc ? " desc" : "");
     });
@@ -1106,7 +1106,7 @@ export class SelectClause {
 
   toFunction(/* config */) {
     let that = this;
-    return function (entity: IEntity) {
+    return function (entity: Entity) {
       let result = {};
       that.propertyPaths.forEach(function (path, i) {
         result[that._pathNames[i]] = EntityAspect.getPropertyPathValue(entity, path);
@@ -1115,7 +1115,7 @@ export class SelectClause {
     };
   }
 
-  toJSONExt(context: IEntityQueryJsonContext) {
+  toJSONExt(context: EntityQueryJsonContext) {
     return this.propertyPaths.map(function (pp) {
       return context.propertyPathFn!(pp);
     });
@@ -1133,7 +1133,7 @@ export class ExpandClause {
     this.propertyPaths = propertyPaths;
   }
 
-  toJSONExt(context: IEntityQueryJsonContext) {
+  toJSONExt(context: EntityQueryJsonContext) {
     return this.propertyPaths.map(function (pp) {
       return context.propertyPathFn!(pp);
     });

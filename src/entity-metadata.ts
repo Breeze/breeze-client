@@ -3,7 +3,7 @@ import { config } from './config';
 import { BreezeEvent } from './event';
 import { assertParam, assertConfig, Param } from './assert-param';
 import { DataType } from './data-type';
-import { EntityAspect, ComplexAspect, IEntity, IComplexObject, IStructuralObject } from './entity-aspect';
+import { EntityAspect, ComplexAspect, Entity, ComplexObject, StructuralObject } from './entity-aspect';
 import { EntityKey } from './entity-key';
 import { Validator } from './validate';
 import { BreezeEnum } from './enum';
@@ -43,7 +43,7 @@ export interface MetadataStoreConfig {
   serializerFn?: (prop: EntityProperty, val: any) => any;
 }
 
-export interface IMetadataFetchedEventArgs {
+export interface MetadataFetchedEventArgs {
   metadataStore: MetadataStore;
   dataService: DataService | string;
   rawMetadata: any;
@@ -88,7 +88,7 @@ export class MetadataStore {
   >      });
   @event
   **/
-  metadataFetched: BreezeEvent<IMetadataFetchedEventArgs>;
+  metadataFetched: BreezeEvent<MetadataFetchedEventArgs>;
   /** @hidden @internal */
   _resourceEntityTypeMap: {};
   /** @hidden @internal */
@@ -650,7 +650,7 @@ export class MetadataStore {
 
   // protected methods
   /** @hidden @internal */
-  _checkEntityType(entity: IEntity) {
+  _checkEntityType(entity: Entity) {
     if (entity.entityType) return;
     let typeName = entity.prototype._$typeName;
     if (!typeName) {
@@ -886,7 +886,7 @@ export class EntityType {
   /** @hidden @internal */
   _extra: any;
   /** @hidden @internal */
-  _ctor: { new (): IStructuralObject };
+  _ctor: { new (): StructuralObject };
   /** @hidden @internal */
   _mappedPropertiesCount: number;
 
@@ -1160,7 +1160,7 @@ export class EntityType {
   _createInstanceCore() {
     let aCtor = this.getCtor();
     let instance = new aCtor();
-    new EntityAspect(instance as IEntity);
+    new EntityAspect(instance as Entity);
     return instance;
   }
 
@@ -1196,7 +1196,7 @@ export class EntityType {
   @param forceRefresh - Whether to ignore any cached version of this constructor. (default == false)
   @return The constructor for this EntityType.
   **/
-  getCtor(forceRefresh: boolean = false): { new (): IStructuralObject } {
+  getCtor(forceRefresh: boolean = false): { new (): StructuralObject } {
     if (this._ctor && !forceRefresh) return this._ctor;
 
     let ctorRegistry = this.metadataStore._ctorRegistry;
@@ -1231,7 +1231,7 @@ export class EntityType {
 
   /** @hidden @internal */
   // May make public later.
-  _setCtor(aCtor: { new (): IStructuralObject }, interceptor?: any) {
+  _setCtor(aCtor: { new (): StructuralObject }, interceptor?: any) {
 
     let instanceProto = aCtor.prototype;
 
@@ -1407,7 +1407,7 @@ export class EntityType {
   }
 
   /** @hidden @internal */
-  _updateTargetFromRaw(target: IStructuralObject, raw: any, rawValueFn: Function) {
+  _updateTargetFromRaw(target: StructuralObject, raw: any, rawValueFn: Function) {
     // called recursively for complex properties
     this.dataProperties.forEach((dp) => {
       if (!dp.isSettable) return;
@@ -1652,7 +1652,7 @@ function createEmptyCtor(type: any) {
   return Function('return function ' + name + '(){}')();
 }
 
-function coEquals(co1: IComplexObject, co2: IComplexObject): boolean {
+function coEquals(co1: ComplexObject, co2: ComplexObject): boolean {
   let complexType = co1.complexAspect!.parentProperty!.dataType as ComplexType;
   let dataProps = complexType.dataProperties;
   let areEqual = dataProps.every(function (dp) {
@@ -1873,9 +1873,9 @@ export class ComplexType {
   }
 
   /** @hidden @internal */
-  _createInstanceCore(parent: IStructuralObject, parentProperty: DataProperty) {
+  _createInstanceCore(parent: StructuralObject, parentProperty: DataProperty) {
     let aCtor = this.getCtor();
-    let instance = new aCtor() as IComplexObject;
+    let instance = new aCtor() as ComplexObject;
     new ComplexAspect(instance, parent, parentProperty);
     // initialization occurs during either attach or in createInstance call.
     return instance;

@@ -4,7 +4,7 @@ import { EntityAspect } from './entity-aspect';
 import { DataProperty } from './entity-metadata';
 
 /** @hidden */
-export interface IObservableArray {
+export interface ObservableArray {
   push: (...args: any[]) => number;
   _push: (...args: any[]) => number;
   unshift: (...args: any[]) =>  number;
@@ -109,7 +109,7 @@ let mixin = {
   }
 };
 
-function updateEntityState(obsArray: IObservableArray) {
+function updateEntityState(obsArray: ObservableArray) {
   let entityAspect = obsArray.getEntityAspect();
   if (entityAspect.entityState.isUnchanged()) {
     entityAspect.setModified();
@@ -119,7 +119,7 @@ function updateEntityState(obsArray: IObservableArray) {
   }
 }
 
-function publish(publisher: IObservableArray, eventName: string, eventArgs: any) {
+function publish(publisher: ObservableArray, eventName: string, eventArgs: any) {
   let pendingPubs = publisher._getPendingPubs();
   if (pendingPubs) {
     if (!publisher._pendingArgs) {
@@ -141,7 +141,7 @@ function initializeParent(obsArray: any, parent: Object, parentProperty: DataPro
   obsArray.parentProperty = parentProperty;
 }
 
-function processAdds(obsArray: IObservableArray, adds: any[]) {
+function processAdds(obsArray: ObservableArray, adds: any[]) {
   obsArray._processAdds(adds);
   // this is referencing the name of the method on the complexArray not the name of the event
   //var args = { added: adds };
@@ -149,7 +149,7 @@ function processAdds(obsArray: IObservableArray, adds: any[]) {
   publish(obsArray, "arrayChanged", { array: obsArray, added: adds });
 }
 
-function processRemoves(obsArray: IObservableArray, removes: any[]) {
+function processRemoves(obsArray: ObservableArray, removes: any[]) {
   obsArray._processRemoves(removes);
   // this is referencing the name of the method on the array not the name of the event
   publish(obsArray, "arrayChanged", { array: obsArray, removed: removes });

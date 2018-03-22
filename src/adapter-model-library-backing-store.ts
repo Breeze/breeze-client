@@ -2,7 +2,7 @@
 
 let core = breeze.core;
 
-export class ModelLibraryBackingStoreAdapter implements breeze.IModelLibraryAdapter {
+export class ModelLibraryBackingStoreAdapter implements breeze.ModelLibraryAdapter {
   name: string;
 
   constructor() {
@@ -13,7 +13,7 @@ export class ModelLibraryBackingStoreAdapter implements breeze.IModelLibraryAdap
 
   };
 
-  getTrackablePropertyNames(entity: breeze.IEntity) {
+  getTrackablePropertyNames(entity: breeze.Entity) {
     let names: string[] = [];
     for (let p in entity) {
       if (p === "entityType") continue;
@@ -51,7 +51,7 @@ export class ModelLibraryBackingStoreAdapter implements breeze.IModelLibraryAdap
   // which can be called either directly or via standard query materialization
 
   // entity is either an entity or a complexObject
-  startTracking(entity: breeze.IStructuralObject, proto: any) {
+  startTracking(entity: breeze.StructuralObject, proto: any) {
     // can't touch the normal property sets within this method - access the backingStore directly instead.
     let bs = movePropsToBackingStore(entity);
 
@@ -83,7 +83,7 @@ export class ModelLibraryBackingStoreAdapter implements breeze.IModelLibraryAdap
           // TODO: change this to nullstob later.
           val = null;
         } else {
-          val = breeze.makeRelationArray([], entity as breeze.IEntity, prop);
+          val = breeze.makeRelationArray([], entity as breeze.Entity, prop);
         }
       } else {
         throw new Error("unknown property: " + propName);

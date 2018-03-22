@@ -1,13 +1,13 @@
-﻿import { IDataServiceAdapter } from './interface-registry';
+﻿import { DataServiceAdapter } from './interface-registry';
 import { core } from './core';
 import { DataType  } from './data-type';
-import { DataService, JsonResultsAdapter, INodeContext, INodeMeta } from './data-service';
+import { DataService, JsonResultsAdapter, NodeContext, NodeMeta } from './data-service';
 import { EntityState  } from './entity-state';
 import { EntityAction } from './entity-action';
 import { MetadataStore, EntityType, StructuralType, DataProperty, NavigationProperty } from './entity-metadata';
 import { EntityManager } from './entity-manager';
 import { MergeStrategy } from './query-options';
-import { IEntity } from './entity-aspect';
+import { Entity } from './entity-aspect';
 import { EntityQuery } from './entity-query';
 
 
@@ -16,18 +16,18 @@ For use by breeze plugin authors only. The class is for use in building a [[IDat
 @adapter (see [[IDataServiceAdapter]])    
 @hidden 
 */
-export interface IMergeOptions {
+export interface MergeOptions {
   mergeStrategy: MergeStrategy;
   includeDeleted?: boolean;
   noTracking?: boolean;
 }
 
 /** @hidden */
-export interface IMappingContextConfig {
+export interface MappingContextConfig {
   dataService: DataService;
   query?: EntityQuery | string;
   entityManager: EntityManager;
-  mergeOptions: IMergeOptions;
+  mergeOptions: MergeOptions;
 }
 
 /**
@@ -44,15 +44,15 @@ export class MappingContext {
   dataService: DataService;
   query: EntityQuery | string;
   entityManager: EntityManager;
-  mergeOptions: IMergeOptions;
-  adapter: IDataServiceAdapter;  // assigned in the AbstractDataServiceAdapter.
+  mergeOptions: MergeOptions;
+  adapter: DataServiceAdapter;  // assigned in the AbstractDataServiceAdapter.
 
   refMap: Object; // TODO
   deferredFns: Function[]; // TODO
   jsonResultsAdapter: JsonResultsAdapter;
   metadataStore: MetadataStore;
 
-  constructor(config: IMappingContextConfig) {
+  constructor(config: MappingContextConfig) {
 
     core.extend(this, config, [
       "query", "entityManager", "dataService", "mergeOptions"
@@ -118,7 +118,7 @@ export class MappingContext {
 MappingContext.prototype._$typeName = "MappingContext";
 
 
-function processMeta(mc: MappingContext, node: any, meta: INodeMeta, assignFn?: (val: any) => void) {
+function processMeta(mc: MappingContext, node: any, meta: NodeMeta, assignFn?: (val: any) => void) {
   // == is deliberate here instead of ===
   if (meta.ignore || node == null) {
     return null;
@@ -198,7 +198,7 @@ function processAnonType(mc: MappingContext, node: any) {
   return result;
 }
 
-function visitNode(node: any, mc: MappingContext, nodeContext: INodeContext, result: Object, key: string) {
+function visitNode(node: any, mc: MappingContext, nodeContext: NodeContext, result: Object, key: string) {
   let jra = mc.jsonResultsAdapter;
   let meta = jra.visitNode(node, mc, nodeContext) || {};
   // allows visitNode to change the value;
@@ -245,7 +245,7 @@ function updateEntityRef(mc: MappingContext, targetEntity: any, node: any) {
 }
 
 // can return null for a deleted entity if includeDeleted == false
-function mergeEntity(mc: MappingContext, node: any, meta: INodeMeta) {
+function mergeEntity(mc: MappingContext, node: any, meta: NodeMeta) {
   node._$meta = meta;
   let em = mc.entityManager;
 
@@ -280,7 +280,7 @@ function mergeEntity(mc: MappingContext, node: any, meta: INodeMeta) {
         }
         targetEntity.entityAspect.entityState = EntityState.Unchanged;
         clearOriginalValues(targetEntity);
-        // propertyName not specified because multiple props IEntityChangedEventArgs
+        // propertyName not specified because multiple props EntityChangedEventArgs
         targetEntity.entityAspect.propertyChanged.publish({ entity: targetEntity, propertyName: null });
         let action = isSaving ? EntityAction.MergeOnSave : EntityAction.MergeOnQuery;
         em.entityChanged.publish({ entityAction: action, entity: targetEntity });
@@ -297,7 +297,7 @@ function mergeEntity(mc: MappingContext, node: any, meta: INodeMeta) {
       }
     }
   } else {
-    targetEntity = entityType._createInstanceCore() as IEntity;
+    targetEntity = entityType._createInstanceCore() as Entity;
 
     updateEntity(mc, targetEntity, node);
 
@@ -329,7 +329,7 @@ function clearOriginalValues(target: any) {
 }
 
 
-function updateEntityNoMerge(mc: MappingContext, targetEntity: IEntity, node: any) {
+function updateEntityNoMerge(mc: MappingContext, targetEntity: Entity, node: any) {
   updateEntityRef(mc, targetEntity, node);
   // we still need to merge related entities even if top level entity wasn't modified.
   node.entityType.navigationProperties.forEach(function (np: NavigationProperty) {
@@ -341,7 +341,7 @@ function updateEntityNoMerge(mc: MappingContext, targetEntity: IEntity, node: an
   });
 }
 
-function updateEntity(mc: MappingContext, targetEntity: IEntity, node: any) {
+function updateEntity(mc: MappingContext, targetEntity: Entity, node: any) {
   updateEntityRef(mc, targetEntity, node);
   let entityType = targetEntity.entityType;
   entityType._updateTargetFromRaw(targetEntity, node, mc.rawValueFn);
@@ -355,7 +355,7 @@ function updateEntity(mc: MappingContext, targetEntity: IEntity, node: any) {
   });
 }
 
-function mergeRelatedEntity(mc: MappingContext, navigationProperty: NavigationProperty, targetEntity: IEntity, rawEntity: any) {
+function mergeRelatedEntity(mc: MappingContext, navigationProperty: NavigationProperty, targetEntity: Entity, rawEntity: any) {
 
   let relatedEntity = mergeRelatedEntityCore(mc, rawEntity, navigationProperty);
   if (relatedEntity == null) return;
@@ -369,7 +369,7 @@ function mergeRelatedEntity(mc: MappingContext, navigationProperty: NavigationPr
   }
 }
 
-function mergeRelatedEntities(mc: MappingContext, navigationProperty: NavigationProperty, targetEntity: IEntity, rawEntity: any) {
+function mergeRelatedEntities(mc: MappingContext, navigationProperty: NavigationProperty, targetEntity: Entity, rawEntity: any) {
   let relatedEntities = mergeRelatedEntitiesCore(mc, rawEntity, navigationProperty);
   if (relatedEntities == null) return;
 
@@ -416,7 +416,7 @@ function mergeRelatedEntitiesCore(mc: MappingContext, rawEntity: any, navigation
   return relatedEntities;
 }
 
-function updateRelatedEntity(relatedEntity: IEntity, targetEntity: IEntity, navigationProperty: NavigationProperty) {
+function updateRelatedEntity(relatedEntity: Entity, targetEntity: Entity, navigationProperty: NavigationProperty) {
   if (!relatedEntity) return;
   let propName = navigationProperty.name;
   let currentRelatedEntity = targetEntity.getProperty(propName);
@@ -437,8 +437,8 @@ function updateRelatedEntity(relatedEntity: IEntity, targetEntity: IEntity, navi
   }
 }
 
-function updateRelatedEntityInCollection(mc: MappingContext, relatedEntity: IEntity | undefined,
-    relatedEntities: IEntity[], targetEntity: IEntity, inverseProperty: NavigationProperty) {
+function updateRelatedEntityInCollection(mc: MappingContext, relatedEntity: Entity | undefined,
+    relatedEntities: Entity[], targetEntity: Entity, inverseProperty: NavigationProperty) {
   if (!relatedEntity) return;
 
   // don't update relatedCollection if preserveChanges & relatedEntity has an fkChange.

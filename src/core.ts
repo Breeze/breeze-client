@@ -194,7 +194,7 @@ function toJson(source: Object, template: Object, target: Object = {}): Object {
 }
 
 /** Replacer function for toJSONSafe, when serializing entities.  Excludes entityAspect and other internal properties. */
-function safeReplacer(prop: string, val: any) {
+function toJSONSafeReplacer(prop: string, val: any) {
     if (prop === "entityAspect" || prop === "complexAspect" || prop === "entityType" || prop === "complexType"
         || prop === "constructor" || prop.charAt(0) === '_' || prop.charAt(0) === '$') return;
     return val;
@@ -724,7 +724,7 @@ export const core = {
 
     toJson: toJson,
     toJSONSafe: toJSONSafe,
-    safeReplacer: safeReplacer,
+    toJSONSafeReplacer: toJSONSafeReplacer,
 };
 
 export interface ErrorCallback {

@@ -1,6 +1,6 @@
 ﻿import { EntityType, NavigationProperty } from './entity-metadata';
-import { IDataServiceAdapter, IUriBuilderAdapter } from './interface-registry';
-import { IKeyMapping } from './entity-manager';
+import { DataServiceAdapter, UriBuilderAdapter } from './interface-registry';
+import { KeyMapping } from './entity-manager';
 import { MappingContext } from './mapping-context';
 import { assertConfig } from './assert-param';
 import { config } from './config';
@@ -43,11 +43,11 @@ export class DataService {
   /** The adapter name for the [[IDataServiceAdapter]] to be used with this service. __Read Only__  **/
   adapterName: string;
   /**  The [[IDataServiceAdapter]] implementation instance associated with this EntityManager. __Read Only__  **/
-  adapterInstance?: IDataServiceAdapter;
+  adapterInstance?: DataServiceAdapter;
   /** The adapter name for the [[IUriBuilderAdapter]] to be used with this service. __Read Only__  **/
   uriBuilderName: string;
   /**  The [[IUriBuilderAdapter]] implementation instance associated with this EntityManager. __Read Only__  **/
-  uriBuilder?: IUriBuilderAdapter;
+  uriBuilder?: UriBuilderAdapter;
   /** Whether the server can provide metadata for this service. __Read Only__   **/
   hasServerMetadata: boolean;
   /** The [[JsonResultsAdapter]] used to process the results of any query against this DataService. __Read Only__ **/
@@ -99,9 +99,9 @@ export class DataService {
     if (!ds.serviceName) {
       throw new Error("Unable to resolve a 'serviceName' for this dataService");
     }
-    ds.adapterInstance = ds.adapterInstance || config.getAdapterInstance<IDataServiceAdapter>("dataService", ds.adapterName);
+    ds.adapterInstance = ds.adapterInstance || config.getAdapterInstance<DataServiceAdapter>("dataService", ds.adapterName);
     ds.jsonResultsAdapter = ds.jsonResultsAdapter || ds.adapterInstance!.jsonResultsAdapter;
-    ds.uriBuilder = ds.uriBuilder || config.getAdapterInstance<IUriBuilderAdapter>("uriBuilder", ds.uriBuilderName);
+    ds.uriBuilder = ds.uriBuilder || config.getAdapterInstance<UriBuilderAdapter>("uriBuilder", ds.uriBuilderName);
     return ds;
   }
 
@@ -170,13 +170,13 @@ function updateWithConfig(obj: DataService, dsConfig?: DataServiceConfig) {
         .whereParam("useJsonp").isBoolean().isOptional()
         .applyAll(obj);
     obj.serviceName = obj.serviceName && DataService._normalizeServiceName(obj.serviceName);
-    obj.adapterInstance = obj.adapterName ?  config.getAdapterInstance<IDataServiceAdapter>("dataService", obj.adapterName) : undefined;
-    obj.uriBuilder = obj.uriBuilderName ? config.getAdapterInstance<IUriBuilderAdapter>("uriBuilder", obj.uriBuilderName) : undefined;
+    obj.adapterInstance = obj.adapterName ?  config.getAdapterInstance<DataServiceAdapter>("dataService", obj.adapterName) : undefined;
+    obj.uriBuilder = obj.uriBuilderName ? config.getAdapterInstance<UriBuilderAdapter>("uriBuilder", obj.uriBuilderName) : undefined;
   }
   return obj;
 }
 
-export interface INodeMeta {
+export interface NodeMeta {
   entityType?: EntityType;
   nodeId?: string;
   nodeRefId?: string;
@@ -185,7 +185,7 @@ export interface INodeMeta {
   extraMetadata?: any;
 }
 
-export interface INodeContext {
+export interface NodeContext {
   nodeType: string;
   propertyName?: string;
   navigationProperty?: NavigationProperty;
@@ -204,12 +204,12 @@ export interface JsonResultsAdapterConfig {
   extractSaveResults?: Function;
   /** A function that is called once per save operation to extract the key mappings from any json received over the wire.  Must return an array.
   This method has a default implementation which simply returns the "keyMappings" property from any json returned as a result of executing the save. */
-  extractKeyMappings?: (data: {}) => IKeyMapping[];
+  extractKeyMappings?: (data: {}) => KeyMapping[];
   /** A function that is called once per save operation to extract any deleted keys from any json received over the wire.  Must return an array.
   This method has a default implementation which simply returns an empty array. */
   extractDeletedKeys?: (data: {}) => any[]; // TODO: refine
   /** A visitor method that will be called on each node of the returned payload. */
-  visitNode?: (v: any, mc: MappingContext, nodeContext: INodeContext) => INodeMeta;
+  visitNode?: (v: any, mc: MappingContext, nodeContext: NodeContext) => NodeMeta;
 
 }
 
@@ -230,7 +230,7 @@ export class JsonResultsAdapter {
   extractSaveResults: Function;
     /** A function that is called once per save operation to extract the key mappings from any json received over the wire.  Must return an array.
   This method has a default implementation which simply returns the "keyMappings" property from any json returned as a result of executing the save. */
-  extractKeyMappings:  (data: {}) => IKeyMapping[];
+  extractKeyMappings:  (data: {}) => KeyMapping[];
   /** A function that is called once per save operation to extract any deleted keys from any json received over the wire.  Must return an array.
   This method has a default implementation which is to simply returns the "deletedKeys" property from any json returned as a result of executing the save. */
   extractDeletedKeys?: (data: {}) => any[]; // TODO: refine

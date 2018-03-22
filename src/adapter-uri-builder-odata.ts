@@ -1,6 +1,6 @@
 ﻿import * as breeze from './breeze';
 
-export class UriBuilderODataAdapter implements breeze.IUriBuilderAdapter {
+export class UriBuilderODataAdapter implements breeze.UriBuilderAdapter {
 
   name: string;
 
@@ -104,7 +104,7 @@ export class UriBuilderODataAdapter implements breeze.IUriBuilderAdapter {
 
 }
 
-(breeze.Predicate.prototype as any).toODataFragment = function (context: breeze.IVisitContext) {
+(breeze.Predicate.prototype as any).toODataFragment = function (context: breeze.VisitContext) {
   return this.visit(context, toODataFragmentVisitor);
 };
 
@@ -114,12 +114,12 @@ let toODataFragmentVisitor = {
     return this.value;
   },
 
-  unaryPredicate: function (this: breeze.UnaryPredicate, context: breeze.IVisitContext) {
+  unaryPredicate: function (this: breeze.UnaryPredicate, context: breeze.VisitContext) {
     let predVal = this.pred.visit(context);
     return odataOpFrom(this) + " " + "(" + predVal + ")";
   },
 
-  binaryPredicate: function (this: breeze.BinaryPredicate, context: breeze.IVisitContext) {
+  binaryPredicate: function (this: breeze.BinaryPredicate, context: breeze.VisitContext) {
     let expr1Val = this.expr1!.visit(context);
     let expr2Val = this.expr2!.visit(context);
     let prefix = (context as any).prefix;
@@ -145,7 +145,7 @@ let toODataFragmentVisitor = {
     }
   },
 
-  andOrPredicate: function (this: breeze.AndOrPredicate, context: breeze.IVisitContext) {
+  andOrPredicate: function (this: breeze.AndOrPredicate, context: breeze.VisitContext) {
     let result = this.preds.map(function (pred) {
       let predVal = pred.visit(context);
       return "(" + predVal + ")";
@@ -153,7 +153,7 @@ let toODataFragmentVisitor = {
     return result;
   },
 
-  anyAllPredicate: function (this: breeze.AnyAllPredicate, context: breeze.IVisitContext) {
+  anyAllPredicate: function (this: breeze.AnyAllPredicate, context: breeze.VisitContext) {
     let exprVal = this.expr.visit(context);
     if (!this.pred.op) { // added 21-Oct-2016 to fix breeze.js issue #172
       return exprVal + "/" + odataOpFrom(this) + "()";
@@ -181,13 +181,13 @@ let toODataFragmentVisitor = {
     }
   },
 
-  propExpr: function (this: breeze.PropExpr, context: breeze.IExpressionContext) {
+  propExpr: function (this: breeze.PropExpr, context: breeze.ExpressionContext) {
     let entityType = context.entityType;
     // '/' is the OData path delimiter
     return entityType ? entityType.clientPropertyPathToServer(this.propertyPath, "/") : this.propertyPath;
   },
 
-  fnExpr: function (this: breeze.FnExpr, context: breeze.IExpressionContext) {
+  fnExpr: function (this: breeze.FnExpr, context: breeze.ExpressionContext) {
     let exprVals = this.exprs.map(function (expr) {
       return expr.visit(context);
     });

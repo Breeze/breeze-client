@@ -1,7 +1,7 @@
 import { core  } from './core';
 import { observableArray } from './observable-array';
 import { BreezeEvent } from './event';
-import { IStructuralObject } from './entity-aspect';
+import { StructuralObject } from './entity-aspect';
 import { DataProperty } from './entity-metadata';
 
 // TODO: mixin impl is not very typesafe
@@ -88,9 +88,9 @@ let primitiveArrayMixin = {
 
 /** For use by breeze plugin authors only. The class is for use in building a [[IModelLibraryAdapter]] implementation. 
 @adapter (see [[IModelLibraryAdapter]])    
-@hidden @internal 
+@hidden 
 */
-export function makePrimitiveArray(arr: any[], parent: IStructuralObject, parentProperty: DataProperty) {
+export function makePrimitiveArray(arr: any[], parent: StructuralObject, parentProperty: DataProperty) {
   let arrX = arr as any;
   observableArray.initializeParent(arrX, parent, parentProperty);
   arrX.arrayChanged = new BreezeEvent("arrayChanged", arrX);
