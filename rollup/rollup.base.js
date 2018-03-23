@@ -12,9 +12,9 @@ export default {
         name: 'breeze',
         sourcemap: true,
         file: './temp/breeze.base.es2015.js', // must be transpiled after
-        format: 'umd'
+        format: 'umd',
+        banner: banner,
     },
-    banner: banner,
     plugins: [
         multiEntry()
     ]
