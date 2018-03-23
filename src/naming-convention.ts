@@ -19,7 +19,7 @@ A NamingConvention instance is used to specify the naming conventions under whic
 will translate property names between the server and the javascript client.
 
 The default NamingConvention does not perform any translation, it simply passes property names thru unchanged.
-
+@dynamic
 **/
 export class NamingConvention {
   /** @hidden @internal */

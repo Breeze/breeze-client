@@ -35,6 +35,7 @@ export interface Subscription {
 
 /**
 Class to support basic event publication and subscription semantics.
+@dynamic
 **/
 export class BreezeEvent<T> {
   /** @hidden @internal */

@@ -166,6 +166,7 @@ error message is generated.
 @param [context] {Object} A free form object whose properties will made available during the validation and error message creation process.
 This object will be passed into the Validator's validation function whenever 'validate' is called. See above for a description
 of additional properties that will be automatically added to this object if not otherwise specified.
+@dynamic
 **/
 export class Validator {
   /** @hidden @internal */

@@ -6,6 +6,7 @@ let _localTimeRegex = /.\d{3}$/;
 
 /**  
 DataType is an 'Enum' containing all of the supported data types.
+@dynamic
 **/
 export class DataType extends BreezeEnum {
   /** The default value of this DataType. __Read Only__ **/

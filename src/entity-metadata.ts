@@ -53,7 +53,7 @@ export interface MetadataFetchedEventArgs {
 An instance of the MetadataStore contains all of the metadata about a collection of [[EntityType]]'s.
 MetadataStores may be shared across [[EntityManager]]'s.  If an EntityManager is created without an
 explicit MetadataStore, the MetadataStore from the MetadataStore.defaultInstance property will be used.
-
+@dynamic
 **/
 export class MetadataStore {
   /** @hidden @internal */

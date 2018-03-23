@@ -36,6 +36,7 @@ Unlike enums in some other environments, each 'symbol' can have both methods and
 >         expect(DayOfWeek.Friday.toString()).toBe("Friday");
 >       });
 >   });
+@dynamic
 */
 export class BreezeEnum {
   // // TODO: think about CompositeEnum (flags impl).

@@ -25,7 +25,7 @@ An EntityQuery instance is used to query entities either from a remote datasourc
 
 EntityQueries are immutable - this means that all EntityQuery methods that return an EntityQuery actually create a new EntityQuery.  This means that
 EntityQueries can be 'modified' without affecting any current instances.
-
+@dynamic
 **/
 export class EntityQuery {
   /** @hidden @internal */

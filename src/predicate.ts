@@ -769,7 +769,7 @@ export class PropExpr extends PredicateExpression {
 
 /** For use by breeze plugin authors only. The class is for use in building a [[IUriBuilderAdapter]] implementation. 
 @adapter (see [[IUriBuilderAdapter]])    
-@hidden 
+@hidden @dynamic
 */
 export class FnExpr extends PredicateExpression {
   fnName: string;
