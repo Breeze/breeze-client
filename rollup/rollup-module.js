@@ -1,36 +1,43 @@
 var fs = require("fs-extra");
+var getArg = require("./build-util").getArg;
 var isDifferent = require("./build-util").isDifferent;
+var buildBundle = require("./rollup-single").buildBundle;
 var run = require("./build-util").run;
 
-var args = process.argv.slice(2);
-if (args.length !== 1 || args[0].indexOf('.js') >= 0) {
-  console.log("Usage: " + process.argv[0] + " " + process.argv[1] + " [filenameRoot]\n" +
-    "Example: node rollup-module.js adapter-ajax-angular");
-  return;
+// if running this file directly
+if (process.argv[1].indexOf("rollup-module.js") >= 0) {
+  // get from command-line arguments
+  var arg0 = getArg();   // 'adapter-ajax-angular';
+  buildModule(arg0);
 }
 
-// get from command-line arguments
-var root = args[0];   // 'adapter-ajax-angular';
+function buildModule(root) {
 
-var cmd = "node rollup/rollup-single.js " + root + 
-  " && npm run tsc-es5 -- --out temp/" + root + ".js temp/" + root + ".es2015.js";
+  buildBundle(root); // create the es2015 rollup bundle
 
-var mincmd = "npm run minify -- --output temp/" + root + ".min.js temp/" + root + ".js";
+  var es5cmd = "npm run tsc-es5 -- --out temp/esm5/" + root + ".umd.js temp/esm2015/" + root + ".umd.js";
+  var mincmd = "npm run minify -- --output temp/esm5/" + root + ".umd.min.js temp/esm5/" + root + ".umd.js";
 
-var srcName = "temp/" + root + ".js";
-var destName = "build/" + root + ".js";
-var srcMin = "temp/" + root + ".min.js";
-var destMin = "build/" + root + ".min.js";
+  var srcName = "temp/esm5/" + root + ".umd.js";
+  var destName = "dist/adapters/" + root + ".umd.js";
+  var srcMin = "temp/esm5/" + root + ".umd.min.js";
+  var destMin = "dist/adapters/" + root + ".umd.min.js";
 
-run(cmd, function () {
-  if (isDifferent(srcName, destName)) {
-    fs.copySync(srcName, destName);
+  run(es5cmd, function () {
+    if (isDifferent(srcName, destName)) {
+      fs.copySync(srcName, destName);
 
-    run(mincmd, function () {
-      if (isDifferent(srcMin, destMin)) {
-        fs.copySync(srcMin, destMin);
-      }
-    })
-  }
-})
+      run(mincmd, function () {
+        if (isDifferent(srcMin, destMin)) {
+          fs.copySync(srcMin, destMin);
+        }
+      })
+    }
+  });
+
+}
+
+module.exports = {
+  buildModule: buildModule
+}
 

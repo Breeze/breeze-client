@@ -53,9 +53,20 @@ function replaceInFile(filename, search, replace) {
     });
 }
 
+/** Get single command line argument, and show usage method if its incorrect */
+function getArg() {
+  var args = process.argv.slice(2);
+  if (args.length !== 1 || args[0].indexOf('.js') >= 0) {
+    var msg = "Usage: " + process.argv[0] + " " + process.argv[1] + " [filenameRoot]"
+    throw new Error(msg);
+  }
+  return args[0];
+}
+
 module.exports = {
   isDifferent: isDifferent,
   getFileSize: getFileSize,
   run: run,
-  replaceInFile: replaceInFile
+  replaceInFile: replaceInFile,
+  getArg: getArg
 }

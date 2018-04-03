@@ -54,14 +54,7 @@
     "rollup-full": "npm run rollup -- -c ./rollup/rollup.full.js && npm run tsc-es5 -- --out build/breeze.debug.js temp/breeze.full.es2015.js && npm run minify -- --output build/breeze.min.js build/breeze.debug.js",
     "rollup-base": "npm run rollup -- -c ./rollup/rollup.base.js && npm run tsc-es5 -- --out build/breeze.base.debug.js temp/breeze.base.es2015.js && npm run minify -- --output build/breeze.base.min.js build/breeze.base.debug.js",
     "rollup-ajax-angular": "node rollup/rollup-module.js adapter-ajax-angular",
-    "rollup-ajax-jquery": "node rollup/rollup-module.js adapter-ajax-jquery",
-    "rollup-data-odata": "node rollup/rollup-module.js adapter-data-service-odata",
-    "rollup-data-webapi": "node rollup/rollup-module.js adapter-data-service-webapi",
-    "rollup-model-backing": "node rollup/rollup-module.js adapter-model-library-backing-store",
-    "rollup-model-ko": "node rollup/rollup-module.js adapter-model-library-ko",
-    "rollup-uri-json": "node rollup/rollup-module.js adapter-uri-builder-json",
-    "rollup-uri-odata": "node rollup/rollup-module.js adapter-uri-builder-odata",
-    "rollup-adapters": "npm run rollup-ajax-angular && npm run rollup-ajax-jquery && npm run rollup-data-odata && npm run rollup-data-webapi && npm run rollup-model-backing && npm run rollup-model-ko && npm run rollup-uri-json && npm run rollup-uri-odata",
+    "rollup-adapters": "node rollup/rollup-adapters.js",
     "rollup-all": "npm run rollup-full && npm run rollup-base && npm run rollup-adapters"
   },
   "author": {

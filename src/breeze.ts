@@ -25,10 +25,10 @@ import { core } from './core';
 import { makeRelationArray, makePrimitiveArray, makeComplexArray } from './array';
 
 import { BreezeConfig } from './config';
-export { BreezeConfig } from './config';
 import { ComplexArray } from './complex-array';
 // import { IConfigParam } from './assert-param';
 import { RelationArray } from './relation-array';
+export { BreezeConfig, ComplexArray, RelationArray }
 
 
 export {
