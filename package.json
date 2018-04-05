@@ -53,7 +53,6 @@
     "typedoc": "typedoc --out ./temp/docs/ --exclude xx  --excludePrivate --excludeNotExported  --tsConfig ./tsconfig.typedoc.json --mode file --readme ./readme.doc.md ./src/breeze.ts && node rollup/copyIfDifferent.js temp/docs docs ",
     "rollup-full": "npm run rollup -- -c ./rollup/rollup.full.js && npm run tsc-es5 -- --out build/breeze.debug.js temp/breeze.full.es2015.js && npm run minify -- --output build/breeze.min.js build/breeze.debug.js",
     "rollup-base": "npm run rollup -- -c ./rollup/rollup.base.js && npm run tsc-es5 -- --out build/breeze.base.debug.js temp/breeze.base.es2015.js && npm run minify -- --output build/breeze.base.min.js build/breeze.base.debug.js",
-    "rollup-ajax-angular": "node rollup/rollup-module.js adapter-ajax-angular",
     "rollup-adapters": "node rollup/rollup-adapters.js",
     "rollup-all": "npm run rollup-full && npm run rollup-base && npm run rollup-adapters"
   },
