@@ -1361,9 +1361,9 @@ export class EntityType {
 
     let ok = true;
     let key = useServerName ? "nameOnServer" : "name";
+    let parentType = this as StructuralType;
     
-    const getProps = (propName: string) => {
-      let parentType = this as StructuralType;
+    const getProps = (propName: string) => { 
       let prop = core.arrayFirst(parentType.getProperties(), core.propEq(key, propName));
       if (prop) {
         parentType = (prop instanceof NavigationProperty) ? prop.entityType : prop.dataType as ComplexType;
