@@ -895,7 +895,8 @@ export class EntityType {
   */
   getEntityCtor = this.getCtor;
 
-  // static qualifyTypeName = qualifyTypeName;
+  /** @hidden @internal */
+  static qualifyTypeName = qualifyTypeName;
 
 
   /** EntityType constructor  
