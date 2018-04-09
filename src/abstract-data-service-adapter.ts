@@ -271,7 +271,7 @@ function createError(httpResponse: HttpResponse) {
     return err;
   }
 
-  // some ajax providers will convert errant result into an object ( angular), others will not (jQuery)
+  // some ajax providers will convert errant result into an object (angularjs), others will not (jQuery)
   // if not do it here.
   if (typeof errObj === "string") {
     try {

@@ -8,13 +8,13 @@ var _ = require('lodash');
 // if running this file directly
 if (process.argv[1].indexOf("rollup-single.js") >= 0) {
   // get from command-line arguments
-  var arg0 = getArg();   // 'adapter-ajax-angular';
+  var arg0 = getArg();   // e.g 'adapter-ajax-angularjs';
   buildBundle(arg0);
 }
 
 function buildBundle(root) {
 
-  var moduleName = _.camelCase('breeze-' + root); // 'breezeAdapterAjaxAngular'
+  var moduleName = _.camelCase(root); // 'AdapterAjaxAngularjs'
 
   var src = './temp/esm2015/' + root + '.js';
   var dest = './temp/esm2015/' + root + '.umd.js'; // must be transpiled after

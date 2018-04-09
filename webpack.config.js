@@ -12,7 +12,7 @@ module.exports = {
     'breeze.debug': [
       './src/breeze',
       './src/adapter-ajax-jquery',
-      './src/adapter-ajax-angular',
+      './src/adapter-ajax-angularjs',
       './src/adapter-model-library-backing-store',
       './src/adapter-model-library-ko',
       './src/adapter-data-service-webapi',

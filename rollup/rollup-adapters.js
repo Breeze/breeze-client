@@ -5,7 +5,7 @@ var run = require("./build-util").run;
 var fs = require("fs-extra");
 
 var adapters = [
-  "adapter-ajax-angular",
+  "adapter-ajax-angularjs",
   "adapter-ajax-jquery",
   "adapter-data-service-odata",
   "adapter-data-service-webapi",

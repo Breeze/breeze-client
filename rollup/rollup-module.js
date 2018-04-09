@@ -7,7 +7,7 @@ var run = require("./build-util").run;
 // if running this file directly
 if (process.argv[1].indexOf("rollup-module.js") >= 0) {
   // get from command-line arguments
-  var arg0 = getArg();   // 'adapter-ajax-angular';
+  var arg0 = getArg();   // e.g. 'adapter-ajax-angularjs';
   buildModule(arg0);
 }
 

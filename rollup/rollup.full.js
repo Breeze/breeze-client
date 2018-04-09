@@ -6,7 +6,7 @@ export default {
         './src/breeze.js',
         './src/interface-registry.js',
         './src/adapter-ajax-jquery.js',
-        './src/adapter-ajax-angular.js',
+        './src/adapter-ajax-angularjs.js',
         './src/adapter-model-library-backing-store.js',
         './src/adapter-data-service-webapi.js',
         './src/adapter-uri-builder-odata.js',

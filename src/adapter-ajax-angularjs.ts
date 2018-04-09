@@ -2,7 +2,7 @@
 
 let core = breeze.core;
 
-export class AjaxAngularAdapter implements breeze.AjaxAdapter {
+export class AjaxAngularjsAdapter implements breeze.AjaxAdapter {
   name: string;
   defaultSettings: { headers?: any };
   requestInterceptor?: (() => breeze.ChangeRequestInterceptor) | breeze.ChangeRequestInterceptor;
@@ -32,17 +32,17 @@ export class AjaxAngularAdapter implements breeze.AjaxAdapter {
       this.$rootScope = rootScope;
     }
 
-  };
+  }
 
   setHttp(http: any) {
     this.$http = http;
     this.$rootScope = null; // to suppress $rootScope.digest
-  };
+  }
 
 
   ajax(config: any) {
     if (!this.$http) {
-      throw new Error("Unable to locate angular for ajax adapter");
+      throw new Error("Unable to locate angularjs for ajax adapter");
     }
     let ngConfig = {
       method: config.type,
@@ -142,10 +142,10 @@ export class AjaxAngularAdapter implements breeze.AjaxAdapter {
       };
       config.error(httpResponse);
     }
-  };
+  }
 }
 
-breeze.config.registerAdapter("ajax", AjaxAngularAdapter);
+breeze.config.registerAdapter("ajax", AjaxAngularjsAdapter);
 
 function encodeParams(obj: Object) {
   let query = '';
