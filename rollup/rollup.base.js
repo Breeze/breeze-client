@@ -3,9 +3,9 @@ var banner = require('./banner').banner;
 
 export default {
     input: [
-        './src/breeze.js',
-        './src/interface-registry.js',
-        './src/abstract-data-service-adapter.js'
+        './temp/esm2015/src/breeze.js',
+        './temp/esm2015/src/interface-registry.js',
+        './temp/esm2015/src/abstract-data-service-adapter.js'
     ],
 
     output: {

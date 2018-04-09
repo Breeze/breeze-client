@@ -4,6 +4,7 @@
         "target": "es2015",
         "module": "es2015",
         "moduleResolution": "node",
+        "outDir": "temp/esm2015",
         "sourceMap": true,
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true,

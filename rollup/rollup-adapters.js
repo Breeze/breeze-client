@@ -20,7 +20,7 @@ var adapters = [
 
 // run(tsccmd, function() {
 adapters.forEach(function(a) {
-  fs.copySync("./src/" + a + ".js", "./temp/esm2015/" + a + ".js");
+  // fs.copySync("./src/" + a + ".js", "./temp/esm2015/" + a + ".js");
   buildModule(a);
 });
 

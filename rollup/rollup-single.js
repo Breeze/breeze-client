@@ -16,8 +16,8 @@ function buildBundle(root) {
 
   var moduleName = _.camelCase(root); // 'AdapterAjaxAngularjs'
 
-  var src = './temp/esm2015/' + root + '.js';
-  var dest = './temp/esm2015/' + root + '.umd.js'; // must be transpiled after
+  var src = './temp/esm2015/src/' + root + '.js';
+  var dest = './temp/esm2015/umd/' + root + '.umd.js'; // must be transpiled after
   var format = 'umd';
 
   rollup.rollup({

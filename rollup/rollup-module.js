@@ -15,9 +15,9 @@ function buildModule(root) {
 
   buildBundle(root); // create the es2015 rollup bundle
 
-  var es5cmd = "npm run tsc-es5 -- --out temp/esm5/" + root + ".umd.js temp/esm2015/" + root + ".umd.js";
+  var es5cmd = "npm run tsc-es5 -- --out temp/esm5/" + root + ".umd.js temp/esm2015/umd/" + root + ".umd.js";
   var mincmd = "npm run minify -- --output temp/esm5/" + root + ".umd.min.js temp/esm5/" + root + ".umd.js";
-
+  
   var srcName = "temp/esm5/" + root + ".umd.js";
   var destName = "dist/adapters/" + root + ".umd.js";
   var srcMin = "temp/esm5/" + root + ".umd.min.js";
