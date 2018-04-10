@@ -29,8 +29,20 @@ Run `npm run typedoc`.  This will create a '\docs' dir. click on the 'index.html
 Api is almost identical to the original but small changes are noted below:
 
  - Breeze no longer depends upon Q.js.  But it does depend on a ES6 promise implementation. i.e. the existence of a global `Promise` object.  The `setQ` function is now a no-op.
- - The names of the adapter files have changed.  E.g. `breeze.dataService.webApi` is now `adapter-data-service-webapi.umd`.
  - The names of the enum values no longer have "Symbol" at the end.  E.g. `EntityStateSymbol` is now `EntityState`.
+ - The names of the adapter files have changed.  E.g. `breeze.dataService.webApi` is now `adapter-data-service-webapi.umd`.
+
+If you have this:
+
+    import 'breeze-client/breeze.dataService.webApi';
+    import 'breeze-client/breeze.modelLibrary.backingStore';
+    import 'breeze-client/breeze.uriBuilder.odata';
+
+Replace it with this:
+
+    import 'breeze-client/adapters/adapter-data-service-webapi.umd';
+    import 'breeze-client/adapters/adapter-model-library-backing-store.umd';
+    import 'breeze-client/adapters/adapter-uri-builder-odata.umd';
 
 ## Compile Notes
 In general we have avoided using null parameters in favor of undefined parameters thoughout the API. This means that signatures will look like
