@@ -35,10 +35,10 @@
   },
   "scripts": {
     "postinstall": "node tools/postinstall.js",
-    "build": "tsb -p tsconfig.build.json && node tools/packager.js && npm run rollup-all",
+    "build": "tsb -p tsconfig.build.json && node tools/packager.js && npm run rollup-all && npm pack ./dist",
     "Xbuild": "npm run rollup-all && node buildpkg.js && cd build && npm pack",
     "Xbuild-package": "tsb -p tsconfig.build.json && node tools/packager.js",
-    "publish": "npm publish ./dist",
+    "publish": "npm publish --tag next ./dist",
     "test": "echo \"Error: no test specified\" && exit 1",
     "clean": "rimraf temp && rimraf src/*.js* && rimraf src/*.d.ts && rimraf build/*.js* && rimraf build/*.tgz && rimraf dist",
     "tsc": "tsc",
@@ -68,7 +68,7 @@
     "Marcel Good",
     "Ward Bell"
   ],
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/Breeze/breeze-client/issues"
   },

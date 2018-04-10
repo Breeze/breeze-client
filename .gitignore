@@ -27,6 +27,11 @@ build/**/*
 temp/**/*
 docs/**/*
 package-lock.json
+index.js
+index.js.map
+public_api.js
+public_api.js.map
+*.tgz
 
 ### node setup ###
 # Logs
