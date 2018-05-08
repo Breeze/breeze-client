@@ -1,11 +1,11 @@
 import { BreezeEvent } from './event';
 import { AbstractDataServiceAdapter} from './abstract-data-service-adapter';
-import { DataService, JsonResultsAdapter, NodeContext } from './data-service';
+import { DataService, DataServiceConfig, JsonResultsAdapter, NodeContext } from './data-service';
 import { DataType  } from './data-type';
 import { EntityAction } from './entity-action';
 import { EntityAspect, ComplexAspect, Entity, StructuralObject } from './entity-aspect';
 import { EntityKey } from './entity-key';
-import { EntityManager, EntityChangedEventArgs, SaveContext, SaveBundle, HttpResponse, KeyMapping, ServerError, SaveResult } from './entity-manager';
+import { EntityManager, EntityError, EntityChangedEventArgs, SaveContext, SaveBundle, HttpResponse, KeyMapping, ServerError, SaveResult } from './entity-manager';
 import { EntityQuery, FilterQueryOp, BooleanQueryOp, OrderByClause, ExpandClause, SelectClause } from './entity-query';
 import { EntityState } from './entity-state';
 import { InterfaceRegistry, AjaxAdapter, DataServiceAdapter, ModelLibraryAdapter, ChangeRequestInterceptor, UriBuilderAdapter, InterfaceRegistryConfig } from './interface-registry';
@@ -42,9 +42,11 @@ export {
   ComplexType,
   DataProperty,
   DataService,
+  DataServiceConfig,
   DataType,
   EntityAction,
   EntityAspect,
+  EntityError,
   EntityKey,
   EntityManager,
   EntityChangedEventArgs,
@@ -148,7 +150,7 @@ export const breeze = {
   makeComplexArray: makeComplexArray,
   makePrimitiveArray: makePrimitiveArray,
   makeRelationArray: makeRelationArray,
-  version: "2.0.0-alpha.4"
+  version: "2.0.0-alpha.5"
 };
 
 // breeze.assertConfig = assertConfig as any;

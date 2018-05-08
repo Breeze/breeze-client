@@ -47,12 +47,12 @@ For use by breeze plugin authors only. The class is for use in building a [[IDat
 @hidden @internal 
 */
 export interface SaveErrorFromServer extends ServerError {
-  entityErrors: EntityErrorDetailFromServer[];
+  entityErrors: EntityErrorFromServer[];
 }
 
 /** Shape of a save error when returned to the client. */
 export interface SaveError extends ServerError {
-  entityErrors: EntityErrorDetail[];
+  entityErrors: EntityError[];
 }
 
 // not subclasses of Error
@@ -61,7 +61,7 @@ For use by breeze plugin authors only. The class is for use in building a [[IDat
 @adapter (see [[IDataServiceAdapter]])    
 @hidden @internal 
 */
-export interface EntityErrorDetailFromServer {
+export interface EntityErrorFromServer {
   entityTypeName: string;
   keyValues: any[];
 
@@ -71,7 +71,7 @@ export interface EntityErrorDetailFromServer {
 }
 
 /** Shape of an error on a specific entity.  Part of a [[ISaveError]] */
-export interface EntityErrorDetail {
+export interface EntityError {
   entity: Entity;
   errorName: string;
   errorMessage: string;
@@ -1646,13 +1646,13 @@ function clearServerErrors(entities: Entity[]) {
 }
 
 function createEntityErrors(entities: Entity[]) {
-  let entityErrors: EntityErrorDetail[] = [];
+  let entityErrors: EntityError[] = [];
   entities.forEach((entity) => {
     core.objectForEach(entity.entityAspect._validationErrors, function (key, ve) {
       let cfg = core.extend({
         entity: entity,
         errorName: ve.validator.name
-      }, ve, ["errorMessage", "propertyName", "isServerError"]) as EntityErrorDetail;
+      }, ve, ["errorMessage", "propertyName", "isServerError"]) as EntityError;
       entityErrors.push(cfg);
     });
   });
@@ -1692,7 +1692,7 @@ function processServerErrors(saveContext: SaveContext, saveError: SaveErrorFromS
     let entityError = core.extend({
       entity: entity,
       isServerError: true
-    }, serr, ["errorName", "errorMessage", "propertyName"]) as EntityErrorDetail;
+    }, serr, ["errorName", "errorMessage", "propertyName"]) as EntityError;
     return entityError;
   });
   // converting ISaveErrorFromServer -> ISaveError 

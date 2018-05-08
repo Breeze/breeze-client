@@ -30,6 +30,8 @@ Api is almost identical to the original but small changes are noted below:
 
  - Breeze no longer depends upon Q.js.  But it does depend on a ES6 promise implementation. i.e. the existence of a global `Promise` object.  The `setQ` function is now a no-op.
  - The names of the enum values no longer have "Symbol" at the end.  E.g. `EntityStateSymbol` is now `EntityState`.
+ - The `DataServiceOptions` interface is now `DataServiceConfig` to be consistent with other naming
+ - The `initializeAdapterInstances` method is removed; use the singular `config.initializeAdapterInstance` method.
  - The names of the adapter files have changed.  E.g. `breeze.dataService.webApi` is now `adapter-data-service-webapi.umd`.
 
 If you have this:

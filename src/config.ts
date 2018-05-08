@@ -7,6 +7,8 @@ export interface AdapterCtor<T extends BaseAdapter> { new (...args: any[]): T; }
 /** @hidden */
 export interface IDef<T extends BaseAdapter> { ctor: AdapterCtor<T>; defaultInstance?: T; }
 
+export type AdapterType = 'dataService'|'modelLibrary'|'ajax'|'uriBuilder';
+
 export class InterfaceDef<T extends BaseAdapter> {
 
     name: string;
@@ -72,7 +74,7 @@ export class BreezeConfig {
     @param interfaceName {String} - one of the following interface names "ajax", "dataService" or "modelLibrary"
     @param adapterCtor {Function} - an ctor function that returns an instance of the specified interface.
     **/
-    registerAdapter<T extends BaseAdapter>(interfaceName: string, adapterCtor: AdapterCtor<T>) {
+    registerAdapter<T extends BaseAdapter>(interfaceName: AdapterType, adapterCtor: AdapterCtor<T>) {
         assertParam(interfaceName, "interfaceName").isNonEmptyString().check();
         assertParam(adapterCtor, "adapterCtor").isFunction().check();
         // this impl will be thrown away after the name is retrieved.
@@ -93,7 +95,7 @@ export class BreezeConfig {
     this method returns the "default" adapter for this interface. If there is no default adapter, then a null is returned.
     @return {Function|null} Returns either a ctor function or null.
     **/
-    getAdapter(interfaceName: string, adapterName: string) {
+    getAdapter(interfaceName: AdapterType, adapterName: string) {
         let idef = this.getInterfaceDef(interfaceName);
         if (adapterName) {
             let impl = idef.getImpl(adapterName);
@@ -113,7 +115,7 @@ export class BreezeConfig {
     @param [isDefault=true] {Boolean} - Whether to make this the default "adapter" for this interface.
     @return {an instance of the specified adapter}
     **/
-    initializeAdapterInstance(interfaceName: string, adapterName: string, isDefault: boolean = true) {
+    initializeAdapterInstance(interfaceName: AdapterType, adapterName: string, isDefault: boolean = true) {
         isDefault = isDefault === undefined ? true : isDefault;
         assertParam(interfaceName, "interfaceName").isNonEmptyString().check();
         assertParam(adapterName, "adapterName").isNonEmptyString().check();
@@ -138,7 +140,7 @@ export class BreezeConfig {
     @return {an instance of the specified adapter}
     @internal
     **/
-    getAdapterInstance<T extends BaseAdapter>(interfaceName: string, adapterName?: string) {
+    getAdapterInstance<T extends BaseAdapter>(interfaceName: AdapterType, adapterName?: string) {
         let idef = this.getInterfaceDef<T>(interfaceName);
         let impl: IDef<T>;
 
