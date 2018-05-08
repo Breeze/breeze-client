@@ -42,6 +42,8 @@ export class BreezeEnum {
   // // TODO: think about CompositeEnum (flags impl).
   /** The name of this symbol */
   name: string;
+  /** Type of the enum; set in prototype of each enum */
+  _$typeName: string;
   /** @hidden @internal */
   static _resolvedNamesAndSymbols: { name: string, symbol: BreezeEnum }[];
 
@@ -141,7 +143,7 @@ export class BreezeEnum {
   /** Return enum name and symbol name */
   toJSON() {
     return {
-      _$typeName: (this.constructor as any).name,
+      _$typeName: this['_$typeName'] || (this.constructor as any).name,
       name: this.name
     };
   }

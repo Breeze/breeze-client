@@ -40,6 +40,7 @@ export class MergeStrategy extends BreezeEnum {
 
 
 }
+MergeStrategy.prototype._$typeName = "MergeStrategy";
 MergeStrategy.resolveSymbols();
 
 
@@ -58,7 +59,7 @@ export class FetchStrategy extends BreezeEnum {
   static FromLocalCache = new FetchStrategy();
 
 }
-
+FetchStrategy.prototype._$typeName = "FetchStrategy";
 FetchStrategy.resolveSymbols();
 
 /** Configuration info to be passed to the [[QueryOptions]] constructor. */
