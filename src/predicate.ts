@@ -330,7 +330,7 @@ export class Predicate {
 
     let entityType = context.entityType;
     // don't bother validating if already done so ( or if no _validate method
-    if (this._validate && entityType == null || this._entityType !== entityType) {
+    if (this._validate && (entityType == null || this._entityType !== entityType)) {
       // don't need to capture return value because validation fn doesn't have one.
       // TODO: this was old code
       // this._validate(entityType, context.usesNameOnServer);
@@ -750,7 +750,7 @@ export class PropExpr extends PredicateExpression {
   _validate(entityType: EntityType | undefined, usesNameOnServer?: boolean) {
 
     if (entityType == null || entityType.isAnonymous) return;
-    let props = entityType.getPropertiesOnPath(this.propertyPath, usesNameOnServer || false, false);
+    let props = entityType.getPropertiesOnPath(this.propertyPath, null, false);
 
     if (!props) {
       let msg = core.formatString("Unable to resolve propertyPath.  EntityType: '%1'   PropertyPath: '%2'", entityType.name, this.propertyPath);
@@ -996,7 +996,7 @@ function parseLitOrPropExpr(value: string, exprContext: ExpressionContext): Pred
       let mayBeIdentifier = RX_IDENTIFIER.test(value);
       if (mayBeIdentifier) {
         // if (entityType.getProperty(value, false) != null) {
-        if (entityType.getPropertiesOnPath(value, exprContext.usesNameOnServer || false, false) != null) {
+        if (entityType.getPropertiesOnPath(value, null, false) != null) {
           return new PropExpr(value);
         }
       }

@@ -1357,15 +1357,16 @@ export class EntityType {
   /** @hidden @internal */
   // TODO: have this return empty array instead of null and fix consumers.
   // TODO: think about renaming with '_' prefix.
-  getPropertiesOnPath(propertyPath: string, useServerName: boolean, throwIfNotFound: boolean = false) {
+  getPropertiesOnPath(propertyPath: string, useServerName: boolean | null, throwIfNotFound: boolean = false) {
     let propertyNames: string[] = (Array.isArray(propertyPath)) ? propertyPath : propertyPath.trim().split('.');
 
     let ok = true;
-    let key = useServerName ? "nameOnServer" : "name";
+    let key = useServerName === true ? "nameOnServer" : useServerName === false ? "name" : null;
     let parentType = this as StructuralType;
     
     const getProps = (propName: string) => { 
-      let prop = core.arrayFirst(parentType.getProperties(), core.propEq(key, propName));
+      const fn = key === null ? core.propsEq("name", "nameOnServer", propName) : core.propEq(key, propName);
+      let prop = core.arrayFirst(parentType.getProperties(), fn);
       if (prop) {
         parentType = (prop instanceof NavigationProperty) ? prop.entityType : prop.dataType as ComplexType;
         // parentType = prop.isNavigationProperty ? prop.entityType : prop.dataType;

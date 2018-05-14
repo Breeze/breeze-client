@@ -1,6 +1,6 @@
 
 var fs = require("fs-extra");
-var replaceInFile = require("./rollup/build-util").replaceInFile;
+var replaceInFile = require("../rollup/build-util").replaceInFile;
 
 // remove unneeded files that cause tsc errors
 fs.remove("./node_modules/@types/highlight.js");

@@ -86,6 +86,13 @@ function propEq(propertyName: string, value: any): (obj: Object) => boolean {
     };
 }
 
+/** can be used like: persons.filter(propEq("firstName", "FirstName", "John")) */
+function propsEq(property1Name: string, property2Name: string, value: any): (obj: Object) => boolean {
+    return function (obj: any) {
+        return obj[property1Name] === value || obj[property2Name] === value;
+    };
+}
+
 /** can be used like persons.map(pluck("firstName")) */
 function pluck(propertyName: any): (obj: Object) => any {
     return function (obj: any) {
@@ -680,6 +687,7 @@ export const core = {
     objectMap: objectMap, // TODO: replace this with something strongly typed.
     extend: extend,
     propEq: propEq,
+    propsEq: propsEq,
     pluck: pluck,
     map: map,
     resolveProperties: resolveProperties,
