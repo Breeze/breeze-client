@@ -1,0 +1,8 @@
+{
+  "name": "adapter-model-library-backing-store",
+  "ngPackage": {
+    "lib": {
+        "entryFile": "../src/adapter-model-library-backing-store.ts"
+      }
+  }
+}

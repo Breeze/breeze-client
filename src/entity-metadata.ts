@@ -2547,7 +2547,7 @@ function isQualifiedTypeName(entityTypeName: string) {
   return entityTypeName.indexOf(":#") >= 0;
 }
 
-function qualifyTypeName(shortName: string, ns?: string) {
+export function qualifyTypeName(shortName: string, ns?: string) {
   if (ns && ns.length > 0) {
     return shortName + ":#" + ns;
   } else {

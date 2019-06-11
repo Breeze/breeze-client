@@ -1,5 +1,5 @@
-﻿import * as breeze from './breeze'; // TODO: think about this approach for plugin modules.
-import { JsonResultsAdapter, KeyMapping } from './breeze';
+﻿import * as breeze from 'breeze-client';
+// import { JsonResultsAdapter, KeyMapping } from './breeze';
 
 /** @hidden */
 export class DataServiceWebApiAdapter extends breeze.AbstractDataServiceAdapter {
@@ -49,7 +49,7 @@ export class DataServiceWebApiAdapter extends breeze.AbstractDataServiceAdapter 
     // use the jsonResultAdapter to extractResults and extractKeyMappings
     let jra = saveContext.dataService.jsonResultsAdapter || this.jsonResultsAdapter;
     let entities = jra.extractSaveResults(data) || [];
-    let keyMappings: KeyMapping[] = jra.extractKeyMappings(data) || [];
+    let keyMappings: breeze.KeyMapping[] = jra.extractKeyMappings(data) || [];
     let deletedKeys = jra.extractDeletedKeys ? (jra.extractDeletedKeys(data)) || [] : [];
 
     if (keyMappings.length) {
@@ -76,7 +76,7 @@ export class DataServiceWebApiAdapter extends breeze.AbstractDataServiceAdapter 
 
   }
 
-  jsonResultsAdapter: JsonResultsAdapter = new breeze.JsonResultsAdapter({
+  jsonResultsAdapter: breeze.JsonResultsAdapter = new breeze.JsonResultsAdapter({
 
     name: "webApi_default",
 

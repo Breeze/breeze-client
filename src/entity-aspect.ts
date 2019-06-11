@@ -16,13 +16,13 @@ export interface Entity {
   entityAspect: EntityAspect;
   entityType: EntityType;
   /** @internal */
-  getProperty(prop: string): any;
+  getProperty?(prop: string): any;
   /** @internal */
-  setProperty(prop: any, value: any): void;
+  setProperty?(prop: any, value: any): void;
   /** @hidden @internal */
-  prototype: { _$typeName: string };
+  prototype?: { _$typeName: string };
   /** @hidden @internal */
-  _$entityType: EntityType;
+  _$entityType?: EntityType;
 }
 
 export interface ComplexObject {
@@ -31,7 +31,7 @@ export interface ComplexObject {
   getProperty(prop: string): any;
   setProperty(prop: any, value: any): void;
   /** @hidden @internal */
-  prototype: { _$typeName: string };
+  prototype?: { _$typeName: string };
 }
 
 export type StructuralObject = Entity | ComplexObject;
@@ -193,7 +193,7 @@ export class EntityAspect {
     }
   };
 
-  /** @hidden @internal */
+  /** @hidden */
   // type-guard
   static isEntity(obj: StructuralObject): obj is Entity {
     return (obj as any).entityAspect != null;

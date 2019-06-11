@@ -1,10 +1,8 @@
 {
   "compress": {
-    "warnings": true,
     "passes": 2
   },
   "sourceMap": true,
   "ie8": true,
-  "mangle": true,
-  "warnings": true
+  "mangle": true
 }

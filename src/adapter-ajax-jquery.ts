@@ -1,4 +1,4 @@
-﻿import * as breeze from './breeze';
+﻿import * as breeze from 'breeze-client';
 
 declare var jQuery: any;
 let core = breeze.core;

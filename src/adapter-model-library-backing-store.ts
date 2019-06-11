@@ -1,4 +1,4 @@
-﻿import * as breeze from './breeze';
+﻿import * as breeze from 'breeze-client';
 
 let core = breeze.core;
 
@@ -26,7 +26,7 @@ export class ModelLibraryBackingStoreAdapter implements breeze.ModelLibraryAdapt
       }
     }
     return names;
-  };
+  }
 
   // This method is called during Metadata initialization
   initializeEntityPrototype(proto: any) {
@@ -45,7 +45,7 @@ export class ModelLibraryBackingStoreAdapter implements breeze.ModelLibraryAdapt
     };
 
     movePropDefsToProto(proto);
-  };
+  }
 
   // This method is called when an EntityAspect is first created - this will occur as part of the entityType.createEntity call.
   // which can be called either directly or via standard query materialization

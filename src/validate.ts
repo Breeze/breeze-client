@@ -384,7 +384,7 @@ export class Validator {
   @param [context.allowEmptyStrings] {Boolean} If this parameter is omitted or false then empty strings do NOT pass validation.
   @return {Validator} A new Validator
   **/
-  public static required(context?: any) {
+  public static required = function(context?: any) {
     let valFn = function (v: any, ctx: any) {
       if (typeof v === "string") {
         if (ctx && ctx.allowEmptyStrings) return true;
@@ -394,7 +394,7 @@ export class Validator {
       }
     };
     return new Validator("required", valFn, context);
-  }
+  };
 
   /**
   Returns a standard maximum string length Validator; the maximum length must be specified
@@ -410,14 +410,14 @@ export class Validator {
   @param context.maxLength {Integer}
   @return {Validator} A new Validator
   **/
-  public static maxLength(context: any) {
+  public static maxLength = function(context: any) {
     let valFn = function (v: any, ctx: any) {
       if (v == null) return true;
       if (typeof (v) !== "string") return false;
       return v.length <= ctx.maxLength;
     };
     return new Validator("maxLength", valFn, context);
-  }
+  };
 
   /**
   Returns a standard string length Validator; both minimum and maximum lengths must be specified.
@@ -520,7 +520,7 @@ export class Validator {
   **/
 
     // TODO: may need to have seperate logic for single.
-  public static number(context: any) {
+  public static number = function(context: any) {
     let valFn = function (v: any, ctx: any) {
       if (v == null) return true;
       if (typeof v === "string" && ctx && ctx.allowString) {
@@ -529,7 +529,7 @@ export class Validator {
       return (typeof v === "number" && !isNaN(v));
     };
     return new Validator("number", valFn, context);
-  }
+  };
   public static double = Validator.number;
   public static single = Validator.number;
 
@@ -545,7 +545,7 @@ export class Validator {
   @static
   @return {Validator} A new Validator
   **/
-  public static integer(context: any) {
+  public static integer = function(context: any) {
     let valFn = function (v: any, ctx: any) {
       if (v == null) return true;
       if (typeof v === "string" && ctx && ctx.allowString) {
@@ -554,7 +554,7 @@ export class Validator {
       return (typeof v === "number") && (!isNaN(v)) && Math.floor(v) === v;
     };
     return new Validator("integer", valFn, context);
-  }
+  };
   public static int64 = Validator.integer;
 
   /**
@@ -568,9 +568,9 @@ export class Validator {
   @static
   @return {Validator} A new Validator
   **/
-  public static int32(context: any) {
+  public static int32 = function(context: any) {
     return intRangeValidatorCtor("int32", INT32_MIN, INT32_MAX, context)();
-  }
+  };
 
   /**
   Returns a standard 16 bit integer data type Validator.
@@ -584,9 +584,9 @@ export class Validator {
   @static
   @return {Validator} A new Validator
   **/
-  public static int16(context: any) {
+  public static int16 = function(context: any) {
     return intRangeValidatorCtor("int16", INT16_MIN, INT16_MAX, context)();
-  }
+  };
 
   /**
   Returns a standard byte data type Validator. (This is a integer between 0 and 255 inclusive for js purposes).
@@ -601,9 +601,9 @@ export class Validator {
   @static
   @return {Validator} A new Validator
   **/
-  public static byte(context: any) {
+  public static byte = function(context: any) {
     return intRangeValidatorCtor("byte", BYTE_MIN, BYTE_MAX, context)();
-  }
+  };
 
   /**
   Returns a standard boolean data type Validator.
@@ -617,20 +617,20 @@ export class Validator {
   @static
   @return {Validator} A new Validator
   **/
-  public static bool() {
+  public static bool = function() {
     let valFn = function (v: any) {
       if (v == null) return true;
       return (v === true) || (v === false);
     };
     return new Validator("bool", valFn);
-  }
+  };
 
-  public static none() {
+  public static none = function() {
     let valFn = function (v: any) {
       return true;
     };
     return new Validator("none", valFn);
-  }
+  };
 
   /**
   Returns a standard date data type Validator.
@@ -645,7 +645,7 @@ export class Validator {
   @static
   @return {Validator} A new Validator
   **/
-  public static date() {
+  public static date = function() {
     let valFn = function (v: any) {
       if (v == null) return true;
       if (typeof v === "string") {
@@ -661,7 +661,7 @@ export class Validator {
       }
     };
     return new Validator("date", valFn);
-  }
+  };
 
   /**
   Returns a credit card number validator
@@ -678,7 +678,7 @@ export class Validator {
   @param [context] {Object} optional parameters to pass through to validation constructor
   @return {Validator} A new Validator
   **/
-  public static creditCard(context: any) {
+  public static creditCard = function(context: any) {
     function valFn(v: any) {
       if (v == null || v === '') return true;
       if (typeof (v) !== 'string') return false;
@@ -687,7 +687,7 @@ export class Validator {
       return luhn(v);
     }
     return new Validator('creditCard', valFn, context);
-  }
+  };
 
 
   /**
@@ -704,7 +704,7 @@ export class Validator {
   @param context.expression {String} String form of the regular expression to apply
   @return {Validator} A new Validator
   **/
-  public static regularExpression(context: any) {
+  public static regularExpression = function(context: any) {
     function valFn(v: any, ctx: any) {
       // do not invalidate if empty; use a separate required test
       if (v == null || v === '') return true;
@@ -717,7 +717,7 @@ export class Validator {
       }
     }
     return new Validator('regularExpression', valFn, context);
-  }
+  };
 
   /**
   Returns the email address validator
@@ -732,11 +732,11 @@ export class Validator {
   @param [context] {Object} optional parameters to pass through to validation constructor
   @return {Validator} A new Validator
   **/
-  public static emailAddress(context: any) {
+  public static emailAddress = function(context: any) {
     // See https://github.com/srkirkland/DataAnnotationsExtensions/blob/master/DataAnnotationsExtensions/EmailAttribute.cs
     let reEmailAddress = /^((([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+(\.([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+)*)|((\x22)((((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(([\x01-\x08\x0b\x0c\x0e-\x1f\x7f]|\x21|[\x23-\x5b]|[\x5d-\x7e]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(\\([\x01-\x09\x0b\x0c\x0d-\x7f]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))))*(((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(\x22)))@((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?$/i;
     return makeRegExpValidator('emailAddress', reEmailAddress, null, context);
-  }
+  };
 
   /**
   Returns the phone validator

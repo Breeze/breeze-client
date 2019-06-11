@@ -164,14 +164,18 @@ export class BreezeConfig {
     registerFunction(fn: Function, fnName: string) {
         assertParam(fn, "fn").isFunction().check();
         assertParam(fnName, "fnName").isString().check();
-        fn.prototype._$fnName = fnName;
+        if (fn.prototype) {
+            fn.prototype._$fnName = fnName;
+        }
         this.functionRegistry[fnName] = fn;
     }
 
     registerType(ctor: Function, typeName: string) {
         assertParam(ctor, "ctor").isFunction().check();
         assertParam(typeName, "typeName").isString().check();
-        ctor.prototype._$typeName = typeName;
+        if (ctor.prototype) {
+            ctor.prototype._$typeName = typeName;
+        }
         this.typeRegistry[typeName] = ctor;
     }
 

@@ -1,9 +1,4 @@
-﻿// import { config } from './config';
-// import { core } from './core';
-
-// import { DataProperty, ComplexType, StructuralType, EntityProperty, NavigationProperty } from './entity-metadata';
-// import { makeRelationArray, makeComplexArray, makePrimitiveArray } from './array';
-import * as breeze from './breeze';
+﻿import * as breeze from 'breeze-client';
 
 let core = breeze.core;
 

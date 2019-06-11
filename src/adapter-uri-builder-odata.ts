@@ -1,4 +1,4 @@
-﻿import * as breeze from './breeze';
+﻿import * as breeze from 'breeze-client';
 
 export class UriBuilderODataAdapter implements breeze.UriBuilderAdapter {
 

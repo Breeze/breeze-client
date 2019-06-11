@@ -1,6 +1,4 @@
-﻿import * as breeze from './breeze';
-import { QueryResult, SaveResult } from './entity-manager';
-import { JsonResultsAdapter } from './data-service';
+﻿import * as breeze from 'breeze-client';
 
 let core = breeze.core;
 
@@ -124,7 +122,7 @@ export class DataServiceODataAdapter extends breeze.AbstractDataServiceAdapter {
       url = url + sep + paramString;
     }
 
-    let promise = new Promise<QueryResult>((resolve, reject) => {
+    let promise = new Promise<breeze.QueryResult>((resolve, reject) => {
       OData.read({
         requestUri: url,
         headers: core.extend({}, this.headers)
@@ -155,7 +153,7 @@ export class DataServiceODataAdapter extends breeze.AbstractDataServiceAdapter {
   }
 
 
-  saveChanges(odataSaveContext: breeze.SaveContext, saveBundle: breeze.SaveBundle): Promise<SaveResult> {
+  saveChanges(odataSaveContext: breeze.SaveContext, saveBundle: breeze.SaveBundle): Promise<breeze.SaveResult> {
     let adapter = odataSaveContext.adapter = this;
     let saveContext = odataSaveContext as ODataSaveContext;
     let url: string;
@@ -226,7 +224,7 @@ export class DataServiceODataAdapter extends breeze.AbstractDataServiceAdapter {
 
   }
 
-  jsonResultsAdapter: JsonResultsAdapter = new breeze.JsonResultsAdapter({
+  jsonResultsAdapter: breeze.JsonResultsAdapter = new breeze.JsonResultsAdapter({
     name: "OData_default",
 
     visitNode: function (node: any, mappingContext: breeze.MappingContext, nodeContext: breeze.NodeContext) {
