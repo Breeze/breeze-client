@@ -1,7 +1,0 @@
-{
-  "extends": "./tsconfig.json",
-  "bundlerOptions": {
-    "entry": "./public_api.ts",
-    "outdir": "./dist"
-  }
-}

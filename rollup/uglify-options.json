@@ -1,8 +1,0 @@
-{
-  "compress": {
-    "passes": 2
-  },
-  "sourceMap": true,
-  "ie8": true,
-  "mangle": true
-}

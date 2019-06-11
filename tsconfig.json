@@ -6,12 +6,16 @@
         "module": "commonjs",
         "moduleResolution": "node",
         "stripInternal": true,
+        "baseUrl": ".",
+        "paths": {
+            "breeze-client": ["./src/breeze"]
+        },
         "sourceMap": true,
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true,
         "removeComments": false,
         "noImplicitAny": true,
-        "strictNullChecks": true,
+        "strictNullChecks": false,
         "suppressImplicitAnyIndexErrors": true,
         "noUnusedLocals": false,
         "typeRoots": [
@@ -21,10 +25,8 @@
     },
     "exclude": [
         "node_modules",
-        "temp",
-        "build",
-        "lib",
-        "rollup"
+        "dist",
+        "temp"
     ]
 
 }

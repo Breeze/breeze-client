@@ -2,6 +2,10 @@
 Breeze data management for JavaScript clients.  
 See the [docs](http://breeze.github.io/doc-js/features.html) for more info about what Breeze does and how to use it.
 
+## Install from npm
+
+    npm install breeze-client@next
+
 ## Build using ng-packagr
 Run `npm run build`.  This will create files in the '\dist' dir.  The directory structure is the [Angular Package Format](https://docs.google.com/document/d/1CZC2rcpxffTDfRDs6p1cfbmKNLA6x5O-NtkJglDaBVs/preview).
 

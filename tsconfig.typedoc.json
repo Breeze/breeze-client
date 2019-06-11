@@ -9,7 +9,7 @@
         "experimentalDecorators": true,
         "removeComments": false,
         "noImplicitAny": true,
-        "strictNullChecks": true,
+        "strictNullChecks": false,
         "suppressImplicitAnyIndexErrors": true,
         "noUnusedLocals": true,
         "lib": ["es5", "es2015.promise", "webworker"]
