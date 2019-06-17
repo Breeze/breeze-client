@@ -41,8 +41,7 @@ export class MergeStrategy extends BreezeEnum {
 
 }
 MergeStrategy.prototype._$typeName = "MergeStrategy";
-MergeStrategy.resolveSymbols();
-
+globalThis['x'] = MergeStrategy.resolveSymbols();
 
 /**
 FetchStrategy is an 'Enum' that determines how and where entities are retrieved from as a result of a query.
@@ -60,7 +59,7 @@ export class FetchStrategy extends BreezeEnum {
 
 }
 FetchStrategy.prototype._$typeName = "FetchStrategy";
-FetchStrategy.resolveSymbols();
+globalThis['x'] = FetchStrategy.resolveSymbols();
 
 /** Configuration info to be passed to the [[QueryOptions]] constructor. */
 export interface QueryOptionsConfig {

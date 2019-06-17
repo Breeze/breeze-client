@@ -9,6 +9,11 @@ export class DataServiceWebApiAdapter extends breeze.AbstractDataServiceAdapter 
     this.name = "webApi";
   }
 
+  static register() {
+    breeze.config.registerAdapter("dataService", DataServiceWebApiAdapter);
+    breeze.config.initializeAdapterInstance("dataService", "webApi", true);
+  }
+
   /** @hidden @internal */
   _prepareSaveBundle(saveContext: breeze.SaveContext, saveBundle: breeze.SaveBundle) {
     let changeRequestInterceptor = this._createChangeRequestInterceptor(saveContext, saveBundle);

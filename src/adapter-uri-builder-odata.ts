@@ -8,6 +8,11 @@ export class UriBuilderODataAdapter implements breeze.UriBuilderAdapter {
     this.name = "odata";
   }
 
+  static register() {
+    breeze.config.registerAdapter("uriBuilder", UriBuilderODataAdapter);
+    breeze.config.initializeAdapterInstance("uriBuilder", "odata", true);
+  }
+
   initialize() { }
 
   buildUri(entityQuery: breeze.EntityQuery, metadataStore: breeze.MetadataStore) {

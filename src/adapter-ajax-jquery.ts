@@ -13,8 +13,12 @@ export class AjaxJQueryAdapter implements breeze.AjaxAdapter {
     this.name = "jQuery";
     this.defaultSettings = { };
     this.requestInterceptor = undefined;
-  };
+  }
 
+  static register() {
+    breeze.config.registerAdapter("ajax", AjaxJQueryAdapter);
+    breeze.config.initializeAdapterInstance("ajax", "jQuery", true);
+  }
 
   initialize() {
     this.jQuery = jQuery;
@@ -22,7 +26,7 @@ export class AjaxJQueryAdapter implements breeze.AjaxAdapter {
     if (!jQuery) {
       this.jQuery = core.requireLib("jQuery;jquery");
     }
-  };
+  }
 
   ajax(config: any) {
     if (!this.jQuery) {

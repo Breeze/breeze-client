@@ -7,11 +7,15 @@ export class ModelLibraryBackingStoreAdapter implements breeze.ModelLibraryAdapt
 
   constructor() {
     this.name = "backingStore";
-  };
+  }
+
+  static register() {
+    breeze.config.registerAdapter("modelLibrary", ModelLibraryBackingStoreAdapter);
+    breeze.config.initializeAdapterInstance("modelLibrary", "backingStore", true);
+  }
 
   initialize() {
-
-  };
+  }
 
   getTrackablePropertyNames(entity: breeze.Entity) {
     let names: string[] = [];
@@ -96,7 +100,7 @@ export class ModelLibraryBackingStoreAdapter implements breeze.ModelLibraryAdapt
         bs[propName] = val;
       }
     });
-  };
+  }
 }
 
 breeze.config.registerAdapter("modelLibrary", ModelLibraryBackingStoreAdapter);

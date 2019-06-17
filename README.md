@@ -45,25 +45,42 @@ API is almost identical to the original (breezejs 1.x) but small changes are not
  The names of the adapter files have changed.  E.g. `breeze.dataService.webApi` is now `adapter-data-service-webapi`, 
  and the locations have changed due to Angular-compatible bundling.
 
+ Also, the aggressive tree-shaking of tsickle/terser/webpack in Angular 8 removes the functions that the Breeze adapters
+ use to register themselves!  So you need to register them yourself.
+
 If you have this:
 
     import 'breeze-client/breeze.dataService.webApi';
     import 'breeze-client/breeze.modelLibrary.backingStore';
     import 'breeze-client/breeze.uriBuilder.odata';
+    import { BreezeBridgeHttpClientModule } from 'breeze-bridge2-angular';
 
-Replace it with this for ES5 (Angular 2 - 7):
+Replace it with this:
 
-    import 'breeze-client/esm5/adapter-data-service-webapi/adapter-data-service-webapi';
-    import 'breeze-client/esm5/adapter-model-library-backing-store/adapter-model-library-backing-store';
-    import 'breeze-client/esm5/adapter-uri-builder-json/adapter-uri-builder-json';
+    import { config } from 'breeze-client';
+    import { DataServiceWebApiAdapter } from 'breeze-client/adapter-data-service-webapi';
+    import { ModelLibraryBackingStoreAdapter } from 'breeze-client/adapter-model-library-backing-store';
+    import { UriBuilderODataAdapter } from 'breeze-client/adapter-uri-builder-odata';
+    import { AjaxHttpClientAdapter } from 'breeze-bridge2-angular';
 
-Or this for ES6 (Angular 8+):
+Note that now you _do not_ import the `BreezeBridgeHttpClientModule`, just the `AjaxHttpClientAdapter`.
 
-    import 'breeze-client/esm2015/adapter-data-service-webapi/adapter-data-service-webapi';
-    import 'breeze-client/esm2015/adapter-model-library-backing-store/adapter-model-library-backing-store';
-    import 'breeze-client/esm2015/adapter-uri-builder-json/adapter-uri-builder-json';
+Then, in your constructor function (for your module or Entity Manager Provider):
 
-And the UMD versions are still available (under the `bundles` directory) for apps that use global JavaScript libraries:
+    constructor(http: HttpClient) {
+        // the order is important
+        ModelLibraryBackingStoreAdapter.register();
+        UriBuilderODataAdapter.register();
+
+        config.registerAdapter('ajax', <any>function() { return new AjaxHttpClientAdapter(http); });
+        config.initializeAdapterInstance('ajax', AjaxHttpClientAdapter.adapterName, true);
+
+        DataServiceWebApiAdapter.register();
+    }
+
+The above has been tested on Angular 7 and 8, and should work for earlier versions.
+
+For apps that use global JavaScript libraries, the UMD versions are still available, under the `bundles` directory:
 
     <script src="node_modules/breeze-client/bundles/breeze-client.umd.js"></script>
     <script src="node_modules/breeze-client/bundles/breeze-client-adapter-model-library-backing-store.umd.js"></script>

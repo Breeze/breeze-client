@@ -11,6 +11,11 @@ export class ModelLibraryKnockoutAdapter implements breeze.ModelLibraryAdapter {
     this.name = "ko";
   }
 
+  static register() {
+    breeze.config.registerAdapter("modelLibrary", ModelLibraryKnockoutAdapter);
+    breeze.config.initializeAdapterInstance("modelLibrary", "ko", true);
+  }
+
   initialize() {
     ko = core.requireLib("ko;knockout", "The Knockout library");
     ko.extenders.intercept = function (target: any, interceptorOptions: any) {

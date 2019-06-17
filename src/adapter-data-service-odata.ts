@@ -26,6 +26,11 @@ export class DataServiceODataAdapter extends breeze.AbstractDataServiceAdapter {
     this.name = "OData";
   }
 
+  static register() {
+    breeze.config.registerAdapter("dataService", DataServiceODataAdapter);
+    breeze.config.initializeAdapterInstance("dataService", "OData", true);
+  }
+
   initialize() {
     OData = core.requireLib("OData", "Needed to support remote OData services");
     OData.jsonHandler.recognizeDates = true;

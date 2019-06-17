@@ -7,6 +7,11 @@ export class UriBuilderJsonAdapter implements breeze.UriBuilderAdapter {
     this.name = "json";
   }
 
+  static register() {
+    breeze.config.registerAdapter("uriBuilder", UriBuilderJsonAdapter);
+    breeze.config.initializeAdapterInstance("uriBuilder", "json", true);
+  }
+
   initialize() {}
 
   buildUri(entityQuery: breeze.EntityQuery, metadataStore: breeze.MetadataStore) {

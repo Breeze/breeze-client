@@ -476,7 +476,7 @@ class PassthruPredicate extends Predicate {
 
   // _validate = core.noop;
 }
-PassthruPredicate.prototype._initialize('passthruPredicate');
+globalThis['x'] = PassthruPredicate.prototype._initialize('passthruPredicate');
 
 /** For use by breeze plugin authors only. The class is for use in building a [[IUriBuilderAdapter]] implementation. 
 @adapter (see [[IUriBuilderAdapter]])    
@@ -496,7 +496,7 @@ export class UnaryPredicate extends Predicate {
   }
 }
 
-UnaryPredicate.prototype._initialize('unaryPredicate', {
+globalThis['x'] = UnaryPredicate.prototype._initialize('unaryPredicate', {
   'not': { aliases: ['!', '~'] },
 });
 
@@ -549,7 +549,7 @@ export class BinaryPredicate extends Predicate {
 
 }
 
-BinaryPredicate.prototype._initialize('binaryPredicate', {
+globalThis['x'] = BinaryPredicate.prototype._initialize('binaryPredicate', {
   'eq': {
     aliases: ["==", "equals"]
   },
@@ -618,7 +618,7 @@ export class AndOrPredicate extends Predicate {
   }
 }
 
-AndOrPredicate.prototype._initialize("andOrPredicate", {
+globalThis['x'] = AndOrPredicate.prototype._initialize("andOrPredicate", {
   'and': { aliases: ['&&'] },
   'or': { aliases: ['||'] }
 } );
@@ -653,7 +653,7 @@ export class AnyAllPredicate extends Predicate {
 
 }
 
-AnyAllPredicate.prototype._initialize("anyAllPredicate", {
+globalThis['x'] = AnyAllPredicate.prototype._initialize("anyAllPredicate", {
   'any': { aliases: ['some'] },
   'all': { aliases: ["every"] }
 });

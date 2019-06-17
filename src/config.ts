@@ -71,7 +71,7 @@ export class BreezeConfig {
     Method use to register implementations of standard breeze interfaces.  Calls to this method are usually
     made as the last step within an adapter implementation.
     @method registerAdapter
-    @param interfaceName {String} - one of the following interface names "ajax", "dataService" or "modelLibrary"
+    @param interfaceName {String} - one of the following interface names: "ajax", "dataService", "modelLibrary", "uriBuilder"
     @param adapterCtor {Function} - an ctor function that returns an instance of the specified interface.
     **/
     registerAdapter<T extends BaseAdapter>(interfaceName: AdapterType, adapterCtor: AdapterCtor<T>) {
@@ -90,7 +90,7 @@ export class BreezeConfig {
     /**
     Returns the ctor function used to implement a specific interface with a specific adapter name.
     @method getAdapter
-    @param interfaceName {String} One of the following interface names "ajax", "dataService" or "modelLibrary"
+    @param interfaceName {String} One of the following interface names: "ajax", "dataService", "modelLibrary", "uriBuilder"
     @param [adapterName] {String} The name of any previously registered adapter. If this parameter is omitted then
     this method returns the "default" adapter for this interface. If there is no default adapter, then a null is returned.
     @return {Function|null} Returns either a ctor function or null.

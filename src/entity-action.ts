@@ -57,7 +57,7 @@ export class EntityAction extends BreezeEnum {
   }
 }
 EntityAction.prototype._$typeName = "EntityAction";
-EntityAction.resolveSymbols();
+globalThis['x'] = EntityAction.resolveSymbols();
 
 
 
