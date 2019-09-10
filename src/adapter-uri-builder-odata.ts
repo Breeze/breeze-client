@@ -43,7 +43,8 @@ export class UriBuilderODataAdapter implements breeze.UriBuilderAdapter {
     }
 
     let qoText = toQueryOptionsString(queryOptions as breeze.QueryOptions);
-    return entityQuery.resourceName + qoText;
+    let sep = entityQuery.resourceName.includes("?") ? "&" : "?";
+    return entityQuery.resourceName + sep + qoText;
 
     // private methods to this func.
 
@@ -99,7 +100,7 @@ export class UriBuilderODataAdapter implements breeze.UriBuilderAdapter {
       }
 
       if (qoStrings.length > 0) {
-        return "?" + qoStrings.join("&");
+        return qoStrings.join("&");
       } else {
         return "";
       }

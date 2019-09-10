@@ -24,7 +24,8 @@ export class UriBuilderJsonAdapter implements breeze.UriBuilderAdapter {
 
     let jsonString = JSON.stringify(json);
     let urlBody = encodeURIComponent(jsonString);
-    return entityQuery.resourceName + "?" + urlBody;
+    let sep = entityQuery.resourceName.includes("?") ? "&" : "?";
+    return entityQuery.resourceName + sep + urlBody;
 
   }
 

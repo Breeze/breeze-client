@@ -203,6 +203,7 @@ function toJson(source: Object, template: Object, target: Object = {}): Object {
 /** Replacer function for toJSONSafe, when serializing entities.  Excludes entityAspect and other internal properties. */
 function toJSONSafeReplacer(prop: string, val: any) {
     if (prop === "entityAspect" || prop === "complexAspect" || prop === "entityType" || prop === "complexType"
+        || prop === "getProperty" || prop === "setProperty"
         || prop === "constructor" || prop.charAt(0) === '_' || prop.charAt(0) === '$') return;
     return val;
 }

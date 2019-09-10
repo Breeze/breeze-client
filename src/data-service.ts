@@ -137,12 +137,15 @@ export class DataService {
 
   /**
    Returns a url for this dataService with the specified suffix. This method handles dataService names either
-   with or without trailing '/'s.
+   with or without trailing '/'s.  If the suffix starts with "http" then it will be returned as-is.
    @method qualifyUrl
    @param suffix {String} The resulting url.
    @return {a Url string}
    **/
   qualifyUrl(suffix: string) {
+    if (suffix && suffix.startsWith("http")) {
+      return suffix;
+    }
     let url = this.serviceName;
     // remove any trailing "/"
     if (core.stringEndsWith(url, "/")) {
