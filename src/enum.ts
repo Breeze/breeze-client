@@ -36,7 +36,7 @@ Unlike enums in some other environments, each 'symbol' can have both methods and
 >         expect(DayOfWeek.Friday.toString()).toBe("Friday");
 >       });
 >   });
-Note that we have globalThis['x'] = ... in some places in the code to prevent Terser from optimizing out some important calls.
+Note that we have Error['x'] = ... in some places in the code to prevent Terser from optimizing out some important calls.
 @dynamic
 */
 export class BreezeEnum {

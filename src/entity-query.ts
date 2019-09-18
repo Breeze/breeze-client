@@ -915,7 +915,7 @@ export class FilterQueryOp extends BreezeEnum implements QueryOp {
   static IsTypeOf = new FilterQueryOp({ operator: "isof" });
 }
 FilterQueryOp.prototype._$typeName = "FilterQueryOp";
-globalThis['x'] = FilterQueryOp.resolveSymbols();
+Error['x'] = FilterQueryOp.resolveSymbols();
 
 
 /**
@@ -932,7 +932,7 @@ export class BooleanQueryOp extends BreezeEnum implements QueryOp {
 
 }
 BooleanQueryOp.prototype._$typeName = "BooleanQueryOp";
-globalThis['x'] = BooleanQueryOp.resolveSymbols();
+Error['x'] = BooleanQueryOp.resolveSymbols();
 
 
 /** For use by breeze plugin authors only.  The class is used in most [[IUriBuilderAdapter]] implementations

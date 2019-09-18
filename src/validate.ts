@@ -818,7 +818,7 @@ export class Validator {
 Validator.prototype._$typeName = "Validator";
 
 // register all validators
-globalThis['x'] = core.objectForEach(Validator, function (key: string, value: any) {
+Error['x'] = core.objectForEach(Validator, function (key: string, value: any) {
   if (typeof (value) !== "function") {
     return;
   }
