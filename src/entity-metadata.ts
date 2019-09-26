@@ -1650,8 +1650,13 @@ function updateClientServerNames(nc: NamingConvention, parent: any, clientPropNa
 }
 
 function createEmptyCtor(type: any) {
-  let name = type.name.replace(/\W/g, '_');
-  return Function('return function ' + name + '(){}')();
+  if (config.noEval) {
+    let entity = function() {};
+    return entity;
+  } else {
+    let name = type.name.replace(/\W/g, '_');
+    return Function('return function ' + name + '(){}')();
+  }
 }
 
 function coEquals(co1: ComplexObject, co2: ComplexObject): boolean {

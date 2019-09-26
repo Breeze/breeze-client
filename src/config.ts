@@ -60,11 +60,22 @@ export class BreezeConfig {
     interfaceInitialized: BreezeEvent<{ interfaceName: string, instance: BaseAdapter, isDefault: boolean }>;
 
     stringifyPad = '';
+    /** whether to prohibit eval() and Function() in breeze code */
+    noEval: boolean;
     /** @hidden @internal */
     _interfaceRegistry: any;  // will be set in adapter-interfaces. untyped here to avoid circularity issues.
 
     constructor() {
         this.interfaceInitialized = new BreezeEvent("interfaceInitialized", this);
+        if (this.noEval === undefined) {
+            try {
+                let x = Function('');
+                this.noEval = false; // eval succeeded
+            } catch {
+                this.noEval = true; // eval failed, probably due to CSP
+            }
+        }
+        
     }
 
     /**
