@@ -23,7 +23,8 @@
   "scripts": {
     "build": "npm run packagr && npm pack ./dist",
     "publish": "npm publish --tag next ./dist",
-    "test": "tsc && jasmine",
+    "test": "tsc && node tools/set-breeze-client.js && jasmine",
+    "debug": "tsc && node tools/set-breeze-client.js && node --inspect-brk node_modules/jasmine/bin/jasmine.js",
     "clean": "rimraf temp && rimraf src/*.js* && rimraf src/*.d.ts && rimraf ./*.d.ts && rimraf dist",
     "tsc": "tsc",
     "watch-tsc": "tsc -w",

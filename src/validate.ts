@@ -298,7 +298,9 @@ export class Validator {
         return Validator.fromJSON(js);
       });
     }
-
+    if (json instanceof Validator) {
+      return json;
+    }
     let validatorName = "Validator." + json.name;
     let fn = config.getRegisteredFunction(validatorName);
     if (!fn) {

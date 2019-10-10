@@ -107,11 +107,14 @@ Note that it is still acceptable for api calls to return a null to indicate that
 
 ## Jasmine tests 
 
-1) from command line
-    run 'npm install jasmine -g' ( global install).
-    run 'jasmine'  from top level breeze-next dir.
+1) From command line:
 
-2) from vs code debugger
+    run `npm install jasmine -g` ( global install).
+
+    run `npm run test`  from top level breeze-client dir.
+
+2) From VS code debugger:
+
     add this section to 'launch.json'
      
         {
@@ -128,7 +131,22 @@ Note that it is still acceptable for api calls to return a null to indicate that
             "outDir": "${workspaceRoot}/dist"
         }    
 
-    run 'npm install jasmine' // local install   
+    run `npm install jasmine` // local install   
     set breakpoint and hit Ctrl-F5.     
 
+3) From Chrome debugger:
+
+    See [Debugging Node.js with Chrome DevTools](https://medium.com/@paul_irish/debugging-node-js-nightlies-with-chrome-devtools-7c4a1b95ae27#.pmqejrn8q).
+
+    1) Open Chrome and go to `chrome://inspect`
+
+    2) Click on the link that says [Open dedicated DevTools for Node]()
+
+    3) Put a `debugger;` statement in your code where you want to start debugging
+
+    4) Run your Jasmine tests in debug mode
+
+        `npm run debug`
+
+    5) Go back to the browser. The `--inspect-brk` (part of the `npm run debug` script) tells the debugger to break on the first line of the first script. You're stopped inside of Jasmine.  Now set your breakpoints, and click the arrow (or hit F8) to continue.
 
