@@ -4,7 +4,7 @@ import { AjaxFakeAdapter } from '../src/adapter-ajax-fake';
 import { ModelLibraryBackingStoreAdapter } from '../src/adapter-model-library-backing-store';
 import { UriBuilderJsonAdapter } from '../src/adapter-uri-builder-json';
 import { DataServiceWebApiAdapter } from '../src/adapter-data-service-webapi';
-import { EntityType, ComplexType } from 'breeze-client';
+import { EntityType, ComplexType } from '../src/entity-metadata';
 
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 120000;
 ModelLibraryBackingStoreAdapter.register();
@@ -16,7 +16,6 @@ const metadata = require('./support/ComplexTypeMetadata.json');
 describe("ComplexType", function() {
 
   beforeEach(function() {
-
   });
 
   it("should create entity and complex type", function() {
@@ -95,7 +94,7 @@ describe("ComplexType", function() {
 
     return em.saveChanges().then(sr => {
       expect(sr.entities).toBeTruthy();
-      expect(sr.entities.length).toEqual(1);
+      expect(sr.entities.length).toEqual(3);
     }).catch(err => {
       console.log(err);
       expect(err).toBeUndefined();

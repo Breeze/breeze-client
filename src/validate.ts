@@ -328,8 +328,8 @@ export class Validator {
   @param validatorFactory {Function} A function that optionally takes a context property and returns a Validator instance.
   @param name {String} The name of the validator.
   **/
-  public static registerFactory(validatorFn: ValidationFn, name: string) {
-    config.registerFunction(validatorFn, "Validator." + name);
+  public static registerFactory(validatorFactory: (options?: any) => Validator, name: string) {
+    config.registerFunction(validatorFactory, "Validator." + name);
   }
 
   /**
