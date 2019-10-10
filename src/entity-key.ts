@@ -58,7 +58,7 @@ export class EntityKey {
     entityType.keyProperties.forEach(function (kp, i) {
       // insure that guid keys are comparable.
       if (kp.dataType === DataType.Guid) {
-        keyValues[i] = keyValues[i] && keyValues[i].toLowerCase();
+        keyValues[i] = keyValues[i] && keyValues[i].toLowerCase ? keyValues[i].toLowerCase() : keyValues[i];
       }
     });
 

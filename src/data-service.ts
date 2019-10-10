@@ -197,7 +197,7 @@ export interface NodeContext {
 /** Configuration info to be passed to the [[JsonResultsAdapter]] constructor */
 export interface JsonResultsAdapterConfig {
   /** The name of this adapter.  This name is used to uniquely identify and locate this instance when an 'exported' JsonResultsAdapter is later imported. */
-  name?: string;
+  name: string;
   /** A Function that is called once per query operation to extract the 'payload' from any json received over the wire. 
   This method has a default implementation which to simply return the "results" property from any json returned as a result of executing the query. 
   */
