@@ -72,4 +72,34 @@ describe("ComplexType", function() {
       expect(err).toBeUndefined();
     });
   });
+
+  it("should set array of unmapped entities", function() {
+    let em = new EntityManager('test');
+    let ms = em.metadataStore;
+    ms.importMetadata(metadata);
+
+    let customer = em.createEntity("Customer", { CompanyName: "ACME"});
+    expect(customer).toBeTruthy();
+
+    let orderType = ms.getEntityType("Order") as EntityType;
+    expect(orderType).toBeTruthy("Could not get Order type");
+    let o1 = orderType.createEntity({ ShipName: "One", Customer: customer });
+    let o2 = orderType.createEntity({ ShipName: "Two", Customer: customer });
+
+    let orderProp = customer.getProperty("UnmappedOrders");
+    orderProp.push(o1);
+    orderProp.push(o2);
+
+    let errors = em.saveChangesValidateOnClient([customer]);
+    expect(errors).toBeNull("Got validation errors");
+
+    return em.saveChanges().then(sr => {
+      expect(sr.entities).toBeTruthy();
+      expect(sr.entities.length).toEqual(1);
+    }).catch(err => {
+      console.log(err);
+      expect(err).toBeUndefined();
+    });
+  });
+
 });

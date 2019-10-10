@@ -63,6 +63,8 @@ export class AjaxFakeAdapter implements breeze.AjaxAdapter {
 
     function done() {
       // create simulated SaveResult
+      // TODO keymappings
+      // TODO allow tester to provide return value
       let data = JSON.parse(requestInfo.config.data);
       if (data.entities) {
         data.entities.forEach(function(e: any) { delete(e.entityAspect); });
