@@ -105,6 +105,8 @@ Note that it is still acceptable for api calls to return a null to indicate that
 
 ## Jasmine tests 
 
+The tests are found in the `spec` directory.  There are three ways to run them.
+
 **1) From command line:**
 
 run `npm install jasmine -g` ( global install).
@@ -151,8 +153,8 @@ See [Debugging Node.js with Chrome DevTools](https://medium.com/@paul_irish/debu
 
 ## Legacy Tests
 
-The original `breeze.js` repo contains thousands of tests, some of which are end-to-end and require a server backend.  The tests are in [../breeze.js/test/internal/](../breeze.js/test/internal/) and they expect to find a `breeze.debug.js` file in 
-the neighboring directory, ../breeze.js/test/breeze/.
+The original [breeze.js](../breeze.js) repo contains thousands of tests, some of which are end-to-end and require a server backend.  The tests are in [breeze.js/test/internal/](../breeze.js/test/internal/), and they expect to find a `breeze.debug.js` file in 
+the neighboring directory, breeze.js/test/breeze/.
 
 The `breeze.debug.js` file is a UMD module containing the main breeze-client code and certain adapters.  To build it, run
 
