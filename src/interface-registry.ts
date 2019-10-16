@@ -6,7 +6,7 @@ import { EntityQuery } from './entity-query';
 import { MetadataStore } from './entity-metadata';
 import { JsonResultsAdapter, DataService } from './data-service';
 import { Entity } from './entity-aspect';
-import { SaveContext, SaveBundle, QueryResult, SaveResult } from './entity-manager';
+import { SaveContext, SaveBundle, QueryResult, SaveResult, HttpResponse } from './entity-manager';
 
 export interface InterfaceRegistryConfig {
     ajax?: InterfaceDef<AjaxAdapter>;
@@ -73,9 +73,22 @@ config.initializeAdapterInstances = function (irConfig: InterfaceRegistryConfig)
     return core.objectMap(config, this.initializeAdapterInstance);
 };
 
+/** DataServiceAdapter Ajax request configuration */
+export interface AjaxConfig {
+    url: string;
+    type?: string;
+    dataType?: string;
+    contentType?: string | boolean;
+    crossDomain?: string | boolean;
+    headers?: {};
+    data?: any;
+    params?: {};
+    success: (res: HttpResponse) => void;
+    error: (res: (HttpResponse | Error)) => void;
+}
 
 export interface AjaxAdapter extends BaseAdapter {
-    ajax(config: any): void;
+    ajax(config: AjaxConfig): void;
 }
 
 export interface ModelLibraryAdapter extends BaseAdapter {

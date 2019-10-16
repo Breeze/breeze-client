@@ -248,7 +248,7 @@ function wrapPropDescription(proto: any, property: breeze.EntityProperty): any {
   };
   (newDescr.set as any).rawSet = propDescr.set;
   return newDescr;
-};
+}
 
 
 function getBackingStore(instance: any) {

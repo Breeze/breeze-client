@@ -348,7 +348,7 @@ export class EntityManager {
 
     this.clear();
 
-  };
+  }
 
   /**
   General purpose property set method.  Any of the properties in the [[EntityManagerConfig]]
@@ -362,7 +362,7 @@ export class EntityManager {
   **/
   setProperties(config: EntityManagerConfig) {
     EntityManager._updateWithConfig(this, config, false);
-  };
+  }
 
   /** @hidden @internal */
   static _updateWithConfig(em: EntityManager, config: EntityManagerConfig, isCtor: boolean) {
@@ -438,7 +438,7 @@ export class EntityManager {
       entity = this.attachEntity(entity, entityState, mergeStrategy);
     }
     return entity;
-  };
+  }
 
   static importEntities(exportedString: string, config?: ImportConfig): EntityManager;
   static importEntities(exportedData: Object, config?: ImportConfig): EntityManager;
@@ -468,7 +468,7 @@ export class EntityManager {
     let em = new EntityManager();
     em.importEntities(exported, config);
     return em;
-  };
+  }
 
   // instance methods
 
@@ -481,7 +481,7 @@ export class EntityManager {
     }).forEach(function (aspect) {
       aspect.acceptChanges();
     });
-  };
+  }
 
   /**
   Exports selected entities, all entities of selected types, or an entire EntityManager cache.
@@ -576,7 +576,7 @@ export class EntityManager {
 
     let result = exportConfig.asString ? JSON.stringify(json, null, config.stringifyPad) : json;
     return result;
-  };
+  }
 
   // TODO: type the return value { entities: entitiesToLink, tempKeyMapping: tempKeyMap }
   importEntities(exportedString: string, config?: ImportConfig): any;
@@ -674,7 +674,7 @@ export class EntityManager {
       entities: entitiesToLink,
       tempKeyMapping: tempKeyMap
     };
-  };
+  }
 
   /**
   Clears this EntityManager's cache but keeps all other settings. Note that this
@@ -696,7 +696,7 @@ export class EntityManager {
     this.keyGenerator = new this.keyGeneratorCtor();
     this.entityChanged.publish({ entityAction: EntityAction.Clear });
     this._setHasChanges(false);
-  };
+  }
 
   /**
   Creates an empty copy of this EntityManager but with the same DataService, MetadataStore, QueryOptions, SaveOptions, ValidationOptions, etc. 
@@ -710,7 +710,7 @@ export class EntityManager {
     let copy = new EntityManager(core.extend({}, this,
       ["dataService", "metadataStore", "queryOptions", "saveOptions", "validationOptions", "keyGeneratorCtor"]));
     return copy;
-  };
+  }
 
   /**
   Attaches an entity to this EntityManager with an  [[EntityState]] of 'Added'.
@@ -730,7 +730,7 @@ export class EntityManager {
   **/
   addEntity(entity: Entity) {
     return this.attachEntity(entity, EntityState.Added);
-  };
+  }
 
   /**
   Attaches an entity to this EntityManager with a specified [[EntityState]].
@@ -795,7 +795,7 @@ export class EntityManager {
     this.entityChanged.publish({ entityAction: EntityAction.Attach, entity: attachedEntity });
 
     return attachedEntity;
-  };
+  }
 
 
   /**
@@ -820,7 +820,7 @@ export class EntityManager {
       throw new Error("This entity does not belong to this EntityManager.");
     }
     return aspect.setDetached();
-  };
+  }
 
   /**
   Fetches the metadata associated with the EntityManager's current 'serviceName'.  This call
@@ -858,7 +858,7 @@ export class EntityManager {
 
     let promise = this.metadataStore.fetchMetadata(dataService || this.dataService);
     return promiseWithCallbacks(promise, callback, errorCallback);
-  };
+  }
 
 
   executeQuery(query: string, callback?: QuerySuccessCallback, errorCallback?: QueryErrorCallback): Promise<QueryResult>;
@@ -929,7 +929,7 @@ export class EntityManager {
     }
 
     return promiseWithCallbacks(promise, callback, errorCallback as ErrorCallback);
-  };
+  }
 
   /**
   Executes the specified query against this EntityManager's local cache.
@@ -1898,7 +1898,7 @@ function structuralObjectToJson(so: StructuralObject, dps: DataProperty[], seria
     } else {
       value = serializerFn ? serializerFn(dp, value) : value;
       if (dp.isUnmapped) {
-        value = core.toJSONSafe(value);
+        value = core.toJSONSafe(value, core.toJSONSafeReplacer);
       }
     }
     if (value === undefined) return;
@@ -2340,7 +2340,7 @@ function unwrapInstance(structObj: StructuralObject, transformFn?: (dp: DataProp
       val = serializerFn ? serializerFn(dp, val) : val;
       if (val !== undefined) {
         if (dp.isUnmapped) {
-          unmapped[dp.nameOnServer] = core.toJSONSafe(val);
+          unmapped[dp.nameOnServer] = core.toJSONSafe(val, core.toJSONSafeReplacer);
         } else {
           rawObject[dp.nameOnServer] = val;
         }

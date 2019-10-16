@@ -2,27 +2,15 @@ import * as breeze from 'breeze-client';
 
 let core = breeze.core;
 
-export interface AjaxConfig {
-      type: string;
-      url: string;
-      data?: any;
-      dataType?: string;
-      contentType?: string;
-      crossDomain?: boolean;
-      headers?: any;
-}
-
 /** Simulates sending ajax to server and getting empty response.  For testing. */
 export class AjaxFakeAdapter implements breeze.AjaxAdapter {
   name: string;
-  defaultSettings: { headers?: any };
   requestInterceptor?: (() => breeze.ChangeRequestInterceptor) | breeze.ChangeRequestInterceptor;
   /** Provides return values for requests.  Used for testing. */
-  responseFn: (ajaxConfig: AjaxConfig) => any;
+  responseFn: (ajaxConfig: breeze.AjaxConfig) => any;
 
   constructor() {
     this.name = "ajaxfake";
-    this.defaultSettings = { };
     this.requestInterceptor = undefined;
   }
 
@@ -34,29 +22,12 @@ export class AjaxFakeAdapter implements breeze.AjaxAdapter {
   initialize() {
   }
 
-  ajax(config: any) {
-    let jqConfig: AjaxConfig = {
-      type: config.type,
-      url: config.url,
-      data: config.params || config.data,
-      dataType: config.dataType,
-      contentType: config.contentType,
-      crossDomain: config.crossDomain,
-      headers: config.headers || {}
-    };
+  ajax(config: breeze.AjaxConfig) {
     let responseFn = this.responseFn;
-
-    if (!core.isEmpty(this.defaultSettings)) {
-      let compositeConfig = core.extend({}, this.defaultSettings);
-      jqConfig = core.extend(compositeConfig, jqConfig) as any;
-      // extend is shallow; extend headers separately
-      let headers = core.extend({}, this.defaultSettings.headers); // copy default headers 1st
-      jqConfig.headers = core.extend(headers, jqConfig.headers);
-    }
 
     let requestInfo = {
       adapter: this,      // this adapter
-      config: jqConfig,   // jQuery's ajax 'settings' object
+      config: config,     // the config arg from the calling Breeze DataServiceAdapter
       dsaConfig: config,  // the config arg from the calling Breeze DataServiceAdapter
       success: successFn, // adapter's success callback
       error: errorFn,      // adapter's error callback
@@ -77,7 +48,6 @@ export class AjaxFakeAdapter implements breeze.AjaxAdapter {
     function done() {
       // create simulated SaveResult
       // TODO keymappings
-      // TODO allow tester to provide return value
       let config = requestInfo.config;
       let data: any;
       if (responseFn) {

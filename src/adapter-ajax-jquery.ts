@@ -28,7 +28,7 @@ export class AjaxJQueryAdapter implements breeze.AjaxAdapter {
     }
   }
 
-  ajax(config: any) {
+  ajax(config: breeze.AjaxConfig) {
     if (!this.jQuery) {
       throw new Error("Unable to locate jQuery");
     }
@@ -100,7 +100,7 @@ export class AjaxJQueryAdapter implements breeze.AjaxAdapter {
       // jqXHR.onreadystatechange = null;
       // jqXHR.abort = null;
     }
-  };
+  }
 }
 
 breeze.config.registerAdapter("ajax", AjaxJQueryAdapter);

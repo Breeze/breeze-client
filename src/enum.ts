@@ -1,4 +1,12 @@
-﻿/**
+﻿/*
+ * Copyright 2012-2019 IdeaBlade, Inc.  All Rights Reserved.  
+ * Use, reproduction, distribution, and modification of this code is subject to the terms and 
+ * conditions of the IdeaBlade Breeze license, available at http://www.breezejs.com/license
+ *
+ * Author: Jay Traband
+ */
+
+/**
 Base class for all Breeze enumerations, such as EntityState, DataType, FetchStrategy, MergeStrategy etc.
 A Breeze Enum is a namespaced set of constant values.  Each Enum consists of a group of related constants, called 'symbols'.
 Unlike enums in some other environments, each 'symbol' can have both methods and properties.

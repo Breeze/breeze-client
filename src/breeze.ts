@@ -8,7 +8,7 @@ import { EntityKey } from './entity-key';
 import { EntityManager, EntityManagerConfig, EntityError, EntityChangedEventArgs, SaveContext, SaveBundle, HttpResponse, KeyMapping, ServerError, SaveResult, QueryResult } from './entity-manager';
 import { EntityQuery, FilterQueryOp, BooleanQueryOp, OrderByClause, ExpandClause, SelectClause } from './entity-query';
 import { EntityState } from './entity-state';
-import { InterfaceRegistry, AjaxAdapter, DataServiceAdapter, ModelLibraryAdapter, ChangeRequestInterceptor, UriBuilderAdapter, InterfaceRegistryConfig } from './interface-registry';
+import { InterfaceRegistry, AjaxAdapter, AjaxConfig, DataServiceAdapter, ModelLibraryAdapter, ChangeRequestInterceptor, UriBuilderAdapter, InterfaceRegistryConfig } from './interface-registry';
 import { KeyGenerator } from './key-generator';
 import { LocalQueryComparisonOptions } from './local-query-comparison-options';
 import { MappingContext } from './mapping-context';
@@ -60,6 +60,7 @@ export {
   FilterQueryOp,
   FnExpr,
   AjaxAdapter,
+  AjaxConfig,
   BaseAdapter,
   ChangeRequestInterceptor,
   DataServiceAdapter,
@@ -153,7 +154,7 @@ export const breeze = {
   makeComplexArray: makeComplexArray,
   makePrimitiveArray: makePrimitiveArray,
   makeRelationArray: makeRelationArray,
-  version: "2.0.0-beta.1"
+  version: "2.0.0-beta.2"
 };
 
 // breeze.assertConfig = assertConfig as any;

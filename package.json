@@ -1,6 +1,6 @@
 {
   "name": "breeze-client",
-  "version": "2.0.0-beta.1",
+  "version": "2.0.0-beta.2",
   "private": true,
   "description": "Breeze data management for JavaScript clients",
   "repository": "https://github.com/Breeze/breeze-client.git",
@@ -16,16 +16,19 @@
     "typedoc": "^0.14.2",
     "typescript": "~3.4.5",
     "ng-packagr": "^5.3.0",
-    "@angular/compiler": "^8.0.0",
-    "@angular/compiler-cli": "^8.0.0",
-    "@angular/core": "^8.0.0"
+    "@angular/compiler": "^8.2.10",
+    "@angular/compiler-cli": "^8.2.10",
+    "@angular/core": "^8.2.10",
+    "@angular/common": "^8.2.10",
+    "rxjs": "^6.5.3"
   },
   "scripts": {
-    "build": "npm run packagr && npm pack ./dist",
+    "build": "npm run clean && npm run packagr && npm pack ./dist",
+    "copy-to-breezejs": "node tools/copy-to-breezejs.js",
     "publish": "npm publish --tag next ./dist",
     "test": "tsc && node tools/set-breeze-client.js && jasmine",
     "debug": "tsc && node tools/set-breeze-client.js && node --inspect-brk node_modules/jasmine/bin/jasmine.js",
-    "clean": "rimraf temp && rimraf src/*.js* && rimraf src/*.d.ts && rimraf ./*.d.ts && rimraf dist",
+    "clean": "rimraf temp && rimraf src/*.js* && rimraf src/*.d.ts && rimraf ./*.d.ts && rimraf dist && rimraf node_modules/breeze-client.js",
     "tsc": "tsc",
     "watch-tsc": "tsc -w",
     "typedoc": "typedoc --out ./temp/docs/ --exclude xx  --excludePrivate --excludeNotExported  --tsConfig ./tsconfig.typedoc.json --mode file --readme ./readme.doc.md ./src/breeze.ts && node tools/copyIfDifferent.js temp/docs docs ",

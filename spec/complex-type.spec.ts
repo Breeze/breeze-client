@@ -85,9 +85,13 @@ describe("ComplexType", function() {
     let o1 = orderType.createEntity({ ShipName: "One", Customer: customer });
     let o2 = orderType.createEntity({ ShipName: "Two", Customer: customer });
 
-    let orderProp = customer.getProperty("UnmappedOrders");
+    let orderProp = customer.getProperty("Orders");
     orderProp.push(o1);
     orderProp.push(o2);
+
+    let uProp = customer.getProperty("UnmappedOrders");
+    uProp.push(o1);
+    uProp.push(o2);
 
     let errors = em.saveChangesValidateOnClient([customer]);
     expect(errors).toBeNull("Got validation errors");
@@ -95,6 +99,40 @@ describe("ComplexType", function() {
     return em.saveChanges().then(sr => {
       expect(sr.entities).toBeTruthy();
       expect(sr.entities.length).toEqual(3);
+    }).catch(err => {
+      console.log(err);
+      expect(err).toBeUndefined();
+    });
+  });
+
+  it("should set array of unmapped many-to-many entities", function() {
+    let em = new EntityManager('test');
+    let ms = em.metadataStore;
+    ms.importMetadata(metadata);
+
+    let customer = em.createEntity("Customer", { CompanyName: "ACME"});
+    expect(customer).toBeTruthy();
+
+    let regionType = ms.getEntityType("Region") as EntityType;
+    expect(regionType).toBeTruthy("Could not get Region type");
+    let r1 = regionType.createEntity({ Name: "One" });
+    let r2 = regionType.createEntity({ Name: "Two" });
+
+    let custRegionType = ms.getEntityType("CustomerRegion") as EntityType;
+    expect(custRegionType).toBeTruthy("Could not get CustomerRegion type");
+    let cr1 = custRegionType.createEntity({ Customer: customer, Region: r1 });
+    let cr2 = custRegionType.createEntity({ Customer: customer, Region: r2 });
+
+    let uProp = customer.getProperty("UnmappedRegions");
+    uProp.push(r1);
+    uProp.push(r2);
+
+    let errors = em.saveChangesValidateOnClient([customer]);
+    expect(errors).toBeNull("Got validation errors");
+
+    return em.saveChanges().then(sr => {
+      expect(sr.entities).toBeTruthy();
+      expect(sr.entities.length).toEqual(5);
     }).catch(err => {
       console.log(err);
       expect(err).toBeUndefined();

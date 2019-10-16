@@ -1,11 +1,12 @@
 
-import { AjaxConfig, AjaxFakeAdapter } from '../src/adapter-ajax-fake';
+import { AjaxFakeAdapter } from '../src/adapter-ajax-fake';
 import { DataServiceWebApiAdapter } from '../src/adapter-data-service-webapi';
 import { ModelLibraryBackingStoreAdapter } from '../src/adapter-model-library-backing-store';
 import { UriBuilderJsonAdapter } from '../src/adapter-uri-builder-json';
 import { config } from '../src/config';
 import { EntityManager } from '../src/entity-manager';
 import { EntityQuery } from '../src/entity-query';
+import { AjaxConfig } from 'breeze-client';
 
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 120000;
 ModelLibraryBackingStoreAdapter.register();

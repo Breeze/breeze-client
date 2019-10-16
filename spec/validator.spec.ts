@@ -10,7 +10,6 @@ describe("Validator", function () {
   it("should be able to register a validator", function () {
 
     let factory = createNumericRangeValidatorFactory();
-    debugger;
     Validator.registerFactory(factory, "numericRange");
 
     let factory2 = config.getRegisteredFunction("Validator.numericRange");
