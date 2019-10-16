@@ -11,7 +11,7 @@ export class DataServiceWebApiAdapter extends breeze.AbstractDataServiceAdapter 
 
   static register() {
     breeze.config.registerAdapter("dataService", DataServiceWebApiAdapter);
-    breeze.config.initializeAdapterInstance("dataService", "webApi", true);
+    return breeze.config.initializeAdapterInstance("dataService", "webApi", true) as DataServiceWebApiAdapter;
   }
 
   /** @hidden @internal */

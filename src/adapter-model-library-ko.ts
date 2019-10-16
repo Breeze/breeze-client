@@ -13,7 +13,7 @@ export class ModelLibraryKnockoutAdapter implements breeze.ModelLibraryAdapter {
 
   static register() {
     breeze.config.registerAdapter("modelLibrary", ModelLibraryKnockoutAdapter);
-    breeze.config.initializeAdapterInstance("modelLibrary", "ko", true);
+    return breeze.config.initializeAdapterInstance("modelLibrary", "ko", true) as ModelLibraryKnockoutAdapter;
   }
 
   initialize() {

@@ -10,7 +10,7 @@ export class UriBuilderODataAdapter implements breeze.UriBuilderAdapter {
 
   static register() {
     breeze.config.registerAdapter("uriBuilder", UriBuilderODataAdapter);
-    breeze.config.initializeAdapterInstance("uriBuilder", "odata", true);
+    return breeze.config.initializeAdapterInstance("uriBuilder", "odata", true) as UriBuilderODataAdapter;
   }
 
   initialize() { }

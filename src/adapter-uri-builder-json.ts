@@ -9,7 +9,7 @@ export class UriBuilderJsonAdapter implements breeze.UriBuilderAdapter {
 
   static register() {
     breeze.config.registerAdapter("uriBuilder", UriBuilderJsonAdapter);
-    breeze.config.initializeAdapterInstance("uriBuilder", "json", true);
+    return breeze.config.initializeAdapterInstance("uriBuilder", "json", true) as UriBuilderJsonAdapter;
   }
 
   initialize() {}

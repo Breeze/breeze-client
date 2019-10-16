@@ -17,7 +17,7 @@ export class AjaxJQueryAdapter implements breeze.AjaxAdapter {
 
   static register() {
     breeze.config.registerAdapter("ajax", AjaxJQueryAdapter);
-    breeze.config.initializeAdapterInstance("ajax", "jQuery", true);
+    return breeze.config.initializeAdapterInstance("ajax", "jQuery", true) as AjaxJQueryAdapter;
   }
 
   initialize() {

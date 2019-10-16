@@ -21,7 +21,7 @@ import * as breeze from 'breeze-client';
  *
  * Installation:
  *    var ajaxAdapter = config.initializeAdapterInstance('ajax', adapterName, true);
- *    AjaxPostAdapter.wrapAjax(ajaxAdapter);
+ *    AjaxPostWrapper.wrapAjax(ajaxAdapter);
  *
  * Example:
  *   var query = breeze.EntityQuery.from('SimilarCustomersPOST')
@@ -32,7 +32,7 @@ import * as breeze from 'breeze-client';
  *           });
  *
  **/
-export class AjaxPostAdapter {
+export class AjaxPostWrapper {
 
   static wrapAjax(ajaxAdapter: breeze.AjaxAdapter) {
 

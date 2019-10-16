@@ -11,7 +11,7 @@ export class ModelLibraryBackingStoreAdapter implements breeze.ModelLibraryAdapt
 
   static register() {
     breeze.config.registerAdapter("modelLibrary", ModelLibraryBackingStoreAdapter);
-    breeze.config.initializeAdapterInstance("modelLibrary", "backingStore", true);
+    return breeze.config.initializeAdapterInstance("modelLibrary", "backingStore", true) as ModelLibraryBackingStoreAdapter;
   }
 
   initialize() {
