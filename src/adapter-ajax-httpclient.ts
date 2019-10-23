@@ -45,7 +45,7 @@ export class AjaxHttpClientAdapter {
 
     let headers = new HttpHeaders(config.headers || {});
     if (!headers.has('Content-Type')) {
-      if (config.type !== 'GET' && config.type !== 'DELETE' && config.contentType !== false) {
+      if (config.type !== 'GET' && config.type !== 'DELETE' && !!config.contentType) {
         headers = headers.set('Content-Type',
           <string>config.contentType || 'application/json; charset=utf-8');
       }

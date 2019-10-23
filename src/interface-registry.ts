@@ -78,7 +78,7 @@ export interface AjaxConfig {
     url: string;
     type?: string;
     dataType?: string;
-    contentType?: string | boolean;
+    contentType?: string;
     crossDomain?: string | boolean;
     headers?: {};
     data?: any;
