@@ -177,7 +177,11 @@ export class EntityAspect {
     // in case this is the NULL entityAspect. - used with ComplexAspects that have no parent.
 
     if (entity != null) {
+      // remove properties that should be on prototype but placed on class by Babel
+      if (!entity.entityType) { delete(entity.entityType); }
+      if (!entity.entityAspect) { delete(entity.entityAspect); }
       entity.entityAspect = this;
+
       // entityType should already be on the entity from 'watch'
       let entityType = entity.entityType || entity._$entityType;
       if (!entityType) {
@@ -191,7 +195,7 @@ export class EntityAspect {
       let entityCtor = entityType.getEntityCtor();
       config.interfaceRegistry.modelLibrary.getDefaultInstance().startTracking(entity, entityCtor.prototype);
     }
-  };
+  }
 
   /** @hidden */
   // type-guard
@@ -249,7 +253,7 @@ export class EntityAspect {
       this._entityKey = new EntityKey(entityType, values);
     }
     return this._entityKey;
-  };
+  }
 
   /**
   Returns the entity to an [[EntityState]] of 'Unchanged' by committing all changes made since the entity was last queried
@@ -268,7 +272,7 @@ export class EntityAspect {
       this.setUnchanged();
     }
     em.entityChanged.publish({ entityAction: EntityAction.AcceptChanges, entity: this.entity });
-  };
+  }
 
   /**
   Returns the entity to an [[EntityState]] of 'Unchanged' by rejecting all changes made to it since the entity was last queried
@@ -299,7 +303,7 @@ export class EntityAspect {
       this.propertyChanged.publish({ entity: entity, propertyName: null });
       entityManager.entityChanged.publish({ entityAction: EntityAction.RejectChanges, entity: entity });
     }
-  };
+  }
 
   /**  @hidden @internal */
   // TODO: rename - and use '_'; used on both EntityAspect and ComplexAspect for polymorphic reasons.
@@ -418,7 +422,7 @@ export class EntityAspect {
     return true;
   }
 
-  loadNavigationProperty(navigationProperty: string, callback?: QuerySuccessCallback, errorCallback?: QueryErrorCallback): Promise<QueryResult>
+  loadNavigationProperty(navigationProperty: string, callback?: QuerySuccessCallback, errorCallback?: QueryErrorCallback): Promise<QueryResult>;
   loadNavigationProperty(navigationProperty: NavigationProperty, callback?: QuerySuccessCallback, errorCallback?: QueryErrorCallback): Promise<QueryResult>;
   /**
   Performs a query for the value of a specified [[NavigationProperty]]. __Async__
@@ -451,7 +455,7 @@ export class EntityAspect {
       return Promise.reject(error);
     });
 
-  };
+  }
 
   /**
   Marks this navigationProperty on this entity as already having been loaded.
@@ -514,7 +518,7 @@ export class EntityAspect {
       ok = validateTarget(that.entity);
     });
     return ok;
-  };
+  }
 
   validateProperty(property: string, context?: any): boolean;
   validateProperty(property: DataProperty, context?: any): boolean;
@@ -551,7 +555,7 @@ export class EntityAspect {
     }
 
     return this._validateProperty(value, context);
-  };
+  }
 
   getValidationErrors(): ValidationError[];
   getValidationErrors(property: string): ValidationError[];
@@ -585,7 +589,7 @@ export class EntityAspect {
       });
     }
     return result;
-  };
+  }
 
   /**
   Adds a validation error.
@@ -595,7 +599,7 @@ export class EntityAspect {
     this._processValidationOpAndPublish(function (that: any) {
       that._addValidationError(validationError);
     });
-  };
+  }
 
   removeValidationError(validationError: ValidationError): void;
   removeValidationError(validationKey: string): void;

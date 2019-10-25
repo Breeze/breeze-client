@@ -20,10 +20,8 @@ export class ModelLibraryBackingStoreAdapter implements breeze.ModelLibraryAdapt
   getTrackablePropertyNames(entity: breeze.Entity) {
     let names: string[] = [];
     for (let p in entity) {
-      if (p === "entityType") continue;
-      if (p === "_$typeName") continue;
-      if (p === "_pendingSets") continue;
-      if (p === "_backingStore") continue;
+      if (p === "entityAspect" || p === "entityType") continue;
+      if (p === "_$typeName" || p === "_pendingSets" || p === "_backingStore") continue;
       let val = entity[p];
       if (!core.isFunction(val)) {
         names.push(p);
@@ -80,7 +78,7 @@ export class ModelLibraryBackingStoreAdapter implements breeze.ModelLibraryAdapt
         }
 
       } else if (prop.isNavigationProperty) {
-        if (val !== undefined) {
+        if (val !== undefined && val !== null) {
           throw new Error("Cannot assign a navigation property in an entity ctor.: " + propName);
         }
         if (prop.isScalar) {
