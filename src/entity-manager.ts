@@ -411,11 +411,11 @@ export class EntityManager {
   >      // create and add an entity;
   >      let emp1 = em1.createEntity("Employee");
   >      // create and add an initialized entity;
-  >      let emp2 = em1.createEntity("Employee", { lastName: Smith", firstName: "John" });
+  >      let emp2 = em1.createEntity("Employee", { lastName: "Smith", firstName: "John" });
   >      // create and attach (not add) an initialized entity
-  >      let emp3 = em1.createEntity("Employee", { id: 435, lastName: Smith", firstName: "John" }, EntityState.Unchanged);
+  >      let emp3 = em1.createEntity("Employee", { id: 435, lastName: "Smith", firstName: "John" }, EntityState.Unchanged);
   >      // create but don't attach an entity;
-  >      let emp4 = em1.createEntity("Employee", { id: 435, lastName: Smith", firstName: "John" }, EntityState.Detached);
+  >      let emp4 = em1.createEntity("Employee", { id: 435, lastName: "Smith", firstName: "John" }, EntityState.Detached);
   @param typeName - The name of the EntityType for which an instance should be created.
   @param entityType - The EntityType of the type for which an instance should be created.
   @param initialValues - (default=null) Configuration object of the properties to set immediately after creation.

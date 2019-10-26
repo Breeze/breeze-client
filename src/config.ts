@@ -69,7 +69,7 @@ export class BreezeConfig {
         this.interfaceInitialized = new BreezeEvent("interfaceInitialized", this);
         if (this.noEval === undefined) {
             try {
-                let x = Function('');
+                Error['x'] = Function('');
                 this.noEval = false; // eval succeeded
             } catch {
                 this.noEval = true; // eval failed, probably due to CSP

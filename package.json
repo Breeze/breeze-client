@@ -1,6 +1,6 @@
 {
   "name": "breeze-client",
-  "version": "2.0.0-beta.6",
+  "version": "2.0.0",
   "private": true,
   "description": "Breeze data management for JavaScript clients",
   "repository": "https://github.com/Breeze/breeze-client.git",
@@ -25,7 +25,7 @@
   "scripts": {
     "build": "npm run clean && npm run packagr && npm pack ./dist",
     "copy-to-breezejs": "node tools/copy-to-breezejs.js",
-    "publish": "npm publish --tag next ./dist",
+    "publish": "npm publish --tag latest ./dist",
     "test": "tsc && node tools/set-breeze-client.js && jasmine",
     "debug": "tsc && node tools/set-breeze-client.js && node --inspect-brk node_modules/jasmine/bin/jasmine.js",
     "clean": "rimraf temp && rimraf src/*.js* && rimraf src/*.d.ts && rimraf ./*.d.ts && rimraf dist && rimraf node_modules/breeze-client.js",
