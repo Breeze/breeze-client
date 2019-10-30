@@ -9,7 +9,7 @@ import { MergeStrategy } from './query-options';
 export class EntityGroup {
   entityManager: EntityManager;
   entityType: EntityType;
-  _indexMap: Object; //  = {};
+  _indexMap: { [index: string]: number };
   _entities: (Entity | null)[];
   _emptyIndexes: number[];
 
