@@ -5,11 +5,12 @@
  * conditions of the IdeaBlade Breeze license, available at http://www.breezejs.com/license
  *
  * Author: Ward Bell
- * Version: 0.9.4
+ * Version: 0.9.5 - Steve Schmitt - convert to TypeScript, migrate to breeze-client repo, add HasEntityGraph and mixinEntityGraph
+ * Version: 0.9.4 - Marcel Good - fix UMD module name
  * --------------------------------------------------------------------------------
- * Adds getEntityGraph method to Breeze EntityManager and EntityManager prototype
- * Source:
- * https://github.com/Breeze/breeze.js.labs/blob/master/breeze.getEntityGraph.js
+ * Adds getEntityGraph method to Breeze EntityManager prototype.
+ * Call   mixinEntityGraph(EntityManager)   to apply the mixin in a tree-shaking-resistant way.
+ * Then   (manager as any).getEntityGraph(entity, "child");
  *
  * Depends on Breeze which it patches
  *
@@ -27,43 +28,20 @@ interface EntityGroup {
   _indexMap: { [index: string]: number };
 }
 
-declare module 'breeze-client' {
-  interface EntityManager {
-    /**
-    Get related entities of root entity (or root entities) as specified by expand.
-    @example
-        var graph = breeze.EntityManager.getEntityGraph(customer, 'Orders.OrderDetails');
-        // graph will be the customer, all of its orders and their details even if deleted.
-    @method getEntityGraph
-    @param roots {Entity|Array of Entity} The root entity or root entities.
-    @param expand {String|Array of String|Object} an expand string, a query expand clause, or array of string paths
-    @return {Array of Entity} root entities and their related entities, including deleted entities. Duplicates are removed and entity order is indeterminate.
-    **/
-    getEntityGraph(roots: Entity | Array<Entity>, expand: string | Array<string> | ExpandClause): Array<Entity>;
+// module augmentation failed to build with ng-packagr, so we have a separate interface
+export interface HasEntityGraph extends EntityManager {
+  /**
+  Get related entities of root entity (or root entities) as specified by expand.
+  @example
+      var graph = breeze.EntityManager.getEntityGraph(customer, 'Orders.OrderDetails');
+      // graph will be the customer, all of its orders and their details even if deleted.
+  @method getEntityGraph
+  @param roots {Entity|Array of Entity} The root entity or root entities.
+  @param expand {String|Array of String|Object} an expand string, a query expand clause, or array of string paths
+  @return {Array of Entity} root entities and their related entities, including deleted entities. Duplicates are removed and entity order is indeterminate.
+  **/
+  getEntityGraph(roots: Entity | Array<Entity>, expand: string | Array<string> | ExpandClause): Array<Entity>;
 
-    /**
-    Execute query locally and return both the query results and their related entities as specified by the optional expand parameter or the query's expand clause.
-    @example
-        var query = breeze.EntityQuery.from('Customers')
-                    .where('CompanyName', 'startsWith', 'Alfred')
-                    .expand('Orders.OrderDetails');
-        var graph = manager.getEntityGraph(query);
-        // graph will be the 'Alfred' customers, their orders and their details even if deleted.
-    @method getEntityGraph
-    @param query {EntityQuery} A query to be executed against the manager's local cache.
-    @param [expand] {String|Array of String|Object} an expand string, a query expand clause, or array of string paths
-    @return {Array of Entity} local queried root entities and their related entities, including deleted entities. Duplicates are removed and entity order is indeterminate.
-    **/
-    getEntityGraph(query: EntityQuery, expand: string | Array<string> | ExpandClause): Array<Entity>;
-
-  }
-}
-
-// EntityManager.prototype.getEntityGraph = getEntityGraph;
-
-const proto = EntityManager.prototype;
-
-if (!proto.getEntityGraph) {
   /**
   Execute query locally and return both the query results and their related entities as specified by the optional expand parameter or the query's expand clause.
   @example
@@ -77,19 +55,19 @@ if (!proto.getEntityGraph) {
   @param [expand] {String|Array of String|Object} an expand string, a query expand clause, or array of string paths
   @return {Array of Entity} local queried root entities and their related entities, including deleted entities. Duplicates are removed and entity order is indeterminate.
   **/
+  getEntityGraph(query: EntityQuery, expand: string | Array<string> | ExpandClause): Array<Entity>;
 
-  /**
-  Get related entities of root entity (or root entities) as specified by expand.
-  @example
-      var graph = manager.getEntityGraph(customer, 'Orders.OrderDetails');
-      // graph will be the customer, all of its orders and their details even if deleted.
-  @method getEntityGraph
-  @param roots {Entity|Array of Entity} The root entity or root entities.
-  @param expand {String|Array of String|Object} an expand string, a query expand clause, or array of string paths
-  @return {Array of Entity} root entities and their related entities, including deleted entities. Duplicates are removed and entity order is indeterminate.
-  **/
-  proto.getEntityGraph = getEntityGraph;
 }
+
+export function mixinEntityGraph(emclass: { new(): EntityManager }) {
+  const proto = EntityManager.prototype;
+
+  if (!(proto as any).getEntityGraph) {
+    (proto as any).getEntityGraph = getEntityGraph;
+  }
+}
+
+mixinEntityGraph(EntityManager);
 
 
 function getEntityGraph(roots: Entity | Array<Entity> | EntityQuery, expand: string | Array<string> | ExpandClause) {

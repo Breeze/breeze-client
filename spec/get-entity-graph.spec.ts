@@ -2,6 +2,7 @@
 import { ModelLibraryBackingStoreAdapter } from '../src/adapter-model-library-backing-store';
 import { EntityManager } from '../src/entity-manager';
 import '../src/mixin-get-entity-graph';
+import { HasEntityGraph } from '../src/mixin-get-entity-graph';
 
 ModelLibraryBackingStoreAdapter.register();
 const metadata = require('./support/NorthwindIBMetadata.json');
@@ -25,7 +26,7 @@ describe("GetEntityGraph", function () {
     let o2 = em.createEntity("Order", { shipName: "Two", customer: customer });
     let orders = [o1, o2];
 
-    let graph = em.getEntityGraph(orders, 'customer');
+    let graph = (em as HasEntityGraph).getEntityGraph(orders, 'customer');
     expect(graph.length).toEqual(3);
   });
 
@@ -41,7 +42,7 @@ describe("GetEntityGraph", function () {
     let o1 = em.createEntity("Order", { shipName: "One", customer: customer });
     let o2 = em.createEntity("Order", { shipName: "Two", customer: customer });
 
-    let graph = em.getEntityGraph(customer, 'orders');
+    let graph = (em as HasEntityGraph).getEntityGraph(customer, 'orders');
     expect(graph.length).toEqual(3);
   });
 });
