@@ -14,7 +14,6 @@ UriBuilderJsonAdapter.register();
 DataServiceWebApiAdapter.register();
 AjaxFakeAdapter.register();
 const metadata = require('./support/ComplexTypeMetadata.json');
-const ajaxAdapter = config.getAdapterInstance<AjaxFakeAdapter>("ajax");
 
 const dtoAdapter = {
   name: 'dtoAdapter',
@@ -39,6 +38,8 @@ describe("Query", function () {
     let em = new EntityManager('test');
     let ms = em.metadataStore;
     ms.importMetadata(metadata);
+
+    const ajaxAdapter = config.getAdapterInstance<AjaxFakeAdapter>("ajax");
     ajaxAdapter.responseFn = responseFn;
 
     let query = new EntityQuery("Customer");
@@ -54,6 +55,8 @@ describe("Query", function () {
     let em = new EntityManager('test');
     let ms = em.metadataStore;
     ms.importMetadata(metadata);
+    
+    const ajaxAdapter = config.getAdapterInstance<AjaxFakeAdapter>("ajax");
     ajaxAdapter.responseFn = responseFn;
 
     let query = new EntityQuery("Customer");

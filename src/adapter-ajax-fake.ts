@@ -57,7 +57,10 @@ export class AjaxFakeAdapter implements breeze.AjaxAdapter {
         if (config.type === "POST") {
           data = JSON.parse(requestInfo.config.data);
           if (data.entities) {
-            data.entities.forEach(function(e: any) { delete(e.entityAspect); });
+            data.entities.forEach((e: any) => { 
+              e.$type = e.entityAspect.entityTypeName;
+              delete(e.entityAspect); 
+            });
           }
         } else {
           data = [];
