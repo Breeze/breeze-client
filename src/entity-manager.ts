@@ -834,7 +834,7 @@ export class EntityManager {
   >       .then(function() {
   >           let metadataStore = em1.metadataStore;
   >           // do something with the metadata
-  >       }).fail(function(exception) {
+  >       }).catch(function(exception) {
   >           // handle exception here
   >       });
   
@@ -871,7 +871,7 @@ export class EntityManager {
   >     em.executeQuery(query).then( function(data) {
   >         let orders = data.results;
   >         ... query results processed here
-  >     }).fail( function(err) {
+  >     }).catch( function(err) {
   >         ... query failure processed here
   >     });
 
@@ -893,7 +893,7 @@ export class EntityManager {
   >     query.execute().then( function(data) {
   >         let orders = data.results;
   >         ... query results processed here
-  >     }).fail( function(err) {
+  >     }).catch( function(err) {
   >         ... query failure processed here
   >     });
   @param query - The [[EntityQuery]] or OData query string to execute.
@@ -946,7 +946,7 @@ export class EntityManager {
   >     em.executeQuery(query).then( function(data) {
   >         let orders = data.results;
   >         ... query results processed here
-  >     }).fail( function(err) {
+  >     }).catch( function(err) {
   >         ... query failure processed here
   >     });
   @param query - The [[EntityQuery]] to execute.
@@ -967,7 +967,7 @@ export class EntityManager {
   >      em.saveChanges().then(function(saveResult) {
   >          let savedEntities = saveResult.entities;
   >          let keyMappings = saveResult.keyMappings;
-  >      }).fail(function (e) {
+  >      }).catch(function (e) {
   >          // e is any exception that was thrown.
   >      });
 
@@ -978,7 +978,7 @@ export class EntityManager {
   >      em.saveChanges(entitiesToSave, saveOptions).then(function(saveResult) {
   >          let savedEntities = saveResult.entities;
   >          let keyMappings = saveResult.keyMappings;
-  >      }).fail(function (e) {
+  >      }).catch(function (e) {
   >          // e is any exception that was thrown.
   >      });
 

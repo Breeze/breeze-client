@@ -428,7 +428,7 @@ export class EntityAspect {
   Performs a query for the value of a specified [[NavigationProperty]]. __Async__
   >      emp.entityAspect.loadNavigationProperty("Orders").then(function (data) {
   >          var orders = data.results;
-  >      }).fail(function (exception) {
+  >      }).catch(function (exception) {
   >          // handle exception here;
   >      });
   @param navigationProperty - The NavigationProperty or the name of the NavigationProperty to 'load'.

@@ -478,7 +478,7 @@ export class EntityQuery {
   >      let query = new EntityQuery("Orders").using(em);
   >      query.execute().then( function(data) {
   >          ... query results processed here
-  >      }).fail( function(err) {
+  >      }).catch( function(err) {
   >          ... query failure processed here
   >      });
 
@@ -500,7 +500,7 @@ export class EntityQuery {
   >      em.executeQuery(query).then( function(data) {
   >         let orders = data.results;
   >          ... query results processed here
-  >      }).fail( function(err) {
+  >      }).catch( function(err) {
   >         ... query failure processed here
   >      });
 

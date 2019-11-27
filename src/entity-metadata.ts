@@ -409,7 +409,7 @@ export class MetadataStore {
   >      // let ms = anEntityManager.metadataStore;
   >      ms.fetchMetadata("breeze/NorthwindIBModel").then(function(rawMetadata) {
   >            // do something with the metadata
-  >      }).fail(function(exception) {
+  >      }).catch(function(exception) {
   >          // handle exception here
   >      });
   @param dataService -  Either a DataService or just the name of the DataService to fetch metadata for.
