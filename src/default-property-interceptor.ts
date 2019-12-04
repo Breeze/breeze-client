@@ -9,7 +9,7 @@ import { EntityAction } from './entity-action';
 export function defaultPropertyInterceptor(this: StructuralObject, property: EntityProperty, newValue: any, rawAccessorFn: Function) {
   // 'this' is the entity itself in this context.
 
-  if (newValue === undefined) newValue = null;
+  // if (newValue === undefined) newValue = null; <- removed to allow assignment to undefined in Babel constructors
   let oldValue = rawAccessorFn();
 
   let dataType = (property as any).dataType;
