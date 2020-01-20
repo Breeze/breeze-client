@@ -38,7 +38,7 @@ export class EntityQuery {
   This value may be null if the entityType cannot be associated with a resourceName. __Read Only__ */
   fromEntityType?: EntityType;
   /** The 'where' [[Predicate]] used by this query. __Read Only__ */
-  wherePredicate: any; // TODO
+  wherePredicate: Predicate; // TODO
   /** The [[OrderByClause]] used by this query. __Read Only__ */
   orderByClause?: OrderByClause;
   /** The [[ExpandClause]] used by this query. __Read Only__ */
@@ -65,6 +65,7 @@ export class EntityQuery {
   /**  The entityType that will be returned by this query. 
   This property will only be set if the 'toType' method was called. __Read Only__ */
   resultEntityType: EntityType | string;
+  usesNameOnServer?: boolean;
 
   /** Constructor
   >    let query = new EntityQuery("Customers")
