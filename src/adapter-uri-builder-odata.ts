@@ -8,9 +8,10 @@ export class UriBuilderODataAdapter implements breeze.UriBuilderAdapter {
     this.name = "odata";
   }
 
-  static register() {
-    breeze.config.registerAdapter("uriBuilder", UriBuilderODataAdapter);
-    return breeze.config.initializeAdapterInstance("uriBuilder", "odata", true) as UriBuilderODataAdapter;
+  static register(config?: breeze.BreezeConfig) {
+    config = config || breeze.config;
+    config.registerAdapter("uriBuilder", UriBuilderODataAdapter);
+    return config.initializeAdapterInstance("uriBuilder", "odata", true) as UriBuilderODataAdapter;
   }
 
   initialize() { }

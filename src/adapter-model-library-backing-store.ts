@@ -9,9 +9,10 @@ export class ModelLibraryBackingStoreAdapter implements breeze.ModelLibraryAdapt
     this.name = "backingStore";
   }
 
-  static register() {
-    breeze.config.registerAdapter("modelLibrary", ModelLibraryBackingStoreAdapter);
-    return breeze.config.initializeAdapterInstance("modelLibrary", "backingStore", true) as ModelLibraryBackingStoreAdapter;
+  static register(config?: breeze.BreezeConfig) {
+    config = config || breeze.config;
+    config.registerAdapter("modelLibrary", ModelLibraryBackingStoreAdapter);
+    return config.initializeAdapterInstance("modelLibrary", "backingStore", true) as ModelLibraryBackingStoreAdapter;
   }
 
   initialize() {

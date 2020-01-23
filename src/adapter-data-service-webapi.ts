@@ -9,9 +9,10 @@ export class DataServiceWebApiAdapter extends breeze.AbstractDataServiceAdapter 
     this.name = "webApi";
   }
 
-  static register() {
-    breeze.config.registerAdapter("dataService", DataServiceWebApiAdapter);
-    return breeze.config.initializeAdapterInstance("dataService", "webApi", true) as DataServiceWebApiAdapter;
+  static register(config?: breeze.BreezeConfig) {
+    config = config || breeze.config;
+    config.registerAdapter("dataService", DataServiceWebApiAdapter);
+    return config.initializeAdapterInstance("dataService", "webApi", true) as DataServiceWebApiAdapter;
   }
 
   /** @hidden @internal */

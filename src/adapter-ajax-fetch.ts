@@ -17,9 +17,10 @@ export class AjaxFetchAdapter implements breeze.AjaxAdapter {
     this.requestInterceptor = undefined;
   }
 
-  static register() {
-    breeze.config.registerAdapter("ajax", AjaxFetchAdapter);
-    return breeze.config.initializeAdapterInstance("ajax", AjaxFetchAdapter.adapterName, true) as AjaxFetchAdapter;
+  static register(config?: breeze.BreezeConfig) {
+    config = config || breeze.config;
+    config.registerAdapter("ajax", AjaxFetchAdapter);
+    return config.initializeAdapterInstance("ajax", AjaxFetchAdapter.adapterName, true) as AjaxFetchAdapter;
   }
 
   initialize() {

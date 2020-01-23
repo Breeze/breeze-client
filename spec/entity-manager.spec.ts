@@ -229,14 +229,40 @@ describe("EntityManager", function() {
     let order = em.createEntity("Order", { orderID: ordID, customerID: custID, shipName: "Barnum"});
     let orderCust = order.getProperty("customer");
     expect(orderCust).toEqual(cust);
-
     // order.setProperty("customer", undefined);
     (order as any).customer = undefined;
 
     let custOrders = cust.getProperty("orders");
     // orderCust = order.getProperty("customer");
     orderCust = (order as any).customer;
-    expect(orderCust).toBeUndefined();
+    expect(orderCust).toBeNull();
+    expect(custOrders.length).toEqual(0);
+    let orderCustId = order.getProperty("customerID");
+    expect(orderCustId).toBeNull();
+  });
+
+  it("should set FK to null when nav property is initially undefined", function() {
+
+    let em = new EntityManager('test');
+    let ms = em.metadataStore;
+    ms.importMetadata(metadata);
+
+    let custID = "88888888-4444-4444-4444-121212121212";
+    let ordID = 22;
+
+    let cust = em.createEntity("Customer", { customerID: custID, companyName: "Wishbone"});
+    let order = em.createEntity("Order", { orderID: ordID, shipName: "Barnum"});
+    // let orderCust = order.getProperty("customer");
+    // expect(orderCust).toEqual(cust);
+
+    // order.setProperty("customer", undefined);
+    order.setProperty("customer", undefined);
+    // (order as any).customer = undefined;
+
+    let custOrders = cust.getProperty("orders");
+    // orderCust = order.getProperty("customer");
+    let orderCust = (order as any).customer;
+    expect(orderCust).toBeNull();
     expect(custOrders.length).toEqual(0);
     let orderCustId = order.getProperty("customerID");
     expect(orderCustId).toBeNull();

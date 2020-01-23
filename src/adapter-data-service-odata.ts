@@ -26,9 +26,10 @@ export class DataServiceODataAdapter extends breeze.AbstractDataServiceAdapter {
     this.name = "OData";
   }
 
-  static register() {
-    breeze.config.registerAdapter("dataService", DataServiceODataAdapter);
-    return breeze.config.initializeAdapterInstance("dataService", "OData", true) as DataServiceODataAdapter;
+  static register(config?: breeze.BreezeConfig) {
+    config = config || breeze.config;
+    config.registerAdapter("dataService", DataServiceODataAdapter);
+    return config.initializeAdapterInstance("dataService", "OData", true) as DataServiceODataAdapter;
   }
 
   initialize() {

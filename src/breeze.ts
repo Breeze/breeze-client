@@ -154,7 +154,7 @@ export const breeze = {
   makeComplexArray: makeComplexArray,
   makePrimitiveArray: makePrimitiveArray,
   makeRelationArray: makeRelationArray,
-  version: "2.0.2"
+  version: "2.0.3"
 };
 
 // breeze.assertConfig = assertConfig as any;

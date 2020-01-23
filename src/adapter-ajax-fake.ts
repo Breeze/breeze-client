@@ -14,9 +14,10 @@ export class AjaxFakeAdapter implements breeze.AjaxAdapter {
     this.requestInterceptor = undefined;
   }
 
-  static register() {
-    breeze.config.registerAdapter("ajax", AjaxFakeAdapter);
-    return breeze.config.initializeAdapterInstance("ajax", "ajaxfake", true) as AjaxFakeAdapter;
+  static register(config?: breeze.BreezeConfig) {
+    config = config || breeze.config;
+    config.registerAdapter("ajax", AjaxFakeAdapter);
+    return config.initializeAdapterInstance("ajax", "ajaxfake", true) as AjaxFakeAdapter;
   }
 
   initialize() {

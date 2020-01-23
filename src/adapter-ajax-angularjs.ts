@@ -17,9 +17,10 @@ export class AjaxAngularjsAdapter implements breeze.AjaxAdapter {
     //   this.$rootScope;
   }
 
-  static register() {
-    breeze.config.registerAdapter("ajax", AjaxAngularjsAdapter);
-    return breeze.config.initializeAdapterInstance("ajax", "angularjs", true) as AjaxAngularjsAdapter;
+  static register(config?: breeze.BreezeConfig) {
+    config = config || breeze.config;
+    config.registerAdapter("ajax", AjaxAngularjsAdapter);
+    return config.initializeAdapterInstance("ajax", "angularjs", true) as AjaxAngularjsAdapter;
   }
 
   initialize() {

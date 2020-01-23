@@ -1,5 +1,5 @@
 ﻿import { HttpClient, HttpErrorResponse, HttpEvent, HttpHeaders, HttpRequest, HttpResponse } from "@angular/common/http";
-import { AjaxConfig, config, core, HttpResponse as BreezeHttpResponse } from "breeze-client";
+import { AjaxConfig, config, core, HttpResponse as BreezeHttpResponse, BreezeConfig } from "breeze-client";
 import { filter, map } from "rxjs/operators";
 
 export class AjaxHttpClientAdapter {
@@ -10,9 +10,10 @@ export class AjaxHttpClientAdapter {
 
   constructor(public http: HttpClient) { }
 
-  static register(http: HttpClient) {
-    config.registerAdapter("ajax", <any>function () { return new AjaxHttpClientAdapter(http); });
-    return config.initializeAdapterInstance("ajax", AjaxHttpClientAdapter.adapterName, true) as AjaxHttpClientAdapter;
+  static register(http: HttpClient, breezeConfig?: BreezeConfig) {
+    breezeConfig = breezeConfig || config;
+    breezeConfig.registerAdapter("ajax", <any>function () { return new AjaxHttpClientAdapter(http); });
+    return breezeConfig.initializeAdapterInstance("ajax", AjaxHttpClientAdapter.adapterName, true) as AjaxHttpClientAdapter;
   }
 
   initialize() { }
