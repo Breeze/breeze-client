@@ -3,7 +3,7 @@ Built using TypeScript 3.x.
 
 ## Release Notes
 
-With release 2.0, the deployment of Breeze has change significantly, but the API has not.
+With release 2.0, the deployment of Breeze has changed significantly, but the API has not.
 
 See <a href="http://breeze.github.io/doc-js/release-notes.html" target="_blank">the release notes on breeze.github.io</a>.
 

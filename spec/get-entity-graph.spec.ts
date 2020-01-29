@@ -1,19 +1,24 @@
+// import { ModelLibraryBackingStoreAdapter } from '../src/adapter-model-library-backing-store';
+// import { EntityManager } from '../src/entity-manager';
+// import '../src/mixin-get-entity-graph';
+// import { HasEntityGraph } from '../src/mixin-get-entity-graph';
 
-import { ModelLibraryBackingStoreAdapter } from '../src/adapter-model-library-backing-store';
-import { EntityManager } from '../src/entity-manager';
-import '../src/mixin-get-entity-graph';
-import { HasEntityGraph } from '../src/mixin-get-entity-graph';
+import { EntityManager } from 'breeze-client';
+import { ModelLibraryBackingStoreAdapter } from 'breeze-client/adapter-model-library-backing-store';
+
+import 'breeze-client/mixin-get-entity-graph';
+import { HasEntityGraph } from 'breeze-client/mixin-get-entity-graph';
 
 ModelLibraryBackingStoreAdapter.register();
 const metadata = require('./support/NorthwindIBMetadata.json');
 
 // TODO migrate tests from https://github.com/Breeze/breeze.js.samples/blob/master/net/DocCode/DocCode/tests/getEntityGraphTests.js
-describe("GetEntityGraph", function () {
+describe("GetEntityGraph", () => {
 
   beforeEach(function () {
   });
 
-  it("should graph Order expand Customer", function () {
+  test("should graph Order expand Customer", () => {
     let em = new EntityManager('test');
     let ms = em.metadataStore;
     ms.importMetadata(metadata);
@@ -26,11 +31,11 @@ describe("GetEntityGraph", function () {
     let o2 = em.createEntity("Order", { shipName: "Two", customer: customer });
     let orders = [o1, o2];
 
-    let graph = (em as HasEntityGraph).getEntityGraph(orders, 'customer');
+    let graph = (em as any as HasEntityGraph).getEntityGraph(orders, 'customer');
     expect(graph.length).toEqual(3);
   });
 
-  it("should graph Customer expand Orders", function () {
+  test("should graph Customer expand Orders", () => {
     let em = new EntityManager('test');
     let ms = em.metadataStore;
     ms.importMetadata(metadata);

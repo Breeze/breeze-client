@@ -1,14 +1,14 @@
 
-import { EntityAction } from '../src/entity-action';
+// import { EntityAction } from '../src/entity-action';
+import { EntityAction } from 'breeze-client';
 
-
-describe("EntityAction", function () {
+describe("EntityAction", () => {
 
   beforeEach(function () {
 
   });
 
-  it("should have static members", function () {
+  test("should have static members", () => {
     expect(EntityAction.contains(EntityAction.Attach));
     // expect(EntityAction.name).toBe("EntityAction");
     expect(EntityAction.Attach.name).toBe("Attach");

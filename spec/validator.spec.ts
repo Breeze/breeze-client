@@ -1,13 +1,14 @@
-import { config } from '../src/config';
-import { Validator } from '../src/validate';
+// import { config } from '../src/config';
+// import { Validator } from '../src/validate';
 
+import { config, Validator} from 'breeze-client';
 
-describe("Validator", function () {
+describe("Validator", () => {
 
   beforeEach(function () {
   });
 
-  it("should be able to register a validator", function () {
+  test("should be able to register a validator", () => {
 
     let factory = createNumericRangeValidatorFactory();
     Validator.registerFactory(factory, "numericRange");

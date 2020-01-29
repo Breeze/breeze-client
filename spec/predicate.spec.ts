@@ -1,10 +1,10 @@
-import { Predicate } from '../src/predicate';
+import { Predicate } from 'breeze-client';
 
 declare let console: any;
 
 describe("Predicate", () => {
 
-   it("should support both new and old ctor mechs", function() {
+   test("should support both new and old ctor mechs", () => {
       let p1 = new Predicate("CompanyName", "StartsWith", "B");
       let p2 = (Predicate as any)("CompanyName", "StartsWith", "B"); // calling without ctor
       let p3 = Predicate.create("CompanyName", "startsWith", "B");
@@ -19,7 +19,7 @@ describe("Predicate", () => {
 
     });
 
-    it("should support toJson", function() {
+    test("should support toJson", () => {
       let p1 = new Predicate("CompanyName", "StartsWith", "B");
       let json = p1.toJSON();
       let s = JSON.stringify(json);

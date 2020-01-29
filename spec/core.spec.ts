@@ -1,11 +1,11 @@
-import { breeze } from '../src/breeze';
-import { core } from '../src/core';
+// import { breeze } from '../src/breeze';
+// import { core } from '../src/core';
+import { breeze, core } from 'breeze-client';
 
-// declare let console: any;
 
 describe("Core", () => {
 
-  it("should support strong typing at top level", function () {
+  test("should support strong typing at top level", () => {
     let fn1 = breeze.core.arrayFirst;
     let fn2 = core.arrayFirst;
     expect(fn1).not.toBe(null);

@@ -1,14 +1,14 @@
-import { EntityAction } from './../src/entity-action';
-import { assertParam } from './../src/assert-param';
+// import { EntityAction } from './../src/entity-action';
+// import { assertParam } from './../src/assert-param';
+import { EntityAction, EntityState  } from 'breeze-client';
+import { assertParam } from 'breeze-client';
 
-import { EntityState } from '../src/entity-state';
-
-describe("EntityState", function () {
+describe("EntityState", () => {
   beforeEach(function () {
 
   });
 
-  it("should have static members", function () {
+  test("should have static members", () => {
     expect(EntityState.contains(EntityState.Modified));
     expect(EntityState.fromName('Added')).toBe(EntityState.Added);
     let est = EntityState;

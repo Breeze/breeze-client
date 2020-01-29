@@ -28,7 +28,7 @@ Unlike enums in some other environments, each 'symbol' can have both methods and
 >     }
 >
 >     describe("DayOfWeek", () => {
->       it("should support full enum capabilities", function() {
+>       test("should support full enum capabilities", function() {
 >         // // custom methods
 >         let dowSymbols = DayOfWeek.getSymbols();
 >         expect(dowSymbols.length).toBe(7);

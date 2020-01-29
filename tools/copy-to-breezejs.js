@@ -11,7 +11,9 @@ var files = [
   'breeze-client-adapter-model-library-backing-store.umd.js',
   'breeze-client-adapter-uri-builder-odata.umd.js',
   'breeze-client-adapter-uri-builder-json.umd.js',
+  'breeze-client-adapter-ajax-fetch.umd.js',
   'breeze-client-adapter-ajax-angularjs.umd.js',
+  'breeze-client-adapter-ajax-fake',
   'breeze-client-adapter-data-service-webapi.umd.js',
 ];
 

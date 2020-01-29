@@ -1,4 +1,6 @@
-import { BreezeEnum } from '../src/enum';
+// import { BreezeEnum } from '../src/enum';
+import { BreezeEnum } from 'breeze-client';
+
 
 class DayOfWeek extends BreezeEnum {
   dayIndex: number;
@@ -28,7 +30,7 @@ class EntityState extends BreezeEnum {
 
 describe("DayOfWeek2", () => {
 
-   it("should support full enum capabilities", function() {
+   test("should support full enum capabilities", () => {
     // // custom methods
       let dowSymbols = DayOfWeek.getSymbols();
       let esSymbols = EntityState.getSymbols();

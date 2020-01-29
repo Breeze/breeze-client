@@ -1,26 +1,29 @@
 
-import { EntityManager } from '../src/entity-manager';
-import { ModelLibraryBackingStoreAdapter } from '../src/adapter-model-library-backing-store';
-import { EntityType, ComplexType } from 'breeze-client';
+// import { EntityManager } from '../src/entity-manager';
+// import { ModelLibraryBackingStoreAdapter } from '../src/adapter-model-library-backing-store';
+// import { EntityType, ComplexType } from 'breeze-client';
+
+import { EntityManager, EntityType, ComplexType } from 'breeze-client';
+import { ModelLibraryBackingStoreAdapter } from 'breeze-client/adapter-model-library-backing-store';
 
 ModelLibraryBackingStoreAdapter.register();
 const metadata = require('./support/NorthwindIBMetadata.json');
 
-describe("EntityManager", function() {
+describe("EntityManager", () => {
 
 
   beforeEach(function() {
 
   });
 
-  it("should be able to create", function() {
+  test("should be able to create", () => {
     let em = new EntityManager('test');
     let r = em.getChanges();
     expect(r.length).toBe(0);
 
   });
 
-  it("should load metadata", function() {
+  test("should load metadata", () => {
 
     let em = new EntityManager('test');
     let ms = em.metadataStore;
@@ -37,7 +40,7 @@ describe("EntityManager", function() {
 
   });  
 
-  it("should create entity", function() {
+  test("should create entity", () => {
 
     let em = new EntityManager('test');
     let ms = em.metadataStore;
@@ -53,7 +56,7 @@ describe("EntityManager", function() {
     expect(orderID).toBeLessThanOrEqual(-1);
   });
 
-  it("should create entity and complex type", function() {
+  test("should create entity and complex type", () => {
 
     let em = new EntityManager('test');
     let ms = em.metadataStore;
@@ -76,7 +79,7 @@ describe("EntityManager", function() {
   });
 
 
-  it("should attach entities using foreign key", function() {
+  test("should attach entities using foreign key", () => {
 
     let em = new EntityManager('test');
     let ms = em.metadataStore;
@@ -105,7 +108,7 @@ describe("EntityManager", function() {
 
   });
 
-  it("should attach entities when added to array", function() {
+  test("should attach entities when added to array", () => {
 
     let em = new EntityManager('test');
     let ms = em.metadataStore;
@@ -132,7 +135,7 @@ describe("EntityManager", function() {
     expect(custOrders[0]).toEqual(order);
   });
 
-  it("should attach entities when fk set in constructor", function() {
+  test("should attach entities when fk set in constructor", () => {
 
     let em = new EntityManager('test');
     let ms = em.metadataStore;
@@ -152,7 +155,7 @@ describe("EntityManager", function() {
     expect(custOrders[0]).toEqual(order);
   });
 
-  it("should unattach entities when fk set to null", function() {
+  test("should unattach entities when fk set to null", () => {
 
     let em = new EntityManager('test');
     let ms = em.metadataStore;
@@ -172,7 +175,7 @@ describe("EntityManager", function() {
     expect(custOrders.length).toEqual(0);   
   });
 
-  it("should unattach entities when fk set to undefined", function() {
+  test("should unattach entities when fk set to undefined", () => {
 
     let em = new EntityManager('test');
     let ms = em.metadataStore;
@@ -192,7 +195,7 @@ describe("EntityManager", function() {
     expect(custOrders.length).toEqual(0);   
   });
 
-  it("should set FK to null when nav property set to null", function() {
+  test("should set FK to null when nav property set to null", () => {
 
     let em = new EntityManager('test');
     let ms = em.metadataStore;
@@ -216,7 +219,7 @@ describe("EntityManager", function() {
     expect(orderCustId).toBeNull();
   });
 
-  it("should set FK to null when nav property set to undefined", function() {
+  test("should set FK to null when nav property set to undefined", () => {
 
     let em = new EntityManager('test');
     let ms = em.metadataStore;
@@ -241,7 +244,7 @@ describe("EntityManager", function() {
     expect(orderCustId).toBeNull();
   });
 
-  it("should set FK to null when nav property is initially undefined", function() {
+  test("should set FK to null when nav property is initially undefined", () => {
 
     let em = new EntityManager('test');
     let ms = em.metadataStore;

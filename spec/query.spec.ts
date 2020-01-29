@@ -1,18 +1,28 @@
 
-import { AjaxFakeAdapter } from '../src/adapter-ajax-fake';
-import { DataServiceWebApiAdapter } from '../src/adapter-data-service-webapi';
-import { ModelLibraryBackingStoreAdapter } from '../src/adapter-model-library-backing-store';
-import { UriBuilderJsonAdapter } from '../src/adapter-uri-builder-json';
-import { config } from '../src/config';
-import { EntityManager } from '../src/entity-manager';
-import { EntityQuery } from '../src/entity-query';
-import { AjaxConfig, MappingContext, NodeContext, JsonResultsAdapter } from 'breeze-client';
+// import { AjaxFakeAdapter } from '../src/adapter-ajax-fake';
+// import { DataServiceWebApiAdapter } from '../src/adapter-data-service-webapi';
+// import { ModelLibraryBackingStoreAdapter } from '../src/adapter-model-library-backing-store';
+// import { UriBuilderJsonAdapter } from '../src/adapter-uri-builder-json';
+// import { config } from '../src/config';
+// import { EntityManager } from '../src/entity-manager';
+// import { EntityQuery } from '../src/entity-query';
+// import { AjaxConfig, MappingContext, NodeContext, JsonResultsAdapter } from 'breeze-client';
 
-jasmine.DEFAULT_TIMEOUT_INTERVAL = 120000;
+import { config, EntityManager, EntityQuery, AjaxConfig, MappingContext, NodeContext, JsonResultsAdapter } from 'breeze-client';
+import { DataServiceWebApiAdapter } from 'breeze-client/adapter-data-service-webapi';
+import { ModelLibraryBackingStoreAdapter } from 'breeze-client/adapter-model-library-backing-store';
+
+import { UriBuilderJsonAdapter } from 'breeze-client/adapter-uri-builder-json';
+import { AjaxFakeAdapter } from 'breeze-client/adapter-ajax-fake';
+
+// jasmine.DEFAULT_TIMEOUT_INTERVAL = 120000;
 ModelLibraryBackingStoreAdapter.register();
 UriBuilderJsonAdapter.register();
-DataServiceWebApiAdapter.register();
+
 AjaxFakeAdapter.register();
+DataServiceWebApiAdapter.register();
+
+
 const metadata = require('./support/ComplexTypeMetadata.json');
 
 const dtoAdapter = {
@@ -28,18 +38,19 @@ const dtoAdapter = {
 };
 
 
-describe("Query", function () {
+describe("Query", () => {
 
   beforeEach(function () {
   });
 
-  it("should create query and get results", function () {
+  test("should create query and get results", () => {
 
     let em = new EntityManager('test');
     let ms = em.metadataStore;
+    const ajaxAdapter = config.getAdapterInstance<AjaxFakeAdapter>("ajax");
     ms.importMetadata(metadata);
 
-    const ajaxAdapter = config.getAdapterInstance<AjaxFakeAdapter>("ajax");
+    
     ajaxAdapter.responseFn = responseFn;
 
     let query = new EntityQuery("Customer");
@@ -50,7 +61,7 @@ describe("Query", function () {
     });
   });
 
-  it("should allow using a JsonResultsAdapter", function () {
+  test("should allow using a JsonResultsAdapter", () => {
 
     let em = new EntityManager('test');
     let ms = em.metadataStore;
@@ -72,8 +83,6 @@ describe("Query", function () {
   });
 
 });
-
-
 
 
 function responseFn(config: AjaxConfig) {

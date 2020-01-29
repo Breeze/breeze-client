@@ -212,6 +212,7 @@ export class BreezeEvent<T> {
   >          return em.customTag === “blue”;
   >      })
 
+
   will either enable or disable myEntityManager based on the current value of a ‘customTag’ property on myEntityManager.
   Note that this is dynamic, changing the customTag value will cause events to be enabled or disabled immediately.
   @param eventName - The name of the event.
@@ -219,7 +220,7 @@ export class BreezeEvent<T> {
   children of this object will be enabled or disabled.
   @param isEnabled - A boolean, a null or a function that returns either a boolean or a null.
   **/
-  static enable(eventName: string, obj: Object, isEnabled: boolean) {
+ static enable(eventName: string, obj: Object, isEnabled: boolean | (() => any)) {
     assertParam(eventName, "eventName").isNonEmptyString().check();
     assertParam(obj, "obj").isObject().check();
     assertParam(isEnabled, "isEnabled").isBoolean().isOptional().or().isFunction().check();
