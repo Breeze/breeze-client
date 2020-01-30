@@ -1068,13 +1068,14 @@ describe("EntityQuery", () => {
     expect(fr1.entityKey).not.toBeNull();
   });
 
-  test.only("fetchEntityByKey - bad args", async() => {
+  test("fetchEntityByKey - bad args", async() => {
     expect.hasAssertions();
     const em1 = TestFns.newEntityManager();
     try {
-      await em1.fetchEntityByKey("Customer", true);
+      await em1.fetchEntityByKey("Customer" as any);
       throw new Error('should not get here');
     } catch (e) {
+      const foo = e;
       expect(e.message.indexOf("EntityKey") >= 0).toBe(true);
     }
   });
