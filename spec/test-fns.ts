@@ -11,9 +11,17 @@ export const skipDescribeIf = (condition: boolean) => (condition ? describe.skip
 export const expectPass = () => expect(true).toBe(true);
 
 export class TestFns {
+  // Uncomment just one
+  static defaultServerEnvName = "ASPCORE";
+  // static currentServerEnvName = "SEQUELIZE";
+  // static currentServerEnvName = "HIBERNATE";
+  // static currentServerEnvName = "MONGO";
+
+  static serverEnvName: string;
   static defaultServiceName: string;
   static defaultMetadataStore: MetadataStore;
-  static serverEnvName: string;  // MONGO, ASPCORE, SEQUALIZE
+  static metadataStoreIsBeingFetched: boolean;
+  
   static isODataServer: boolean;
   static isMongoServer: boolean;
   static isSequelizeServer: boolean;
@@ -38,7 +46,10 @@ export class TestFns {
     }
   };
 
-  static initServerEnvName(serverEnvName: string) {
+  static initEnv(serverEnvName?: string) {
+    if (serverEnvName == null) {
+      serverEnvName = TestFns.defaultServerEnvName;
+    }
     TestFns.serverEnvName = serverEnvName.toLocaleUpperCase();
 
     TestFns.isODataServer = serverEnvName === 'ODATA';
@@ -61,16 +72,21 @@ export class TestFns {
   private static initAdapters() {
     global['fetch'] = require('node-fetch');
 
-    ModelLibraryBackingStoreAdapter.register();
+    // ModelLibraryBackingStoreAdapter.register();
+    // UriBuilderJsonAdapter.register();
+    // AjaxFetchAdapter.register();
+    // DataServiceWebApiAdapter.register();
+    
+    DataServiceWebApiAdapter.register();
     UriBuilderJsonAdapter.register();
     AjaxFetchAdapter.register();
-    DataServiceWebApiAdapter.register();
+    ModelLibraryBackingStoreAdapter.register();
 
     NamingConvention.camelCase.setAsDefault();
   }
 
   static async initDefaultMetadataStore() {
-    if (!TestFns.defaultMetadataStore) {
+    if (TestFns.defaultMetadataStore == null) {
       const ms = new MetadataStore();
       const x = await ms.fetchMetadata(TestFns.defaultServiceName);
       TestFns.defaultMetadataStore = ms;  
@@ -85,10 +101,7 @@ export class TestFns {
     } else if (TestFns.defaultMetadataStore) {
       em = new EntityManager({ serviceName: TestFns.defaultServiceName, metadataStore: TestFns.defaultMetadataStore });
     } else {
-      em = new EntityManager(TestFns.defaultServiceName);
-      em.metadataStore.metadataFetched.subscribe( (metadataFetchedArgs) => {
-        TestFns.defaultMetadataStore = metadataFetchedArgs.metadataStore;
-      });
+      em = new EntityManager({ serviceName: TestFns.defaultServiceName });
     }
     return em;
   }

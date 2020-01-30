@@ -2,8 +2,11 @@ import { breeze, EntityManager, EntityQuery, NamingConvention, Predicate, Entity
 import { skipTestIf, TestFns, expectPass } from './test-fns';
 import { NodeMeta } from 'src/data-service';
 
-// TODO: 
-TestFns.initServerEnvName("ASPCORE");
+TestFns.initEnv();
+
+beforeAll( async() => {
+  await TestFns.initDefaultMetadataStore();
+});
 
 const jsonResultsAdapter = new breeze.JsonResultsAdapter({
   name: "eventAdapter",

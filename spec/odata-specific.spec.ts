@@ -2,8 +2,11 @@
 import { breeze, EntityManager, EntityQuery, NamingConvention, Predicate, EntityType, EntityState, EntityKey, Entity } from 'breeze-client';
 import { TestFns, expectPass, describeIf } from './test-fns';
 
-// TODO: 
-TestFns.initServerEnvName('foo')
+TestFns.initEnv();
+
+beforeAll( async() => {
+  await TestFns.initDefaultMetadataStore();
+});
 
 describeIf(TestFns.isODataServer)("OData specific", () => {
 
