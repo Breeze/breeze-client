@@ -1118,7 +1118,7 @@ export class EntityType {
   @param initialValues- Configuration object of the properties to set immediately after creation.
   @return The new entity.
   **/
-  createEntity(initialValues: any) {
+  createEntity(initialValues?: any) {
     // ignore the _$eref once the entity is attached to an entityManager.
     if (initialValues && initialValues._$eref && !initialValues._$eref.entityAspect.entityManager) return initialValues._$eref;
 

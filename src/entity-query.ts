@@ -142,7 +142,7 @@ export class EntityQuery {
   }
 
 
-  where(predicate: Predicate): EntityQuery;
+  where(predicate?: Predicate): EntityQuery;
   where(predicate: Object): EntityQuery;
   where(property: string, operator: string, value: any): EntityQuery;
   where(property: string, operator: FilterQueryOp, value: any): EntityQuery;
@@ -209,7 +209,7 @@ export class EntityQuery {
   }
 
 
-  orderBy(propertyPaths: string, isDescending?: boolean): EntityQuery;
+  orderBy(propertyPaths?: string, isDescending?: boolean): EntityQuery;
   orderBy(propertyPaths: string[], isDescending?: boolean): EntityQuery;
   /**
   Returns a new query that orders the results of the query by property name.  By default sorting occurs is ascending order, but sorting in descending order is supported as well.
@@ -299,7 +299,7 @@ export class EntityQuery {
   @param propertyPaths - A comma-separated (',') string of property paths or an array of property paths.
   If 'propertyPaths' is either null or omitted then any existing projection on the query is removed.
   **/
-  select(propertyPaths: string | string[]) {
+  select(propertyPaths?: string | string[]) {
     let selectClause = propertyPaths == null ? null : new SelectClause(normalizePropertyPaths(propertyPaths));
     return clone(this, "selectClause", selectClause);
   }
@@ -361,7 +361,7 @@ export class EntityQuery {
   by a '.' and another navigation property name to enable identifying a multi-level relationship.
   If 'propertyPaths' is either null or omitted then any existing 'expand' clause on the query is removed.
   **/
-  expand(propertyPaths: string | string[]) {
+  expand(propertyPaths?: string | string[]) {
     let expandClause = propertyPaths == null ? null : new ExpandClause(normalizePropertyPaths(propertyPaths));
     return clone(this, "expandClause", expandClause);
   }
