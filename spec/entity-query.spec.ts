@@ -1,10 +1,8 @@
 import { breeze, EntityManager, EntityQuery, NamingConvention, Predicate, EntityType, EntityState, EntityKey, Entity } from 'breeze-client';
-import { skipIf, TestFns, expectPass } from './test-fns';
+import { skipTestIf, TestFns, expectPass } from './test-fns';
 
-const defaultServiceName = 'http://localhost:61552/breeze/NorthwindIBModel';
-TestFns.init(defaultServiceName);
-
-const serverEnv = 'webApi';
+// TODO:
+TestFns.initServerEnvName("ASPCORE");
 
 describe("EntityQuery", () => {
 
@@ -16,7 +14,7 @@ describe("EntityQuery", () => {
   test("should allow simple metadata query", async () => {
     let em = new EntityManager('test');
     let ms = em.metadataStore;
-    const metadata = await ms.fetchMetadata(defaultServiceName);
+    const metadata = await ms.fetchMetadata(TestFns.defaultServiceName);
     expect(metadata).not.toBeNull();
     
   });
@@ -390,7 +388,7 @@ describe("EntityQuery", () => {
   });
 
   // skipIfHibFuncExpr.
-  // skipIf("mongo", "does not support 'year' odata predicate").
+  // skipTestIf("mongo", "does not support 'year' odata predicate").
   test("function expr - date(month) function", async() => {
     const em1 = TestFns.newEntityManager();
     const p = Predicate.create("month(hireDate)", ">", 6).and("month(hireDate)", "<", 11);
@@ -465,6 +463,265 @@ describe("EntityQuery", () => {
     // TODO: test if qr1.results are ordered by city and region
   });
 
+  test("check getEntityByKey", async() => {
+    expect.hasAssertions();
+    const em1 = TestFns.newEntityManager();
+    const query = EntityQuery
+      .from("Customers");
+    const qr1 = await em1.executeQuery(query);
+    
+    const cust1 = qr1.results[0];
+    const key = cust1.getProperty(TestFns.wellKnownData.keyNames.customer);
+    const cust2 = em1.getEntityByKey("Customer", key);
+    expect(cust1).toBe(cust2);
+  });
+
+  test("local cache query for all Suppliers in fax 'Papa'", async() => {
+    expect.hasAssertions();
+    const em1 = TestFns.newEntityManager();
+    const query = new breeze.EntityQuery("Suppliers");
+    const qr1 = await em1.executeQuery(query);
+    expect(qr1.results.length).toBeGreaterThan(0);
+    const predicate = breeze.Predicate.create(TestFns.wellKnownData.keyNames.supplier, '==', 0)
+      .or('fax', '==', 'Papa');
+    const localQuery = breeze.EntityQuery
+      .from('Suppliers')
+      .where(predicate)
+      .toType('Supplier');
+
+    const suppliers = em1.executeQueryLocally(localQuery);
+    // Defect #2486 Fails with "Invalid ISO8601 duration 'Papa'"
+    expect(suppliers.length).toBe(0);
+    
+  });
+
+  test("inlineCount when ordering results by simple navigation path", async() => {
+    expect.hasAssertions();
+    const em1 = TestFns.newEntityManager();
+    const pred = new Predicate("shipCity", "startsWith", "A");
+    const query = EntityQuery
+      .from("Orders")
+      .where(pred)
+      .orderBy("customerID");
+    // .orderBy("customer.companyName")
+    const qr1 = await em1.executeQuery(query);
+    const totalCount = qr1.results.length;
+    expect(totalCount).toBeGreaterThan(3);
+    const q2 = query.inlineCount(true).take(3);
+    const qr2 = await em1.executeQuery(q2);
+    expect(qr2.results.length).toBe(3);
+    expect(qr2.inlineCount).toBe(totalCount);
+  });
+
+  test("inlineCount when ordering results by nested navigation path", async() => {
+    expect.hasAssertions();
+    const em1 = TestFns.newEntityManager();
+    const pred = new Predicate("shipCity", "startsWith", "A");
+    const query = breeze.EntityQuery.from("Orders")
+      .where(pred)
+      .orderBy("customer.companyName");
+    const qr1 = await em1.executeQuery(query);
+    const totalCount = qr1.results.length;
+    expect(totalCount).toBeGreaterThan(3);
+    const q2 = query.inlineCount(true).take(3);
+    const qr2 = await em1.executeQuery(q2);
+    expect(qr2.results.length).toBe(3);
+    expect(qr2.inlineCount).toBe(totalCount);
+  });
+
+  test("getAlfred", async() => {
+    expect.hasAssertions();
+    const em1 = TestFns.newEntityManager();
+    const query = EntityQuery.from("Customers").where("companyName", "startsWith", "Alfreds");
+    const qr1 = await em1.executeQuery(query);
+    const alfred = qr1.results[0];
+    const alfredsID = alfred.getProperty(TestFns.wellKnownData.keyNames.customer).toLowerCase();
+    expect(alfredsID).toEqual(TestFns.wellKnownData.alfredsID);
+  });
+
+  test("URL malformed with bad resource name combined with 'startsWith P'", async() => {
+    expect.hasAssertions();
+    const em1 = TestFns.newEntityManager();
+    // we intentionally mispelled the resource name to cause the query to fail
+    const query = EntityQuery.from("Customer").where("companyName", "startsWith", "P");
+
+    try {
+      const qr1 = await em1.executeQuery(query);
+      throw new Error('should not get here');
+    } catch ( error) {
+      if (TestFns.isMongoServer) {
+        expect(error.message.indexOf("Unable to locate") >= 0).toBe(true);
+      } else if (TestFns.isODataServer) {
+        expect(error.message.indexOf("Not Found") >= 0).toBe(true);
+      } else if (TestFns.isSequelizeServer) {
+        expect(error.message.indexOf("Cannot find an entityType") > 0).toBe(true);
+      } else if (TestFns.isHibernateServer) {
+        expect(error.message.indexOf("no entityType name registered") > 0).toBe(true);
+      } else if (TestFns.isAspCoreServer) {
+        expect(error.status === 404).toBe(true);
+      } else {
+        expect(error.message.indexOf("No HTTP resource was found") >= 0).toBe(true);
+      }
+    }
+  });
+
+  skipTestIf(TestFns.isMongoServer)
+  ("with take, orderby and expand", async() => {
+    expect.hasAssertions();
+    const em1 = TestFns.newEntityManager();
+    const q1 = EntityQuery.from("Products")
+      .expand("category")
+      .orderBy("category.categoryName desc, productName");
+    const qr1 = await em1.executeQuery(q1);
+    const topTen = qr1.results.slice(0, 10);
+    const q2 = q1.take(10);
+    const qr2 = await em1.executeQuery(q2);
+    const topTenAgain = qr2.results;
+    expect(topTen).toEqual(topTenAgain);
+  });
+
+  skipTestIf(TestFns.isMongoServer)
+  ("with take, skip, orderby and expand", async() => {
+    expect.hasAssertions();
+    const em1 = TestFns.newEntityManager();
+    const q1 = EntityQuery.from("Products")
+      .expand("category")
+      .orderBy("category.categoryName, productName");
+    const qr1 = await em1.executeQuery(q1);
+    const nextTen = qr1.results.slice(10, 20);
+    const q2 = q1.skip(10).take(10);
+    const qr2 = await em1.executeQuery(q2);
+    const nextTenAgain = qr2.results;
+    expect(nextTen).toEqual(nextTenAgain);
+  });
+
+  test("with quotes", async() => {
+    expect.hasAssertions();
+    const em1 = TestFns.newEntityManager();
+    const q1 = EntityQuery.from("Customers")
+      .where("companyName", 'contains', "'")
+      .using(em1);
+    const qr1 = await q1.execute();
+    expect(qr1.results.length).toBeGreaterThan(0);
+    const r = em1.executeQueryLocally(q1);
+    expect(r.length).toBe(qr1.results.length);
+  });
+
+  test("with embedded ampersand", async() => {
+    expect.hasAssertions();
+    const em1 = TestFns.newEntityManager();
+    const q1 = EntityQuery.from("Customers")
+      .where('companyName', 'contains', '&')
+      .using(em1);
+    const qr1 = await q1.execute();
+    expect(qr1.results.length).toBeGreaterThan(0);
+    const r = em1.executeQueryLocally(q1);
+    expect(r.length).toBe(qr1.results.length);
+  });
+
+  test("bad query test", async() => {
+    expect.hasAssertions();
+    const em1 = TestFns.newEntityManager();
+    try {
+      const qr1 = await EntityQuery.from("EntityThatDoesnotExist")
+        .using(em1)
+        .execute();
+      throw new Error('should not get here') ;
+    } catch (e) {
+      if (TestFns.isODataServer) {
+        expect(e.message === "Not Found").toBe(true);
+      } else if (TestFns.isAspCoreServer) {
+        expect(e.status === 404).toBe(true);
+      } else {
+        expect(e.message && e.message.toLowerCase().indexOf("entitythatdoesnotexist") >= 0).toBe(true);
+      }
+    }
+  });
+
+  skipTestIf(TestFns.isMongoServer)
+  ("nested expand", async() => {
+    expect.hasAssertions();
+    const em1 = TestFns.newEntityManager();
+    const q1 = EntityQuery.from("OrderDetails").where("orderID", "<", 10255).expand("order.customer");
+    const qr1 = await em1.executeQuery(q1);
+      
+    const details = qr1.results;
+    details.forEach( (od) => {
+      const order = od.getProperty("order");
+      expect(order).not.toBeNull();
+      if (order.getProperty("customerID")) {
+        const customer = order.getProperty("customer");
+        expect(customer).not.toBeNull();
+      }
+    });
+
+   });
+
+   skipTestIf(TestFns.isMongoServer)
+   ("nested expand 3 level", async() => {
+    expect.assertions(3);
+    const em1 = TestFns.newEntityManager();
+    const q1 = EntityQuery.from("Orders").take(5).expand("orderDetails.product.category");
+    const qr1 = await em1.executeQuery(q1);
+    const orders = qr1.results;
+    const orderDetails = orders[0].getProperty("orderDetails");
+    expect(orderDetails.length).toBeGreaterThan(0);
+    const product = orderDetails[0].getProperty("product");
+    expect(product).not.toBeNull();
+    const category = product.getProperty("category");
+    expect(category).not.toBeNull();
+  });
+
+  skipTestIf(TestFns.isMongoServer)
+  ("retrievedEntities - nested expand 2 level", async() => {
+    expect.hasAssertions();
+    const em1 = TestFns.newEntityManager();
+    const q1 = EntityQuery.from("OrderDetails").take(5).expand("order.customer");
+    const qr1 = await em1.executeQuery(q1);
+    const entities = qr1.retrievedEntities;
+    expect(entities).not.toBeNull();
+    expect(entities.length).toBeGreaterThan(5);
+    const details = qr1.results;
+
+    const isOk = details.some(function (od) {
+      expect(entities.indexOf(od) >= 0).toBe(true);
+      const order = od.getProperty("order");
+      expect(entities.indexOf(order) >= 0).toBe(true);
+      const cust = order.getProperty("customer");
+      if (cust) {
+        expect(entities.indexOf(cust) >= 0).toBe(true);
+        return true;
+      } else {
+        return false;
+      }
+    });
+    expect(isOk).toBe(true);
+  });
+
+  skipTestIf(TestFns.isMongoServer)
+  ("retrievedEntities - nested expand 3 level", async() => {
+    expect.hasAssertions();
+    const em1 = TestFns.newEntityManager();
+    const q1 = EntityQuery.from("Orders").take(5).expand("orderDetails.product.category");
+    const qr1 = await em1.executeQuery(q1);
+    
+    const entities = qr1.retrievedEntities;
+    expect(entities).not.toBeNull();
+    const orders = qr1.results;
+    for (let i = 0, ilen = orders.length; i < ilen; i++) {
+      expect(entities.indexOf(orders[i]) >= 0).toBe(true);
+      const orderDetails = orders[i].getProperty("orderDetails");
+      for (let j = 0, jlen = orderDetails.length; j < jlen; j++) {
+        expect(entities.indexOf(orderDetails[j]) >= 0).toBe(true);
+        expect(entities.indexOf(orderDetails[j].getProperty("product")) >= 0).toBe(true);
+        expect(entities.indexOf(orderDetails[j].getProperty("product").getProperty("category")) >= 0).toBe(true);
+      }
+    }
+    const allEntities = em1.getEntities();
+    expect(allEntities.length).toBe(entities.length);
+  });
+    
+    
 
 });
 

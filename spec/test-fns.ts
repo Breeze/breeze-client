@@ -5,7 +5,9 @@ import { AjaxFetchAdapter } from 'breeze-client/adapter-ajax-fetch';
 import { DataServiceWebApiAdapter } from 'breeze-client/adapter-data-service-webapi';
 
 export const testIf = (condition: boolean) => (condition ? test : test.skip);
-export const skipIf = (condition: boolean) => (condition ? test.skip : test);
+export const skipTestIf = (condition: boolean) => (condition ? test.skip : test);
+export const describeIf = (condition: boolean) => (condition ? describe : describe.skip);
+export const skipDescribeIf = (condition: boolean) => (condition ? describe.skip : describe);
 export const expectPass = () => expect(true).toBe(true);
 
 export class TestFns {
@@ -14,13 +16,9 @@ export class TestFns {
   static serverEnvName: string;  // MONGO, ASPCORE, SEQUALIZE
   static isODataServer: boolean;
   static isMongoServer: boolean;
-
-
-  static initServerEnvName(serverEnvName: string) {
-    TestFns.serverEnvName = serverEnvName;
-    TestFns.isODataServer = serverEnvName === 'ODATA';
-    TestFns.isMongoServer = serverEnvName === 'MONGO';
-  }
+  static isSequelizeServer: boolean;
+  static isAspCoreServer: boolean;
+  static isHibernateServer: boolean;
 
   static wellKnownData = {
     nancyID: 1 as any,
@@ -40,7 +38,27 @@ export class TestFns {
     }
   };
 
-  static init(defaultServiceName: string) {
+  static initServerEnvName(serverEnvName: string) {
+    TestFns.serverEnvName = serverEnvName.toLocaleUpperCase();
+
+    TestFns.isODataServer = serverEnvName === 'ODATA';
+    TestFns.isMongoServer = serverEnvName === 'MONGO';
+    TestFns.isSequelizeServer = serverEnvName === 'SEQUELIZE';
+    TestFns.isAspCoreServer = serverEnvName === 'ASPCORE';
+    TestFns.isHibernateServer = serverEnvName === 'HIBERNATE';
+
+    TestFns.initAdapters();
+    TestFns.updateWellKnownDataIfMongo();
+
+    if (TestFns.isAspCoreServer) {
+      TestFns.defaultServiceName = 'http://localhost:61552/breeze/NorthwindIBModel';
+    } else {
+
+    }
+  }
+
+
+  private static initAdapters() {
     global['fetch'] = require('node-fetch');
 
     ModelLibraryBackingStoreAdapter.register();
@@ -49,10 +67,6 @@ export class TestFns {
     DataServiceWebApiAdapter.register();
 
     NamingConvention.camelCase.setAsDefault();
-
-    TestFns.updateWellKnownDataIfMongo();
-
-    TestFns.defaultServiceName = defaultServiceName;
   }
 
   static async initDefaultMetadataStore() {
