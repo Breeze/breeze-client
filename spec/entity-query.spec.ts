@@ -721,7 +721,121 @@ describe("EntityQuery", () => {
     expect(allEntities.length).toBe(entities.length);
   });
     
+  skipTestIf(TestFns.isMongoServer)
+  ("size test", async() => {
+    expect.hasAssertions();
+    const em1 = TestFns.newEntityManager();
     
+    const q1 = EntityQuery.from("Customers").take(5).expand("orders");
+    await em1.executeQuery(q1);
+    const s1 = TestFns.sizeOf(em1);
+    await em1.executeQuery(q1);
+    const s2 = TestFns.sizeOf(em1);
+    em1.clear();
+    const s3 = TestFns.sizeOf(em1);
+    const difObj1 = TestFns.sizeOfDif(s2, s3);
+    expect(difObj1.dif).not.toBeNull();
+    await em1.executeQuery(q1);
+    const s4 = TestFns.sizeOf(em1);
+    expect(s1.size).toBe(s4.size);
+
+    const em2 = TestFns.newEntityManager();
+    await em2.executeQuery(q1);
+    const s5 = TestFns.sizeOf(em2);
+    const difObj2 = TestFns.sizeOfDif(s1, s5);
+    expect(difObj2.dif).toBe(0);
+    em2.clear();
+    const s6 = TestFns.sizeOf(em2);
+    const difObj3 = TestFns.sizeOfDif(s3, s6);
+    expect(difObj2.dif).toBe(0);
+  });
+
+  // skipTestIf(TestFns.isMongoServer)
+  // ("sizeof config", async() => {
+  //     const done = assert.async();
+  //     const em = newEm();
+  //     const em2 = newEm();
+  //     const query = EntityQuery.from("Customers").take(5).expand("orders");
+
+  //     const s1, s2, s3, s4, s5, s6;
+  //     const sizeDif;
+  //     em.executeQuery(query).then(function (data) {
+  //       s1 = testFns.sizeOf(breeze.config);
+  //       return em.executeQuery(query);
+  //     }).then(function (data2) {
+  //       s2 = testFns.sizeOf(breeze.config);
+  //       em.clear();
+  //       s3 = testFns.sizeOf(breeze.config);
+  //       return em.executeQuery(query);
+  //     }).then(function (data3) {
+  //       s4 = testFns.sizeOf(breeze.config);
+  //       ok(s1.size === s4.size, "sizes should be equal");
+  //       em2 = newEm();
+  //       s5 = testFns.sizeOf(breeze.config);
+  //       return em2.executeQuery(query);
+  //     }).then(function (data4) {
+  //       s6 = testFns.sizeOf(breeze.config);
+  //       ok(s5.size === s6.size, "sizes should be equal");
+
+  //     }).fail(testFns.handleFail).fin(done);
+  //   });
+
+  //   skipTestIf(TestFns.isMongoServer)
+  //   ("size test property change", async() => {
+  //     const done = assert.async();
+  //     const em = newEm();
+  //     const em2 = newEm();
+  //     const query = EntityQuery.from("Customers").take(5).expand("orders");
+
+  //     const s1, s2, s3, s4, s5, s6;
+  //     const sizeDif, difObj;
+  //     const hasChanges = em.hasChanges();
+
+  //     em.entityChanged.subscribe(function (x) {
+  //       const y = x;
+  //     });
+  //     em2.entityChanged.subscribe(function (x) {
+  //       const y = x;
+  //     });
+
+  //     em.executeQuery(query).then(function (data) {
+  //       s1 = testFns.sizeOf(em);
+  //       return em.executeQuery(query);
+  //     }).then(function (data2) {
+  //       const custs = data2.results;
+  //       custs.forEach(function (c) {
+  //         const rv = c.getProperty("rowVersion");
+  //         c.setProperty("rowVersion", rv + 1);
+  //       });
+  //       em.rejectChanges();
+  //       s2 = testFns.sizeOf(em);
+  //       difObj = testFns.sizeOfDif(s1, s2);
+  //       sizeDif = Math.abs(difObj.dif);
+  //       ok(sizeDif < 20, "s12 dif should be very small: " + sizeDif);
+  //       em.clear();
+  //       s3 = testFns.sizeOf(em);
+  //       difObj = testFns.sizeOfDif(s2, s3);
+  //       ok(difObj.dif, "should be a sizeDif result");
+  //       return em.executeQuery(query);
+  //     }).then(function (data3) {
+  //       s4 = testFns.sizeOf(em);
+  //       sizeDif = Math.abs(s1.size - s4.size);
+  //       ok(sizeDif < 20, "sizes should be equal: " + sizeDif);
+  //       return em2.executeQuery(query);
+  //     }).then(function (data4) {
+  //       s5 = testFns.sizeOf(em2);
+  //       difObj = testFns.sizeOfDif(s1, s5);
+  //       sizeDif = Math.abs(difObj.dif);
+  //       ok(sizeDif < 20, "sizes should be almost equal: " + sizeDif);
+
+  //       em2.clear();
+  //       s6 = testFns.sizeOf(em2);
+  //       difObj = testFns.sizeOfDif(s3, s6);
+  //       sizeDif = Math.abs(difObj.dif);
+  //       ok(sizeDif < 20, "empty sizes should be almost equal: " + sizeDif);
+
+  //     }).fail(testFns.handleFail).fin(done);
+  //   });    
 
 });
 
