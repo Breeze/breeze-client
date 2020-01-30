@@ -389,6 +389,82 @@ describe("EntityQuery", () => {
     expect(emps2.length).toBe(qr1.results.length);
   });
 
+  // skipIfHibFuncExpr.
+  // skipIf("mongo", "does not support 'year' odata predicate").
+  test("function expr - date(month) function", async() => {
+    const em1 = TestFns.newEntityManager();
+    const p = Predicate.create("month(hireDate)", ">", 6).and("month(hireDate)", "<", 11);
+    const query = EntityQuery
+      .from("Employees")
+      .where(p);
+
+    const qr1 = await em1.executeQuery(query);
+    expect(qr1.results.length).toBeGreaterThan(0);
+    const emps2 = em1.executeQueryLocally(query);
+    expect(emps2.length).toBe(qr1.results.length);
+  });
+
+  test("take(0)", async() => {
+    expect.hasAssertions();
+    const em1 = TestFns.newEntityManager();
+    const query = EntityQuery
+      .from("Customers")
+      .take(0);
+    const qr1 = await em1.executeQuery(query);
+    expect(qr1.results.length).toBe(0);
+  });
+
+  test("take(0) with inlinecount", async() => {
+    expect.hasAssertions();
+    const em1 = TestFns.newEntityManager();
+    const query = EntityQuery
+      .from("Customers")
+      .take(0)
+      .inlineCount();
+    const qr1 = await em1.executeQuery(query);
+    expect(qr1.results.length).toBe(0);
+    expect(qr1.inlineCount).toBeGreaterThan(0);
+  });
+
+  test("select with inlinecount", async() => {
+    expect.hasAssertions();
+    const em1 = TestFns.newEntityManager();
+    const query = EntityQuery
+      .from("Customers")
+      .select("companyName, region, city")
+      .inlineCount();
+    const qr1 = await em1.executeQuery(query);
+    expect(qr1.results.length).toBe(qr1.inlineCount);
+  });
+
+  test("select with inlinecount and take", async() => {
+    expect.hasAssertions();
+    const em1 = TestFns.newEntityManager();
+    const query = EntityQuery
+      .from("Customers")
+      .select("companyName, region, city")
+      .take(5)
+      .inlineCount();
+    const qr1 = await em1.executeQuery(query);
+    expect(qr1.results.length).toBe(5);
+    expect(qr1.inlineCount).toBeGreaterThan(5);
+  });
+
+  test("select with inlinecount and take and orderBy", async() => {
+    expect.hasAssertions();
+    const em1 = TestFns.newEntityManager();
+    const query = EntityQuery
+      .from("Customers")
+      .select("companyName, region, city")
+      .orderBy("city, region")
+      .take(5)
+      .inlineCount();
+    const qr1 = await em1.executeQuery(query);
+    expect(qr1.results.length).toBe(5);
+    expect(qr1.inlineCount).toBeGreaterThan(5);
+    // TODO: test if qr1.results are ordered by city and region
+  });
+
 
 });
 
