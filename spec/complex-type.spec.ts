@@ -11,7 +11,9 @@ import { EntityManager, EntityType, ComplexType} from 'breeze-client';
 import { ModelLibraryBackingStoreAdapter } from 'breeze-client/adapter-model-library-backing-store';
 import { UriBuilderJsonAdapter } from 'breeze-client/adapter-uri-builder-json';
 import { DataServiceWebApiAdapter } from 'breeze-client/adapter-data-service-webapi';
-import { AjaxFakeAdapter } from 'breeze-client/adapter-ajax-fake';
+// import { AjaxFakeAdapter } from 'breeze-client/adapter-ajax-fake';  // OK
+import { AjaxFakeAdapter } from './adapter-ajax-fake';    // OK
+// import { AjaxFakeAdapter } from '../src/adapter-ajax-fake'; // BAD
 
 ModelLibraryBackingStoreAdapter.register();
 UriBuilderJsonAdapter.register();

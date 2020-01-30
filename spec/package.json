@@ -5,7 +5,8 @@
   "description": "Breeze tests",
   "repository": "https://github.com/Breeze/breeze-client.git",
   "dependencies": {
-    "breeze-client": "file:../breeze-client-2.0.3.tgz"
+    "breeze-client": "file:../breeze-client-2.0.3.tgz",
+    "node-fetch": "^2.6.0"
   },
   "devDependencies": {
     "@types/jest": "^25.1.0",
