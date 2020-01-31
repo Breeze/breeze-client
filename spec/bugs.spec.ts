@@ -1,4 +1,4 @@
-import { Entity, EntityQuery, EntityType, MetadataStore, Predicate, breeze, MergeStrategy } from 'breeze-client';
+import { Entity, EntityQuery, EntityType, MetadataStore, Predicate, breeze, MergeStrategy, EntityState } from 'breeze-client';
 import { TestFns, skipTestIf } from './test-fns';
 
 const metadata = require('./support/NorthwindIBMetadata.json');
@@ -11,7 +11,7 @@ beforeAll(async () => {
 
 });
 
-describe("Old Bugs", () => {
+describe("Old Fixed Bugs", () => {
 
   beforeEach(function () {
 
@@ -183,6 +183,57 @@ describe("Old Bugs", () => {
     expect(results[0]).toBe(customer);
       
   });
+
+  //Using EntityManager em1, query Entity A and it's nav property (R1) Entity B1.
+  //Using EntityManager em2, query A and change it's nav property to B2. Save the change.
+  //Using EntityManager em1, still holding A and B1, query A, including it's expanded nav property R1.
+  //In R1.subscribeChanges, the correct new value of B2 will exist as R1's value but it will have a status of "Detached".
+  test("bug with nav prop change and expand", async () => {
+    const em1 = TestFns.newEntityManager();
+    const em2 = TestFns.newEntityManager();
+    const p = Predicate.create("freight", ">", 100).and("customerID", "!=", null);
+    const query = new EntityQuery()
+      .from("Orders")
+      .where(p)
+      .orderBy("orderID")
+      .expand("customer")
+      .take(1);
+
+    let oldCust, newCust1a, newCust1b, order1, order1a, order1b;
+    const qr1 = await em1.executeQuery(query);
+
+    order1 = qr1.results[0];
+    oldCust = order1.getProperty("customer");
+    expect(oldCust).not.toBeNull();
+    const qr2 = await em2.executeQuery(EntityQuery.fromEntityKey(order1.entityAspect.getKey()));
+
+    order1a = qr2.results[0];
+    expect(order1.entityAspect.getKey()).toEqual(order1a.entityAspect.getKey());
+
+    const customerType = em2.metadataStore.getEntityType("Customer") as EntityType;
+    newCust1a = customerType.createEntity();
+    newCust1a.setProperty("companyName", "Test_compName");
+    order1a.setProperty("customer", newCust1a);
+
+    const sr = await em2.saveChanges();
+
+    em1.entityChanged.subscribe((args) => {
+      const entity = args.entity;
+      expect(entity).not.toBeNull();
+      expect(entity.entityAspect.entityState).not.toEqual(EntityState.Detached);
+    });
+
+    const qr3 = await em1.executeQuery(query);
+
+    order1b = qr3.results[0];
+    expect(order1b).toBe(order1);
+    newCust1b = order1b.getProperty("customer");
+    expect(newCust1a.entityAspect.getKey()).toEqual(newCust1b.entityAspect.getKey());
+    expect(newCust1b).not.toBeNull();
+    expect(newCust1b.entityAspect.entityState.isUnchanged()).toBe(true);
+  });
+
+
 
 
 });
