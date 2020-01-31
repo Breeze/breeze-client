@@ -1,10 +1,10 @@
-import { breeze, EntityManager, EntityQuery, NamingConvention, Predicate, EntityType, EntityState, EntityKey, Entity, MergeStrategy, RelationArray, core, QueryOptions, FetchStrategy } from 'breeze-client';
+import { breeze, EntityManager, EntityQuery, NamingConvention, Predicate, EntityType, EntityState, EntityKey, Entity, MergeStrategy, RelationArray, core, QueryOptions, FetchStrategy, FilterQueryOp } from 'breeze-client';
 import { skipTestIf, TestFns, expectPass } from './test-fns';
 
 TestFns.initServerEnv();
 
 function ok(a: any, b?: any) {
-
+  throw new Error('for test conversion purposes')
 }
 
 beforeAll(async () => {
@@ -1364,6 +1364,94 @@ describe("EntityQuery", () => {
     expect(orders.length).toBeGreaterThan(0);
   });
 
+  test("predicate", async () => {
+    expect.hasAssertions();
+    const em = TestFns.newEntityManager();
+
+    const baseQuery = EntityQuery.from("Orders");
+    const pred1 = new Predicate("freight", ">", 100);
+    const pred2 = new Predicate("orderDate", ">", new Date(1998, 3, 1));
+    const query = baseQuery.where(pred1.and(pred2));
+    const queryUrl = query._toUri(em);
+
+    const qr1 = await em.executeQuery(query);
+    const orders = qr1.results;
+    expect(orders.length).toBeGreaterThan(0);
+  });
+
+  test("predicate with contains", async function () {
+    expect.hasAssertions();
+    const em = TestFns.newEntityManager();
+    const p1 = Predicate.create("companyName", "startsWith", "S");
+    const p2 = Predicate.create("city", "contains", "er");
+    const whereClause = p1.and(p2);
+    const query = new EntityQuery()
+      .from("Customers")
+      .where(whereClause);
+    const qr1 = await em.executeQuery(query);
+    expect(qr1.results.length).toBeGreaterThan(0);
+  });
+
+  test("with contains", async function () {
+    expect.hasAssertions();
+    const em = TestFns.newEntityManager();
+    const query = EntityQuery.from("Customers")
+      .where("companyName", FilterQueryOp.Contains, 'market');
+    //.where("CompanyName", "contains", 'market'); // Alternative to FilterQueryOp
+    const qr1 = await em.executeQuery(query);
+    expect(qr1.results.length).toBeGreaterThan(0);
+  });
+
+
+  test("predicate 2", async function () {
+    expect.hasAssertions();
+    const em = TestFns.newEntityManager();
+
+    const baseQuery = EntityQuery.from("Orders");
+    const pred1 = Predicate.create("freight", ">", 100);
+    const pred2 = Predicate.create("orderDate", ">", new Date(1998, 3, 1));
+    const newPred = Predicate.and([pred1, pred2]);
+    const query = baseQuery.where(newPred);
+    const queryUrl = query._toUri(em);
+
+    const qr1 = await em.executeQuery(query);
+    expect(qr1.results.length).toBeGreaterThan(0);
+  });
+
+  test("predicate 3", async function () {
+    expect.hasAssertions();
+    const em = TestFns.newEntityManager();
+    const baseQuery = EntityQuery.from("Orders");
+    const pred = Predicate.create("freight", ">", 100)
+      .and("orderDate", ">", new Date(1998, 3, 1));
+    const query = baseQuery.where(pred);
+    const queryUrl = query._toUri(em);
+    const qr1 = await em.executeQuery(query);
+    expect(qr1.results.length).toBeGreaterThan(0);
+  });
+
+
+  test("not predicate with null", async function () {
+    expect.hasAssertions();
+    const em = TestFns.newEntityManager();
+
+    let pred = new Predicate("region", FilterQueryOp.Equals, null);
+    pred = pred.not();
+    const query = new EntityQuery()
+      .from("Customers")
+      .where(pred)
+      .take(10);
+
+    const queryUrl = query._toUri(em);
+
+    const qr1 = await em.executeQuery(query);
+    const customers = qr1.results;
+    expect(customers.length).toBeGreaterThan(0);
+    customers.forEach( (customer) => {
+      const region = customer.getProperty("region");
+      expect(region != null).toBe(true);
+    });
+  });
 
 
 
