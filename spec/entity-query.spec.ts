@@ -1133,6 +1133,97 @@ describe("EntityQuery", () => {
     expect(changes.length).toBe(0);
   });
 
+  // no expand support in Mongo
+  skipTestIf(TestFns.isMongoServer)
+  ("isNavigationPropertyLoaded on expand", async() => {
+    expect.hasAssertions();
+    const em1 = TestFns.newEntityManager();
+    const query = EntityQuery.from("Customers").where("companyName", "startsWith", "An").take(2).expand("orders.orderDetails");
+    const qr1 = await em1.executeQuery(query);
+    const r = qr1.results;
+
+    expect(r.length).toBe(2);
+    r.forEach( (cust) => {
+      const ordersLoaded = cust.entityAspect.isNavigationPropertyLoaded("orders");
+      expect(ordersLoaded).toBe(true);
+      const orders = cust.getProperty("orders") as Entity[];
+      expect(orders.length).toBeGreaterThan(0);
+      orders.forEach( (order) => {
+        const detailsLoaded = order.entityAspect.isNavigationPropertyLoaded("orderDetails");
+        expect(detailsLoaded).toBe(true);
+      });
+    });
+  });
+
+  test("can run two queries in parallel for fresh EM w/ empty metadataStore", async() => {
+    expect.hasAssertions();
+    const em1 = TestFns.newEntityManager();
+    const query = breeze.EntityQuery.from("Customers");
+    let successCount = 0;
+
+    const prom1 = em1.executeQuery(query).then( () => {
+      return successCount++;
+    });
+    const prom2 = em1.executeQuery(query).then( () => {
+      return successCount++;
+    });
+
+    await Promise.all([prom1, prom2]);
+    expect(successCount).toBe(2);
+  });
+
+  test("numeric/string  query ", async() => {
+    expect.assertions(2);
+    const em1 = TestFns.newEntityManager();
+    const prodKeyNm = TestFns.wellKnownData.keyNames.product;
+    
+    const qr1 = await EntityQuery.from("Products").take(5).using(em1).execute();
+    const id = qr1.results[0].getProperty(prodKeyNm).toString();
+
+    const q2 = new breeze.EntityQuery()
+      .from("Products").where(prodKeyNm, '==', id).take(5);
+    const qr2 = await q2.using(em1).execute();
+    expect(qr2.results.length).toBe(1);
+    const q3 = new breeze.EntityQuery()
+      .from("Products").where(prodKeyNm, '!=', id);
+    const qr3 = await q3.using(em1).execute();
+    expect(qr3.results.length).toBeGreaterThan(1);
+  });
+
+
+  test("results notification", async() => {
+    expect.hasAssertions();
+    const em1 = TestFns.newEntityManager();
+    const alfredsID = '785efa04-cbf2-4dd7-a7de-083ee17b6ad2';
+    const query = EntityQuery.from("Customers")
+      .where(TestFns.wellKnownData.keyNames.customer, "==", alfredsID)
+      .using(em1);
+
+    let arrayChangedCount = 0;
+    let adds: any[];
+    const qr1 = await query.execute();
+    const customer = qr1.results[0];
+    const orders = customer.getProperty("orders");
+    orders.arrayChanged.subscribe( (args: any) => {
+      arrayChangedCount++;
+      adds = args.added;
+    });
+    // return query.expand("orders").execute();
+    // same as above but doesn't need expand
+    await customer.entityAspect.loadNavigationProperty("orders");
+    // should only see a single arrayChanged event fired
+    expect(arrayChangedCount).toBe(1);
+    // should have been multiple entities shown as added
+    expect(adds && adds.length > 0).toBe(true)
+    const orderType = em1.metadataStore.getEntityType("Order") as EntityType;
+    const newOrder = orderType.createEntity();
+    orders.push(newOrder);
+    // should have incremented by 1
+    expect(arrayChangedCount).toBe(2);
+    // should have only a single entity added here;
+    expect(adds && adds.length === 1).toBe(true);
+  });
+
 
 });
 
