@@ -1016,7 +1016,7 @@ describe("EntityQuery", () => {
     expect(fr1.fromCache).toBe(false);
   });
 
-  test.only("fetchEntityByKey - deleted", async() => {
+  test("fetchEntityByKey - deleted", async() => {
     expect.hasAssertions();
     const em1 = TestFns.newEntityManager();
     const alfredsID = TestFns.wellKnownData.alfredsID;
@@ -1078,6 +1078,59 @@ describe("EntityQuery", () => {
       const foo = e;
       expect(e.message.indexOf("EntityKey") >= 0).toBe(true);
     }
+  });
+
+  test("hasChanges after query", async() => {
+    expect.hasAssertions();
+    const em1 = TestFns.newEntityManager();
+    const query = EntityQuery.from("Customers").take(20);
+    const qr1 = await em1.executeQuery(query);
+    const r = qr1.results;
+    expect(r.length).toBe(20);
+    expect(em1.hasChanges()).toBe(false);
+  });
+
+  test("hasChanges after query 2", async() => {
+    expect.hasAssertions();
+    const em1 = TestFns.newEntityManager();
+    const query = EntityQuery.from("Customers").where("companyName", "startsWith", "An").take(2);
+    const qr1 = await em1.executeQuery(query);
+    const r = qr1.results;
+    expect(r.length).toBe(2);
+    expect(em1.hasChanges()).toBe(false);
+    const entity = r[0];
+    const lr = await entity.entityAspect.loadNavigationProperty("orders");
+    const orders = lr.results as Entity[];
+    const isLoaded = entity.entityAspect.isNavigationPropertyLoaded("orders");
+    // navProp should be marked as loaded
+    expect(isLoaded).toBe(true);
+    // should be some orders - this is a 'test' bug if not
+    expect(orders.length).toBeGreaterThan(0);
+    const areAllOrders = orders.every( o => o.entityType.shortName === "Order");
+    expect(areAllOrders).toBe(true);
+    // should not have changes after nav prop load
+    expect(em1.hasChanges()).toBe(false);
+    const changes = em1.getChanges();
+    expect(changes.length).toBe(0);
+  });
+
+  // no expand support in Mongo
+  skipTestIf(TestFns.isMongoServer)
+  ("hasChanges after query 3", async() => {
+    expect.hasAssertions();
+    const em1 = TestFns.newEntityManager();
+    const query = EntityQuery.from("Customers").take(20);
+    const qr1 = await em1.executeQuery(query);
+    const r = qr1.results;
+    expect(r.length).toBe(20);
+    expect(em1.hasChanges()).toBe(false);
+    const qr2 = await query.expand("orders").using(em1).execute();
+    const r2 = qr2.results;
+    expect(r2.length).toBe(20);
+    // should not have changes after nav prop load
+    expect(em1.hasChanges()).toBe(false); 
+    const changes = em1.getChanges();
+    expect(changes.length).toBe(0);
   });
 
 
