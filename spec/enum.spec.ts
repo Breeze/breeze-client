@@ -28,7 +28,7 @@ class EntityState extends BreezeEnum {
 }
 
 
-describe("DayOfWeek2", () => {
+describe("Breeze Enums", () => {
 
    test("should support full enum capabilities", () => {
     // // custom methods

@@ -38,7 +38,7 @@ const dtoAdapter = {
 };
 
 
-describe("Query", () => {
+describe("AjaxFake", () => {
 
   beforeEach(function () {
   });

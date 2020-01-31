@@ -1,5 +1,3 @@
-// import { breeze } from '../src/breeze';
-// import { core } from '../src/core';
 import { breeze, core } from 'breeze-client';
 
 

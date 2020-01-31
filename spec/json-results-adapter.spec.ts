@@ -2,7 +2,7 @@ import { breeze, EntityManager, EntityQuery, NamingConvention, Predicate, Entity
 import { skipTestIf, TestFns, expectPass } from './test-fns';
 import { NodeMeta } from 'src/data-service';
 
-TestFns.initEnv();
+TestFns.initServerEnv();
 
 beforeAll( async() => {
   await TestFns.initDefaultMetadataStore();

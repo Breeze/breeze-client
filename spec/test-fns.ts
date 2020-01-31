@@ -1,4 +1,4 @@
-import { EntityManager, NamingConvention, MetadataStore } from 'breeze-client';
+import { EntityManager, NamingConvention, MetadataStore, DataType, breeze } from 'breeze-client';
 import { ModelLibraryBackingStoreAdapter } from 'breeze-client/adapter-model-library-backing-store';
 import { UriBuilderJsonAdapter } from 'breeze-client/adapter-uri-builder-json';
 import { AjaxFetchAdapter } from 'breeze-client/adapter-ajax-fetch';
@@ -9,6 +9,9 @@ export const skipTestIf = (condition: boolean) => (condition ? test.skip : test)
 export const describeIf = (condition: boolean) => (condition ? describe : describe.skip);
 export const skipDescribeIf = (condition: boolean) => (condition ? describe.skip : describe);
 export const expectPass = () => expect(true).toBe(true);
+
+// Alt unused approach
+// export const skipTestIf = (condition: boolean) => (condition ? { test: test.skip } : { test: test });
 
 export class TestFns {
   // Uncomment just one
@@ -46,7 +49,7 @@ export class TestFns {
     }
   };
 
-  static initEnv(serverEnvName?: string) {
+  static initServerEnv(serverEnvName?: string) {
     if (serverEnvName == null) {
       serverEnvName = TestFns.defaultServerEnvName;
     }
@@ -132,10 +135,24 @@ export class TestFns {
 
   static sizeOf = sizeOf;
   static sizeOfDif = sizeOfDif;
-  
+  static getDups = getDups; 
+  static isSorted = isSorted;
 }
 
 // Misc Fns.
+
+function getDups(items: any[]) {
+  let uniqueItems: any[] = [];
+  let dups: any[] = [];
+  items.forEach(function (item) {
+    if (uniqueItems.indexOf(item) === -1) {
+      uniqueItems.push(item);
+    } else {
+      dups.push(item);
+    }
+  });
+  return dups;
+}
 
 function sizeOf(value: any, level?: number): any {
   if (level == undefined) level = 0;
@@ -233,4 +250,82 @@ function clearVisited(value: any) {
     }
   }
 }
+
+function isSorted(collection: any[], propertyName?: string, dataType?: DataType, isDescending?: boolean, isCaseSensitive?: boolean) {
+  let extractFn: (obj: any) => string = null;
+  if (propertyName) {
+    extractFn = function (obj) { return obj && obj.getProperty(propertyName); }
+  }
+  isCaseSensitive = isCaseSensitive == null ? true : isCaseSensitive;
+  const compareFn = function (a: any, b: any) {
+    // localeCompare has issues in Chrome.
+    // const compareResult = a[propertyName].localeCompare(b.propertyName);
+    return compare(a, b, extractFn, dataType, isDescending, isCaseSensitive);
+  };
+  const isOk = isSortedCore(collection, compareFn);
+  
+  return isOk;
+};
+
+function isSortedCore(collection: any[], compareFn: (a: any, b: any) => number) {
+  let firstTime = true;
+  let prevItem: any;
+  const isOk = collection.every(function (item) {
+    if (firstTime) {
+      firstTime = false;
+    } else {
+      const r = compareFn(prevItem, item);
+      if (r > 0) {
+        return false;
+      }
+    }
+    prevItem = item;
+    return true;
+  });
+  return isOk;
+}
+
+function haveSameContents(a1: any, a2: any) {
+  const areBothArrays = Array.isArray(a1) && Array.isArray(a2);
+  if (!areBothArrays) return false;
+  if (a1.length !== a2.length) return false;
+  return a1.every(function (v: any) {
+    return a2.indexOf(v) >= 0;
+  });
+}
+
+function compareByProperty(a: any, b: any, propertyName: string, dataType?: DataType, isDescending?: boolean, isCaseSensitive?: boolean) {
+  const value1 = a && a.getProperty(propertyName);
+  const value2 = b && b.getProperty(propertyName);
+  return compare(value1, value2, null, dataType, isDescending, isCaseSensitive);
+}
+
+function compare(a: any, b: any, extractValueFn: (a: any) => any, dataType?: DataType, isDescending?: boolean, isCaseSensitive?: boolean) {
+  extractValueFn = extractValueFn || function (x) { return x; }
+  let value1 = extractValueFn(a);
+  let value2 = extractValueFn(b);
+  value1 = value1 === undefined ? null : value1;
+  value2 = value2 === undefined ? null : value2;
+  if (dataType === DataType.String) {
+    if (!isCaseSensitive) {
+      value1 = (value1 || "").toLowerCase();
+      value2 = (value2 || "").toLowerCase();
+    }
+  } else {
+    const normalize = breeze.DataType.getComparableFn(dataType);
+    value1 = normalize(value1);
+    value2 = normalize(value2);
+  }
+  if (value1 === value2) {
+    return 0;
+  } else if (value1 > value2 || value2 === undefined) {
+    return isDescending ? -1 : 1;
+  } else {
+    return isDescending ? 1 : -1;
+  }
+
+}
+
+
+
 

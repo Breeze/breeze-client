@@ -486,7 +486,7 @@ export class MetadataStore {
   @param noTrackingFn - A function that is executed immediately after a noTracking entity has been created and whose return
   value will be used in place of the noTracking entity.
   **/
-  registerEntityTypeCtor(structuralTypeName: string, aCtor?: any, initFn?: Function, noTrackingFn?: Function) {
+  registerEntityTypeCtor(structuralTypeName: string, aCtor?: any, initFn?: Function | string, noTrackingFn?: Function) {
     assertParam(structuralTypeName, "structuralTypeName").isString().check();
     assertParam(aCtor, "aCtor").isFunction().isOptional().check();
     assertParam(initFn, "initFn").isOptional().isFunction().or().isString().check();

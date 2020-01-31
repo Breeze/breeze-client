@@ -2,7 +2,7 @@
 import { breeze, EntityManager, EntityQuery, NamingConvention, Predicate, EntityType, EntityState, EntityKey, Entity } from 'breeze-client';
 import { TestFns, expectPass, describeIf } from './test-fns';
 
-TestFns.initEnv();
+TestFns.initServerEnv();
 
 beforeAll( async() => {
   await TestFns.initDefaultMetadataStore();

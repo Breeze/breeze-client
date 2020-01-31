@@ -1,8 +1,3 @@
-
-// import { EntityManager } from '../src/entity-manager';
-// import { ModelLibraryBackingStoreAdapter } from '../src/adapter-model-library-backing-store';
-// import { EntityType, ComplexType } from 'breeze-client';
-
 import { EntityManager, EntityType, ComplexType } from 'breeze-client';
 import { ModelLibraryBackingStoreAdapter } from 'breeze-client/adapter-model-library-backing-store';
 
