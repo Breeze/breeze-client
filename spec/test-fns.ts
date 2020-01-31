@@ -1,4 +1,4 @@
-import { EntityManager, NamingConvention, MetadataStore, DataType, breeze } from 'breeze-client';
+import { EntityManager, NamingConvention, MetadataStore, DataType, breeze, core, Entity } from 'breeze-client';
 import { ModelLibraryBackingStoreAdapter } from 'breeze-client/adapter-model-library-backing-store';
 import { UriBuilderJsonAdapter } from 'breeze-client/adapter-uri-builder-json';
 import { AjaxFetchAdapter } from 'breeze-client/adapter-ajax-fetch';
@@ -137,6 +137,9 @@ export class TestFns {
   static sizeOfDif = sizeOfDif;
   static getDups = getDups; 
   static isSorted = isSorted;
+  static morphString = morphString;
+  static morphStringProp = morphStringProp;
+  static removeAccents = removeAccents;
 }
 
 // Misc Fns.
@@ -144,7 +147,7 @@ export class TestFns {
 function getDups(items: any[]) {
   let uniqueItems: any[] = [];
   let dups: any[] = [];
-  items.forEach(function (item) {
+  items.forEach((item) => {
     if (uniqueItems.indexOf(item) === -1) {
       uniqueItems.push(item);
     } else {
@@ -250,6 +253,39 @@ function clearVisited(value: any) {
     }
   }
 }
+
+function morphStringProp(entity: Entity, propName: string) {
+  const val = entity.getProperty(propName);
+  const newVal = morphString(val);
+  entity.setProperty(propName, newVal);
+  return newVal;
+}
+
+function morphString(str: string) {
+  if (!str) {
+    return "_X";
+  }
+  if (str.length > 1 && (core.stringEndsWith(str, "_X") || core.stringEndsWith(str, "__"))) {
+    return str.substr(0, str.length - 2);
+  } else {
+    return str + "_X";
+  }
+}
+
+function removeAccents(s: string) {
+  let r = s.toLowerCase();
+  r = r.replace(new RegExp(/[àáâãäå]/g), "a");
+  r = r.replace(new RegExp(/æ/g), "ae");
+  r = r.replace(new RegExp(/ç/g), "c");
+  r = r.replace(new RegExp(/[èéêë]/g), "e");
+  r = r.replace(new RegExp(/[ìíîï]/g), "i");
+  r = r.replace(new RegExp(/ñ/g), "n");
+  r = r.replace(new RegExp(/[òóôõö]/g), "o");
+  r = r.replace(new RegExp(/œ/g), "oe");
+  r = r.replace(new RegExp(/[ùúûü]/g), "u");
+  r = r.replace(new RegExp(/[ýÿ]/g), "y");
+  return r;
+};
 
 function isSorted(collection: any[], propertyName?: string, dataType?: DataType, isDescending?: boolean, isCaseSensitive?: boolean) {
   let extractFn: (obj: any) => string = null;

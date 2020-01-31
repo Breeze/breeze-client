@@ -84,7 +84,7 @@ describe("EntityQuery", () => {
     expect.assertions(1);
   });
 
-  
+
 
   test("query with 'in' clause", async () => {
     expect.assertions(3);
@@ -215,7 +215,7 @@ describe("EntityQuery", () => {
     }
   });
 
-  
+
 
   test("date in a projection", async () => {
     const em1 = TestFns.newEntityManager();
@@ -440,7 +440,7 @@ describe("EntityQuery", () => {
     expect(cust1).toBe(cust2);
   });
 
-  
+
 
   test("inlineCount when ordering results by simple navigation path", async () => {
     expect.hasAssertions();
@@ -772,7 +772,7 @@ describe("EntityQuery", () => {
       // empty sizes should be almost equal
       expect(sizeDif < 20).toBe(true);
     });
-  
+
 
   // no expand support in Mongo
   skipTestIf(TestFns.isMongoServer)
@@ -1217,7 +1217,7 @@ describe("EntityQuery", () => {
     expect(query).toBe(sameQuery);
   });
 
-  
+
 
   test("queried date property is a DateTime", async () => {
     expect.hasAssertions();
@@ -1312,7 +1312,7 @@ describe("EntityQuery", () => {
   });
 
 
-  test("uni (1-n) region and territories", async() => {
+  test("uni (1-n) region and territories", async () => {
     expect.hasAssertions();
     const em1 = TestFns.newEntityManager();
     const q = new EntityQuery()
@@ -1331,7 +1331,7 @@ describe("EntityQuery", () => {
   });
 
 
-  test("starts with op", async() => {
+  test("starts with op", async () => {
     expect.hasAssertions();
     const em1 = TestFns.newEntityManager();
     const query = new EntityQuery()
@@ -1344,7 +1344,7 @@ describe("EntityQuery", () => {
     const customers = qr1.results;
     const isSorted = TestFns.isSorted(customers, "companyName", breeze.DataType.String, false, em1.metadataStore.localQueryComparisonOptions.isCaseSensitive);
     expect(isSorted).toBe(true);
-    customers.forEach( c => {
+    customers.forEach(c => {
       expect(c.getProperty("companyName")).not.toBeNull();
       const key = c.entityAspect.getKey();
       expect(key).not.toBeNull();
@@ -1353,7 +1353,7 @@ describe("EntityQuery", () => {
     });
   });
 
-  test("greater than op", async() => {
+  test("greater than op", async () => {
     expect.hasAssertions();
     const em1 = TestFns.newEntityManager();
     const query = EntityQuery.from("Orders")
@@ -1379,7 +1379,7 @@ describe("EntityQuery", () => {
     expect(orders.length).toBeGreaterThan(0);
   });
 
-  test("predicate with contains", async function () {
+  test("predicate with contains", async() => {
     expect.hasAssertions();
     const em = TestFns.newEntityManager();
     const p1 = Predicate.create("companyName", "startsWith", "S");
@@ -1392,7 +1392,7 @@ describe("EntityQuery", () => {
     expect(qr1.results.length).toBeGreaterThan(0);
   });
 
-  test("with contains", async function () {
+  test("with contains", async() => {
     expect.hasAssertions();
     const em = TestFns.newEntityManager();
     const query = EntityQuery.from("Customers")
@@ -1403,7 +1403,7 @@ describe("EntityQuery", () => {
   });
 
 
-  test("predicate 2", async function () {
+  test("predicate 2", async() => {
     expect.hasAssertions();
     const em = TestFns.newEntityManager();
 
@@ -1418,7 +1418,7 @@ describe("EntityQuery", () => {
     expect(qr1.results.length).toBeGreaterThan(0);
   });
 
-  test("predicate 3", async function () {
+  test("predicate 3", async() => {
     expect.hasAssertions();
     const em = TestFns.newEntityManager();
     const baseQuery = EntityQuery.from("Orders");
@@ -1431,7 +1431,7 @@ describe("EntityQuery", () => {
   });
 
 
-  test("not predicate with null", async function () {
+  test("not predicate with null", async() => {
     expect.hasAssertions();
     const em = TestFns.newEntityManager();
 
@@ -1447,12 +1447,251 @@ describe("EntityQuery", () => {
     const qr1 = await em.executeQuery(query);
     const customers = qr1.results;
     expect(customers.length).toBeGreaterThan(0);
-    customers.forEach( (customer) => {
+    customers.forEach((customer) => {
       const region = customer.getProperty("region");
       expect(region != null).toBe(true);
     });
   });
 
+  test("fromEntities", async() => {
+    expect.hasAssertions();
+    const em = TestFns.newEntityManager();
+    const query = new EntityQuery()
+      .from("Orders")
+      .take(2);
+    const qr1 = await em.executeQuery(query);
+    const orders = qr1.results;
+    expect(orders.length).toBe(2);
+    const q2 = EntityQuery.fromEntities(orders);
+    const qr2 = await q2.execute();
+    expect(qr2.results.length).toBe(2);
+  });
 
+
+  test("where nested property", async() => {
+    expect.hasAssertions();
+    const em = TestFns.newEntityManager();
+    const query = new EntityQuery()
+      .from("Products")
+      .where("category.categoryName", "startswith", "S")
+      .expand("category");
+    const queryUrl = query._toUri(em);
+    const qr1 = await em.executeQuery(query);
+    const products = qr1.results;
+    const cats = products.map(product => product.getProperty("category"));
+    cats.forEach(function (cat) {
+      const catName = cat.getProperty("categoryName");
+      expect(core.stringStartsWith(catName, "S")).toBe(true);
+    });
+  });
+
+
+  test("where nested property 2", async() => {
+    expect.hasAssertions();
+    const em = TestFns.newEntityManager();
+    const query = new EntityQuery()
+      .from("Orders")
+      .where("customer.region", "==", "CA");
+
+    const qr1 = await em.executeQuery(query);
+    const customers = qr1.results;
+    // some customers should have been found
+    expect(qr1.results.length).toBeGreaterThan(0);
+  });
+
+  test("orderBy", async() => {
+    expect.hasAssertions();
+    const em = TestFns.newEntityManager();
+
+    const query = new EntityQuery("Products")
+      .orderBy("productName desc")
+      .take(5);
+
+    const qr1 = await em.executeQuery(query);
+    const products = qr1.results;
+    const isSorted = TestFns.isSorted(products, "productName", breeze.DataType.String, true, em.metadataStore.localQueryComparisonOptions.isCaseSensitive);
+    expect(isSorted).toBe(true);
+  });
+
+  test("orderBy 2 fields", async() => {
+    expect.hasAssertions();
+    const em = TestFns.newEntityManager();
+
+    const query = new EntityQuery("Customers")
+      .orderBy("country, city")
+      .where("country", "!=", null).where("city", "!=", null)
+      .take(30);
+
+    
+    const qr1 = await em.executeQuery(query);
+    const custs = qr1.results;
+    const countryCities = custs.map(function (p) {
+      const countryCity = TestFns.removeAccents(p.getProperty("country") + ":" + p.getProperty("city"));
+      p.countryCity = countryCity;
+      return countryCity;
+    });
+    const isSorted = TestFns.isSorted(countryCities, null, breeze.DataType.String, false, em.metadataStore.localQueryComparisonOptions.isCaseSensitive);
+    expect(isSorted).toBe(true);
+    const q2 = query.orderBy(null);
+    const q3 = q2.orderBy("country").orderBy("city");
+    const qr2 = await em.executeQuery(q3);
+    const custs2 = qr2.results;
+    custs2.forEach(function (p) {
+      p.countryCity = TestFns.removeAccents(p.getProperty("country") + ":" + p.getProperty("city"));
+    });
+    const isOk = breeze.core.arrayZip(custs, custs2, function (c1, c2) {
+      return c1.countryCity === c2.countryCity;
+    }).every(function (v) {
+      return v;
+    });
+    expect(isOk).toBe(true);
+  });
+
+
+  test("expand", async() => {
+    expect.hasAssertions();
+    const em = TestFns.newEntityManager();
+    let query = new EntityQuery().from("Products").where("categoryID", "!=", null);
+    query = query.expand("category").take(5);
+    const qr1 = await em.executeQuery(query);
+    expect(em.hasChanges()).toBe(false);
+    expect(em.getChanges().length).toBe(0);
+    const products = qr1.results;
+    expect(products.length).toBe(5);
+    let cats: any[] = [];
+    products.map(function (product) {
+      const cat = product.getProperty("category");
+      if (cat) {
+        cats.push(cats);
+      }
+    });
+    expect(cats.length).toBe(5);
+  });
+
+
+  test("expand multiple", async() => {
+    expect.hasAssertions();
+    const em = TestFns.newEntityManager();
+    let query = new EntityQuery("Orders").where("customerID", "!=", null).where("employeeID", "!=", null);
+    query = query.expand(["customer", "employee"]).take(20);
+
+    const qr1 = await em.executeQuery(query);
+    expect(em.hasChanges()).toBe(false);
+    expect(em.getChanges().length).toBe(0);
+    const orders = qr1.results;
+    const custs = [];
+    const emps = [];
+    orders.map(function (order) {
+      const cust = order.getProperty("customer");
+      if (cust) {
+        custs.push(cust);
+      }
+      const emp = order.getProperty("employee");
+      if (emp) {
+        emps.push(emp);
+      }
+    });
+    expect(custs.length).toBe(20);
+    expect(emps.length).toBe(20);
+  });
+
+
+  test("expand nested", async() => {
+    expect.hasAssertions();
+    const em = TestFns.newEntityManager();
+
+    let query = new EntityQuery()
+      .from("Orders");
+
+    query = query.expand("customer, orderDetails, orderDetails.product")
+      .take(5);
+
+    const qr1 = await em.executeQuery(query);
+    expect(em.hasChanges()).toBe(false);
+    expect(em.getChanges().length).toBe(0);
+    const orders = qr1.results;
+    const custs = [];
+    let orderDetails: any[] = [];
+    const products = [];
+    orders.map(function (order) {
+      const cust = order.getProperty("customer");
+      if (cust) {
+        custs.push(cust);
+      }
+      const orderDetailItems = order.getProperty("orderDetails");
+      if (orderDetailItems) {
+        Array.prototype.push.apply(orderDetails, orderDetailItems);
+        orderDetailItems.map((orderDetail: Entity) => {
+          const product = orderDetail.getProperty("product");
+          if (product) {
+            products.push(product);
+          }
+        });
+      }
+    });
+    expect(orders.length).toBe(5);
+    expect(custs.length).toBeGreaterThan(1);
+    expect(orderDetails.length).toBeGreaterThan(5);
+    expect(products.length).toBeGreaterThan(5);
+  });
+
+
+  test("expand through null child object", async() => {
+    expect.hasAssertions();
+    const em = TestFns.newEntityManager();
+    let query = new EntityQuery()
+      .from("Orders")
+      .where("employeeID", "eq", null);
+    query = query.expand("employee, employee.manager, employee.directReports")
+      .take(5);
+    const qr1 = await em.executeQuery(query);
+    expect(em.hasChanges()).toBe(false);
+    expect(em.getChanges().length).toBe(0);
+    const orders = qr1.results;
+    expect(orders.length).toBeGreaterThan(0);
+    orders.map(function (order) {
+      const emp = order.getProperty("employee");
+      expect(emp == null).toBe(true);
+    });
+
+  });
+
+
+  test("orderBy nested", async() => {
+    expect.hasAssertions();
+    const em = TestFns.newEntityManager();
+    const query = new EntityQuery()
+      .from("Products")
+      .orderBy("category.categoryName desc")
+      .expand("category");
+    const qr1 = await em.executeQuery(query);
+    expect(em.hasChanges()).toBe(false);
+    expect(em.getChanges().length).toBe(0);
+    const products = qr1.results;
+    const cats = products.map(function (product) {
+      return product.getProperty("category");
+    });
+    const isSorted = TestFns.isSorted(cats, "categoryName", breeze.DataType.String, true, em.metadataStore.localQueryComparisonOptions.isCaseSensitive);
+    expect(isSorted).toBe(true);
+  });
+
+
+  test("orderBy two part nested", async() => {
+    expect.hasAssertions();
+    const em = TestFns.newEntityManager();
+    const query = new EntityQuery()
+      .from("Products")
+      .orderBy(["category.categoryName desc", "productName"])
+      .expand("category");
+    const qr1 = await em.executeQuery(query);
+    expect(em.hasChanges()).toBe(false);
+    expect(em.getChanges().length).toBe(0);
+    const products = qr1.results;
+    const cats = products.map(function (product) {
+      return product.getProperty("category");
+    });
+    const isSorted = TestFns.isSorted(cats, "categoryName", breeze.DataType.String, true, em.metadataStore.localQueryComparisonOptions.isCaseSensitive);
+    expect(isSorted).toBe(true);
+  });
 
 }); // end of describe
