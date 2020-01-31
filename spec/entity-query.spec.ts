@@ -1016,7 +1016,7 @@ describe("EntityQuery", () => {
     expect(fr1.fromCache).toBe(false);
   });
 
-  test("fetchEntityByKey - deleted", async() => {
+  test.only("fetchEntityByKey - deleted", async() => {
     expect.hasAssertions();
     const em1 = TestFns.newEntityManager();
     const alfredsID = TestFns.wellKnownData.alfredsID;
@@ -1030,12 +1030,12 @@ describe("EntityQuery", () => {
     
     const alfred2 = fr2.entity;
     expect(alfred).not.toBeNull();
-    expect(fr1.fromCache).toBe(true);
+    expect(fr2.fromCache).toBe(true);
     const fr3 = await em1.fetchEntityByKey(fr2.entityKey, true);
     
     const alfred3 = fr3.entity;
     // alfred3 should not have been found because it was deleted.
-    expect(alfred3).toBeNull();
+    expect(alfred3).toBeUndefined();
     expect(fr3.fromCache).toBe(true);
 
     em1.setProperties({ queryOptions: em1.queryOptions.using(MergeStrategy.OverwriteChanges) });
@@ -1063,7 +1063,7 @@ describe("EntityQuery", () => {
     const alfredsID = '885efa04-cbf2-4dd7-a7de-083ee17b6ad7'; // not a valid key
     const fr1 = await em1.fetchEntityByKey("Customer", alfredsID, true);
     const alfred = fr1.entity;
-    expect(alfred).toBeNull();
+    expect(alfred).toBeUndefined();
     expect(fr1.fromCache).toBe(false);
     expect(fr1.entityKey).not.toBeNull();
   });

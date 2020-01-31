@@ -1,5 +1,4 @@
-﻿import { ValidationErrorsChangedEventArgs } from './entity-aspect';
-import { core } from './core';
+﻿import { core } from './core';
 import { config } from './config';
 import { BreezeEvent } from './event';
 import { assertParam } from './assert-param';

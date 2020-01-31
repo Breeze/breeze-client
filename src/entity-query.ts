@@ -1,5 +1,4 @@
-﻿import { QueryOp } from './entity-query';
-import { core, Callback, ErrorCallback } from './core';
+﻿import { core, Callback, ErrorCallback } from './core';
 import { assertParam } from './assert-param';
 import { DataType } from './data-type';
 import { EntityAspect, Entity } from './entity-aspect';
