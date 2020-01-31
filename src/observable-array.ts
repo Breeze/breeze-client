@@ -12,7 +12,8 @@ export interface ObservableArray {
   shift: () => any;
   splice: (...args: any[]) => any[];
   slice: (a: number, b?: number) => any[]; // implemented on the native array
-
+  length: number;
+  
   getEntityAspect: () => EntityAspect;
   arrayChanged: BreezeEvent<{ array: any[], added?: any[]; removed?: any[]; }>;
   parent?: Object;

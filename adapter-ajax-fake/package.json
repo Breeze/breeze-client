@@ -1,8 +1,0 @@
-{
-  "name": "adapter-ajax-fake",
-  "ngPackage": {
-    "lib": {
-        "entryFile": "../src/adapter-ajax-fake.ts"
-      }
-  }
-}

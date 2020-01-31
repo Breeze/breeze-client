@@ -1133,6 +1133,23 @@ describe("EntityQuery Basics", () => {
 
   });
 
+  // skipTestIf(TestFns.isODataServer)
+  // ("webApi metadata", function (assert) {
+  //     expect.hasAssertions();
+
+  //     const metadataPath = TestFns.defaultServiceName + "/Metadata";
+  //     $.getJSON(metadataPath, function (data, status) {
+  //       // On success, 'data' contains the model metadata.
+  //       //                console.log(data);
+  //       ok(data);
+  //       var metadata = typeof (data) === "string" ? JSON.parse(data) : data;
+  //       var str = JSON.stringify(metadata, undefined, 4);
+  //       testFns.output("Metadata");
+  //       testFns.output(str);
+  //       done();
+  //     }).fail(testFns.handleFail);
+  //   });
+
 
   test("update entityManager on pk change", () => {
     expect.hasAssertions();

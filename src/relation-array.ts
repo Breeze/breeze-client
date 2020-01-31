@@ -5,6 +5,7 @@ import { Entity  } from './entity-aspect';
 import { DataProperty, NavigationProperty } from './entity-metadata';
 import { EntityState } from './entity-state';
 import { EntityQuery } from './entity-query';
+import { QuerySuccessCallback, QueryErrorCallback, QueryResult } from './entity-manager';
 
 // TODO: mixin impl is not very typesafe
 
@@ -16,6 +17,7 @@ export interface RelationArray extends ObservableArray {
   navigationProperty: NavigationProperty;
   _inProgress?: boolean;
   _addsInProcess: Entity[];
+  load(querySuccessCallback?: QuerySuccessCallback, queryErrorCallback?: QueryErrorCallback): Promise<QueryResult>; 
 }
 
 let relationArrayMixin = {
@@ -58,7 +60,7 @@ let relationArrayMixin = {
   @param [errorCallback] {Function}
   @return {Promise}
   **/
-  load: function(callback: Callback, errorCallback: ErrorCallback) {
+  load: function(callback?: QuerySuccessCallback, errorCallback?: QueryErrorCallback): Promise<QueryResult> {
     let parent = this.parentEntity;
     let query = EntityQuery.fromEntityNavigation(this.parentEntity, this.navigationProperty);
     let em = parent.entityAspect.entityManager;

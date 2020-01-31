@@ -1,4 +1,4 @@
-import { Entity, EntityQuery, EntityType, MetadataStore, Predicate, breeze, MergeStrategy, DataProperty, NavigationProperty, core, QueryOptions } from 'breeze-client';
+import { Entity, EntityQuery, EntityType, MetadataStore, Predicate, breeze, MergeStrategy, DataProperty, NavigationProperty, core, QueryOptions, FilterQueryOp } from 'breeze-client';
 import { TestFns, skipTestIf, skipDescribeIf } from './test-fns';
 
 function ok(a: any, b?: any) {
@@ -18,7 +18,7 @@ describe("Entity Query Exceptions", () => {
 
   });
 
-  test("with bad resourceName", async () => {
+  test("query with bad resourceName", async () => {
     expect.hasAssertions();
     const em1 = TestFns.newEntityManager();
     try {
@@ -37,7 +37,55 @@ describe("Entity Query Exceptions", () => {
     }
   });
 
-  test("with bad criteria", async () => {
+  test("where with bad filter operator", function () {
+    expect.hasAssertions();
+    try {
+      const query = new EntityQuery()
+        .from("Customers")
+        .where("companyName", "startsXWith", "C");
+      throw new Error("shouldn't get here");
+    } catch (error) {
+      expect(error instanceof Error).toBe(true);
+      expect(error.message.indexOf("startsXWith") > 0).toBe(true);
+    }
+  });
+
+  test("where with bad field name", async function () {
+    expect.hasAssertions();
+    const em = TestFns.newEntityManager();
+    const query = new EntityQuery()
+      .from("Customers")
+      .where("badCompanyName", "startsWith", "C");
+    try {
+      await em.executeQuery(query);
+      throw new Error("shouldn't get here");
+    }
+    catch (error) {
+      expect(error instanceof Error).toBe(true);
+      expect(error.message.indexOf("badCompanyName") > 0).toBe(true);
+      error.handled = true;
+    }
+
+  });
+
+  test("where with bad orderBy property ", async function () {
+    expect.hasAssertions();
+    const em = TestFns.newEntityManager();
+    const query = new EntityQuery()
+      .from("Customers")
+      .where("companyName", FilterQueryOp.StartsWith, "C")
+      .orderBy("badCompanyName");
+    try {
+      await em.executeQuery(query);
+      throw new Error("shouldn't get here");
+    } catch (error) {
+      expect(error instanceof Error).toBe(true);
+      expect(error.message.indexOf("badCompanyName") > 0).toBe(true);
+      error.handled = true;
+    }
+  });
+
+  test("where with bad criteria", async () => {
     expect.assertions(1);
     const em1 = TestFns.newEntityManager();
     const query = new EntityQuery()
@@ -51,7 +99,7 @@ describe("Entity Query Exceptions", () => {
     }
   });
 
-  test("with bad criteria - 2", async () => {
+  test("where with bad criteria - 2", async () => {
     expect.assertions(1);
     const em1 = TestFns.newEntityManager();
     const query = new EntityQuery()
@@ -65,8 +113,7 @@ describe("Entity Query Exceptions", () => {
     }
   });
 
-
-  test("fetchEntityByKey - bad args", async () => {
+  test("fetchEntityByKey with bad args", async () => {
     expect.hasAssertions();
     const em1 = TestFns.newEntityManager();
     try {
@@ -78,7 +125,7 @@ describe("Entity Query Exceptions", () => {
     }
   });
 
-  test("with bad resource name combined with 'startsWith P'", async () => {
+  test("query with bad resource name combined with 'startsWith P'", async () => {
     expect.hasAssertions();
     const em1 = TestFns.newEntityManager();
     // we intentionally mispelled the resource name to cause the query to fail

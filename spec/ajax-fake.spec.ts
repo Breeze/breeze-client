@@ -13,7 +13,7 @@ import { DataServiceWebApiAdapter } from 'breeze-client/adapter-data-service-web
 import { ModelLibraryBackingStoreAdapter } from 'breeze-client/adapter-model-library-backing-store';
 
 import { UriBuilderJsonAdapter } from 'breeze-client/adapter-uri-builder-json';
-import { AjaxFakeAdapter } from 'breeze-client/adapter-ajax-fake';
+import { AjaxFakeAdapter } from './adapter-ajax-fake';
 
 // jasmine.DEFAULT_TIMEOUT_INTERVAL = 120000;
 ModelLibraryBackingStoreAdapter.register();
