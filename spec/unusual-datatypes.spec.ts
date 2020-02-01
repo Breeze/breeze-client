@@ -471,7 +471,7 @@ describe("Unusual Datatypes", () => {
     expect.hasAssertions();
     const em = TestFns.newEntityManager();
     // const discPropName = (TestFns.isSequelizeServer) ? "discontinued" : "isDiscontinued";
-    const discPropName = "discontinued" 
+    const discPropName = "discontinued" ;
     const query = new EntityQuery("Products")
       .where(discPropName, "==", true)
       .take(10);
@@ -486,7 +486,7 @@ describe("Unusual Datatypes", () => {
     expect.hasAssertions();
     const em = TestFns.newEntityManager();
     // const discPropName = TestFns.isSequelizeServer ? "discontinued" : "isDiscontinued";
-    const discPropName = "discontinued" 
+    const discPropName = "discontinued" ;
     const query = new EntityQuery("Products")
       .where(discPropName, "==", null)
       .take(30);

@@ -5,7 +5,6 @@
   "description": "Breeze tests",
   "repository": "https://github.com/Breeze/breeze-client.git",
   "dependencies": {
-    "breeze-client": "file:../breeze-client-2.0.6.tgz",
     "node-fetch": "^2.6.0"
   },
   "devDependencies": {
@@ -22,7 +21,6 @@
     "typescript": "^3.4.5"
   },
   "scripts": {
-    "test-old": "node ../tools/set-breeze-client.js && jest",
     "test": "rimraf *.spec.js && jest",
     "debug-old": "tsc && node tools/set-breeze-client.js && node --inspect-brk node_modules/jasmine/bin/jasmine.js",
     "tsc": "tsc",

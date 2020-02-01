@@ -315,6 +315,7 @@ function arrayFirst<T>(array: T[], predicate: Predicate<T>) {
 }
 
 /** Return index of first element matching predicate */
+function arrayIndexOf<T>(array: T[], predicate: Predicate<any>): number;
 function arrayIndexOf<T>(array: T[], predicate: Predicate<T>): number {
     for (let i = 0, j = array.length; i < j; i++) {
         if (predicate(array[i])) return i;
