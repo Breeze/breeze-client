@@ -5,6 +5,7 @@
   "description": "Breeze tests",
   "repository": "https://github.com/Breeze/breeze-client.git",
   "dependencies": {
+    "breeze-client": "file:../breeze-client-2.0.6.tgz",
     "node-fetch": "^2.6.0"
   },
   "devDependencies": {
@@ -14,6 +15,7 @@
     "fs-extra": "^8.0.1",
     "jest": "^25.1.0",
     "jest-extended": "^0.11.5",
+    "node-localstorage": "^2.1.5",
     "rimraf": "^2.7.1",
     "rxjs": "^6.5.3",
     "ts-jest": "^25.0.0",

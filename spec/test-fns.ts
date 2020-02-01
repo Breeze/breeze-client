@@ -62,8 +62,8 @@ export class TestFns extends UtilFns {
     TestFns.isAspCoreServer = serverEnvName === 'ASPCORE';
     TestFns.isHibernateServer = serverEnvName === 'HIBERNATE';
 
+    TestFns.initBrowserShims();
     TestFns.initAdapters();
-    TestFns.updateWellKnownDataIfMongo();
 
     if (TestFns.isAspCoreServer) {
       TestFns.defaultServiceName = 'http://localhost:61552/breeze/NorthwindIBModel';
@@ -72,10 +72,17 @@ export class TestFns extends UtilFns {
     }
   }
 
+  private static initBrowserShims() {
+    global['fetch'] = require('node-fetch');
+    // const LocalStorage = require('node-localstorage').LocalStorage;
+    // global['localStorage'] = new LocalStorage('./scratch');
+    // if (typeof localStorage === "undefined" || localStorage === null) {
+    //   const LocalStorage = require('node-localstorage').LocalStorage;
+    //   global['localStorage'] = new LocalStorage('./scratch');
+    // }
+  }
 
   private static initAdapters() {
-    global['fetch'] = require('node-fetch');
-
     // ModelLibraryBackingStoreAdapter.register();
     // UriBuilderJsonAdapter.register();
     // AjaxFetchAdapter.register();
@@ -88,6 +95,8 @@ export class TestFns extends UtilFns {
 
     NamingConvention.camelCase.setAsDefault();
   }
+
+  
 
   static async initDefaultMetadataStore() {
     if (TestFns.defaultMetadataStore == null) {
@@ -110,29 +119,29 @@ export class TestFns extends UtilFns {
     return em;
   }
 
-  private static updateWellKnownDataIfMongo() {
-    if (TestFns.serverEnvName !== 'MONGO') {
-      return;
-    }
-    TestFns.wellKnownData = {
-      nancyID: "51a6d50e1711572dcc8ce7d1",
-      alfredsID: null,
-      dummyOrderID: "50a6d50e1711572dcc8ce7d1",
-      dummyEmployeeID: "50a6d50e1711572dcc8ce7d2",
-      chaiProductID: 10001,
-      alfredsOrderDetailKey: null,
-      keyNames: {
-        order: "_id",
-        customer: "_id",
-        employee: "_id",
-        product: "_id",
-        user: "_id",
-        supplier: "_id",
-        region: "_id"
-      }
-    };
+  // private static updateWellKnownDataIfMongo() {
+  //   if (TestFns.serverEnvName !== 'MONGO') {
+  //     return;
+  //   }
+  //   TestFns.wellKnownData = {
+  //     nancyID: "51a6d50e1711572dcc8ce7d1",
+  //     alfredsID: null,
+  //     dummyOrderID: "50a6d50e1711572dcc8ce7d1",
+  //     dummyEmployeeID: "50a6d50e1711572dcc8ce7d2",
+  //     chaiProductID: 10001,
+  //     alfredsOrderDetailKey: null,
+  //     keyNames: {
+  //       order: "_id",
+  //       customer: "_id",
+  //       employee: "_id",
+  //       product: "_id",
+  //       user: "_id",
+  //       supplier: "_id",
+  //       region: "_id"
+  //     }
+  //   };
     
-  }
+  // }
 
   
 }

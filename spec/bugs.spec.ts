@@ -256,7 +256,30 @@ describe("Old Fixed Bugs", () => {
     expect(newCust1b.entityAspect.entityState.isUnchanged()).toBe(true);
   });
 
+  test("bug with import relationship resolution", async function () {
+    expect.hasAssertions();
+    
+    const exportImportSample1 = require('./support/export-import-1.json');
 
+    const ds = new breeze.DataService({
+      serviceName: "none",
+      hasServerMetadata: false
+    });
+    const manager = new breeze.EntityManager({
+      dataService: ds
+    });
+    manager.importEntities(exportImportSample1);
+
+    const q2 = new breeze.EntityQuery("OrderHeaders")
+        .using(breeze.FetchStrategy.FromLocalCache);
+    
+    const data2 = await manager.executeQuery(q2);
+    const order = data2.results[0];
+    //uncomment line below and the relationship is resolved
+    //manager._linkRelatedEntities(order);
+    const orderShipments = order.getProperty("orderShipments");
+    expect(orderShipments.length).toBeGreaterThan(0);
+  });
 
 
 });

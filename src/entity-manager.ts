@@ -539,7 +539,7 @@ export class EntityManager {
   @param exportConfig - Export configuration options or a boolean
     - asString - (boolean) - If true (default), return export bundle as a string.
     - includeMetadata - (boolean) - If true (default), include metadata in the export bundle.
-  @return The export bundle either serialized (default) or as a JSON object.
+  @return The export bundle either serialized as a string (default) or as a JSON object.
   The bundle contains the metadata (unless excluded) and the entity data grouped by type.
   The entity data include property values, change-state, and temporary key mappings (if any).
 
@@ -547,7 +547,7 @@ export class EntityManager {
   suitable for export, storage, and import. The schema and contents of the bundle may change in future versions of Breeze.
   Manipulate it at your own risk with appropriate caution.
   **/
-  exportEntities(entities?: Entity[] | EntityType[] | string[], exportConfig?: { asString?: boolean, includeMetadata?: boolean } | boolean) {
+  exportEntities(entities?: Entity[] | EntityType[] | string[], exportConfig?: { asString?: boolean, includeMetadata?: boolean } | boolean): string | Object {
     assertParam(entities, "entities").isArray().isEntity()
       .or().isNonEmptyArray().isInstanceOf(EntityType)
       .or().isNonEmptyArray().isString()

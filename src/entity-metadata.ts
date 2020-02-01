@@ -523,22 +523,86 @@ export class MetadataStore {
   }
 
   /**
-  Returns an [[EntityType]] or a [[ComplexType]] given its name.
+  Returns an [[EntityType]] or null given its name.
   >      // assume em1 is a preexisting EntityManager
-  >      let odType = em1.metadataStore.getEntityType("OrderDetail");
+  >      let odType = em1.metadataStore.getAsEntityType("OrderDetail");
 
   or to throw an error if the type is not found
-  >      let badType = em1.metadataStore.getEntityType("Foo", false);
+  >      let badType = em1.metadataStore.getAsEntityType("Foo", false);
   >      // badType will not get set and an exception will be thrown.
   @param structuralTypeName - Either the fully qualified name or a short name may be used. If a short name is specified and multiple types share
   that same short name an exception will be thrown.
   @param okIfNotFound - (default=false) Whether to throw an error if the specified EntityType is not found.
   @return The EntityType. ComplexType or 'null' if not not found.
   **/
-  getEntityType(structuralTypeName: string, okIfNotFound: boolean = false) {
-    assertParam(structuralTypeName, "structuralTypeName").isString().check();
+  getAsEntityType(typeName: string, okIfNotFound: boolean = false) {
+    const st = this.getStructuralType(typeName, okIfNotFound);
+    if (st instanceof EntityType) {
+      return st as EntityType;
+    } else if (okIfNotFound) {
+      return null;
+    } else {
+      let msg = core.formatString("Unable to locate an 'EntityType' by the name: '%1'. Be sure to execute a query or call fetchMetadata first.", typeName);
+      throw new Error(msg);
+    }
+  }
+
+  /**
+  Returns an [[EntityType]] or null given its name.
+  >      // assume em1 is a preexisting EntityManager
+  >      let locType = em1.metadataStore.getAsComplexType("Location");
+
+  or to throw an error if the type is not found
+  >      let badType = em1.metadataStore.getAsComplexType("Foo", false);
+  >      // badType will not get set and an exception will be thrown.
+  @param structuralTypeName - Either the fully qualified name or a short name may be used. If a short name is specified and multiple types share
+  that same short name an exception will be thrown.
+  @param okIfNotFound - (default=false) Whether to throw an error if the specified EntityType is not found.
+  @return The EntityType. ComplexType or 'null' if not not found.
+  **/
+ getAsComplexType(typeName: string, okIfNotFound: boolean = false) {
+  const st = this.getStructuralType(typeName, okIfNotFound);
+  if (st instanceof ComplexType) {
+    return st as ComplexType;
+  } else if (okIfNotFound) {
+    return null;
+  } else {
+    let msg = core.formatString("Unable to locate an 'ComplexType' by the name: '%1'. Be sure to execute a query or call fetchMetadata first.", typeName);
+    throw new Error(msg);
+  }
+}
+
+
+  /**
+  Returns an [[EntityType]] or a [[ComplexType]] given its name.
+  @deprecated Replaced by getStructuralType but ... it is probably more usefull to call either getAsEntityType or getAsComplexType instead
+  @param typeName - Either the fully qualified name or a short name may be used. If a short name is specified and multiple types share
+  that same short name an exception will be thrown.
+  @param okIfNotFound - (default=false) Whether to throw an error if the specified EntityType is not found.
+  @return The EntityType. ComplexType or 'null' if not not found.
+  **/
+  getEntityType(typeName: string, okIfNotFound: boolean = false) {
+    return this.getStructuralType(typeName, okIfNotFound);
+  }
+
+  /**
+  Returns an [[EntityType]] or a [[ComplexType]] given its name.
+  >      // assume em1 is a preexisting EntityManager
+  >      let odType = em1.metadataStore.getStructuralType("OrderDetail");
+
+  or to throw an error if the type is not found
+  >      let badType = em1.metadataStore.getStructuralType("Foo", false);
+  >      // badType will not get set and an exception will be thrown.
+  @deprecated Preferably use either getAsEntityType or getAsComplexType.  Get
+  @param typeName - Either the fully qualified name or a short name may be used. If a short name is specified and multiple types share
+  that same short name an exception will be thrown.
+  @param okIfNotFound - (default=false) Whether to throw an error if the specified EntityType is not found.
+  @return The EntityType. ComplexType or 'null' if not not found.
+  **/
+  getStructuralType(typeName: string, okIfNotFound: boolean = false) {
+    assertParam(typeName, "typeName").isString().check();
     assertParam(okIfNotFound, "okIfNotFound").isBoolean().isOptional().check(false);
-    return this._getStructuralType(structuralTypeName, okIfNotFound);
+    return this._getStructuralType(typeName, okIfNotFound);
   }
 
   /** @hidden @internal */
@@ -550,11 +614,6 @@ export class MetadataStore {
       let msg = core.formatString("Unable to locate a 'Type' by the name: '%1'. Be sure to execute a query or call fetchMetadata first.", typeName);
       throw new Error(msg);
     }
-    // TODO: review this - don't think it can happen.
-    // if (type.length) {
-    //   let typeNames = type.join(",");
-    //   throw new Error("There are multiple types with this 'shortName': " + typeNames);
-    // }
     return type;
   }
 
