@@ -11,6 +11,9 @@ export interface Callback {
     (data: any): void;
 }
 
+// type Predicate = (i: any) => boolean;
+type Predicate<T> = (i: T) => boolean;
+
 let hasOwnProperty: (obj: Object, key: string) => boolean = uncurry(Object.prototype.hasOwnProperty);
 let arraySlice: (ar: any[], start?: number, end?: number) => any[] = uncurry(Array.prototype.slice);
 let isES5Supported: boolean = function () {
@@ -301,7 +304,8 @@ function toArray(item: any): any[] {
 }
 
 /** Return first element matching predicate */
-function arrayFirst<T>(array: T[], predicate: (el: any) => boolean) {
+function arrayFirst<T>(array: T[], predicate: Predicate<any>): T;
+function arrayFirst<T>(array: T[], predicate: Predicate<T>) {
     for (let i = 0, j = array.length; i < j; i++) {
         if (predicate(array[i])) {
             return array[i];
@@ -311,7 +315,7 @@ function arrayFirst<T>(array: T[], predicate: (el: any) => boolean) {
 }
 
 /** Return index of first element matching predicate */
-function arrayIndexOf(array: any[], predicate: (el: any) => boolean): number {
+function arrayIndexOf<T>(array: T[], predicate: Predicate<T>): number {
     for (let i = 0, j = array.length; i < j; i++) {
         if (predicate(array[i])) return i;
     }
@@ -319,7 +323,7 @@ function arrayIndexOf(array: any[], predicate: (el: any) => boolean): number {
 }
 
 /** Add item if not already in array */
-function arrayAddItemUnique(array: any[], item: any) {
+function arrayAddItemUnique<T>(array: T[], item: T) {
     let ix = array.indexOf(item);
     if (ix === -1) array.push(item);
 }
@@ -329,8 +333,8 @@ function arrayAddItemUnique(array: any[], item: any) {
  * @param predicateOrItem - item to remove, or function to determine matching item
  * @param shouldRemoveMultiple - true to keep removing after first match, false otherwise
  */
-function arrayRemoveItem(array: any[], predicateOrItem: any, shouldRemoveMultiple?: boolean) {
-    let predicate = isFunction(predicateOrItem) ? predicateOrItem : undefined;
+function arrayRemoveItem<T>(array: T[], predicateOrItem: T | Predicate<T> , shouldRemoveMultiple?: boolean) {
+    let predicate = (isFunction(predicateOrItem) ? predicateOrItem : undefined) as Predicate<T>;
     let lastIx = array.length - 1;
     let removed = false;
     for (let i = lastIx; i >= 0; i--) {

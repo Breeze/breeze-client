@@ -154,6 +154,7 @@ describe("EntityQuery Basics", () => {
 
     const qr1 = await em1.executeQuery(query);
     const customers = qr1.results;
+    // const xxx = TestFns.containSameItems(customers, customers);
     const isSorted = TestFns.isSorted(customers, "companyName", breeze.DataType.String, false, em1.metadataStore.localQueryComparisonOptions.isCaseSensitive);
     expect(isSorted).toBe(true);
     customers.forEach(c => {

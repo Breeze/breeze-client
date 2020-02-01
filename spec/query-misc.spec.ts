@@ -100,6 +100,26 @@ describe("Entity Query Misc", () => {
     expect(alfredsID).toEqual(TestFns.wellKnownData.alfredsID);
   });
 
+  // testFns.skipIf("odata,mongo", "has not yet implemented server side interception").
+  test("insure that query is Not a duration query even without type mapping", async function () {
+    expect.hasAssertions();
+    const em = TestFns.newEntityManager();
+    const q = EntityQuery.from("AltCustomers").where('companyName', '==', 'Papa');
+
+    const data = await em.executeQuery(q);
+    expect(data.results.length).toBe(0);
+  });
+
+  // testFns.skipIf("mongo,odata,sequelize,hibernate", "is N/A for this EF specific test").
+  test("query involving multiple entities on the server", async function () {
+    expect.hasAssertions();
+
+    const em = TestFns.newEntityManager();
+    const q = EntityQuery.from("QueryInvolvingMultipleEntities");
+
+    const data = await em.executeQuery(q);
+    expect(true).toBe(true);
+  });
   
 
 

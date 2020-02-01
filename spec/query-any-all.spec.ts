@@ -2,10 +2,6 @@ import { Entity, EntityQuery, Predicate } from 'breeze-client';
 import { TestFns } from './test-fns';
 import { UtilFns } from './util-fns';
 
-function ok(a: any, b?: any) {
-  throw new Error('for test conversion purposes');
-}
-
 TestFns.initServerEnv();
 
 beforeAll(async () => {

@@ -33,6 +33,29 @@ describe("Old Fixed Bugs", () => {
     expect.assertions(1);
   });
 
+  test("bug in local cache query for all Suppliers in region 'Papa'", async function () {
+    expect.hasAssertions();
+    const em = TestFns.newEntityManager(); // creates a new EntityManager configured with metadata
+    const query = new breeze.EntityQuery("Suppliers");
+    const data = await em.executeQuery(query);
+    
+    const count = data.results.length;
+    expect(count).toBeGreaterThan(0);
+
+    const predicate = breeze.Predicate.create(TestFns.wellKnownData.keyNames.supplier, '==', 0)
+      .or('companyName', '==', 'Papa');
+
+    const localQuery = breeze.EntityQuery
+      .from('Suppliers')
+      .where(predicate)
+      .toType('Supplier');
+
+    const suppliers = em.executeQueryLocally(localQuery);
+    // Defect #2486 Fails with "Invalid ISO8601 duration 'Papa'"
+    expect(suppliers.length).toBe(0);
+  
+  });
+
   test("bug with expand not working with paging or inlinecount", async () => {
 
     const em1 = TestFns.newEntityManager();

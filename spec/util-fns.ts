@@ -2,6 +2,13 @@ import { Entity, DataType, core } from 'breeze-client';
 
 export class UtilFns {
 
+  static containSameItems(a1: any[], a2: any[]) {
+    const areBothArrays = Array.isArray(a1) && Array.isArray(a2);
+    if (!areBothArrays) return false;
+    if (a1.length !== a2.length) return false;
+    return a1.every( v => a2.indexOf(v) >= 0);
+  }
+
   static getDups(items: any[]) {
     let uniqueItems: any[] = [];
     let dups: any[] = [];
@@ -13,13 +20,6 @@ export class UtilFns {
       }
     });
     return dups;
-  }
-
-  static containSameItems(a1: any[], a2: any[]) {
-    const areBothArrays = Array.isArray(a1) && Array.isArray(a2);
-    if (!areBothArrays) return false;
-    if (a1.length !== a2.length) return false;
-    return a1.every( (v: any) => a2.indexOf(v) >= 0);
   }
 
   static sizeOf(value: any, level?: number): any {
