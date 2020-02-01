@@ -547,7 +547,7 @@ export class EntityManager {
   suitable for export, storage, and import. The schema and contents of the bundle may change in future versions of Breeze.
   Manipulate it at your own risk with appropriate caution.
   **/
-  exportEntities(entities?: Entity[] | EntityType[] | string[], exportConfig?: { asString: boolean, includeMetadata: boolean } | boolean) {
+  exportEntities(entities?: Entity[] | EntityType[] | string[], exportConfig?: { asString?: boolean, includeMetadata?: boolean } | boolean) {
     assertParam(entities, "entities").isArray().isEntity()
       .or().isNonEmptyArray().isInstanceOf(EntityType)
       .or().isNonEmptyArray().isString()
