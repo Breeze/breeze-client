@@ -27,8 +27,7 @@ describe("Entity Materialization", () => {
       this.isObsolete = false;
       this.init = init;
     };
-
-  };
+  }
 
   test("post create init after materialization", async() => {
     expect.hasAssertions();

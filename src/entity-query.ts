@@ -147,6 +147,7 @@ export class EntityQuery {
   where(property: string, operator: FilterQueryOp, value: any): EntityQuery;
   where(property: string, filterop: FilterQueryOp, property2: string, filterop2: FilterQueryOp, value: any): EntityQuery;  // for any/all clauses
   where(property: string, filterop: string, property2: string, filterop2: string, value: any): EntityQuery;  // for any/all clauses
+  where(property: string, filterop: string, property2: string, filterop2: string, property3: string, filterop3: string, value: any): EntityQuery;  // for any/all clauses
   where(anArray: RecursiveArray<string | number | FilterQueryOp | Predicate>): EntityQuery;
   /**
   Returns a new query with an added filter criteria; Can be called multiple times which means to 'and' with any existing

@@ -4,7 +4,7 @@ import { skipTestIf, TestFns, expectPass } from './test-fns';
 TestFns.initServerEnv();
 
 function ok(a: any, b?: any) {
-  throw new Error('for test conversion purposes')
+  throw new Error('for test conversion purposes');
 }
 
 beforeAll(async () => {
@@ -80,7 +80,7 @@ describe("EntityQuery Basics", () => {
     expect.assertions(3);
     const em1 = TestFns.newEntityManager();
 
-    const countries = ['Austria', 'Italy', 'Norway']
+    const countries = ['Austria', 'Italy', 'Norway'];
     const query = EntityQuery.from("Customers")
       .where("country", 'in', countries);
     const qr1 = await em1.executeQuery(query);
@@ -1051,7 +1051,7 @@ describe("EntityQuery Basics", () => {
     // should only see a single arrayChanged event fired
     expect(arrayChangedCount).toBe(1);
     // should have been multiple entities shown as added
-    expect(adds && adds.length > 0).toBe(true)
+    expect(adds && adds.length > 0).toBe(true);
     const orderType = em1.metadataStore.getEntityType("Order") as EntityType;
     const newOrder = orderType.createEntity();
     orders.push(newOrder);

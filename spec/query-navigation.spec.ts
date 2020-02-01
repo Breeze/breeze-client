@@ -2,7 +2,7 @@ import { Entity, EntityQuery, EntityType, MetadataStore, Predicate, breeze, Merg
 import { TestFns, skipTestIf } from './test-fns';
 
 function ok(a: any, b?: any) {
-  throw new Error('for test conversion purposes')
+  throw new Error('for test conversion purposes');
 }
 
 TestFns.initServerEnv();
