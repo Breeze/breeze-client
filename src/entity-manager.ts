@@ -29,6 +29,11 @@ export interface HttpResponse {
   getHeaders(headerName: string): string;
 }
 
+export interface ImportResult {
+  entities: Entity[];
+  tempKeyMapping: ITempKeyMap;
+}
+
 // subclasses of Error
 
 /** Base shape of any errors returned from the server. */
@@ -579,8 +584,8 @@ export class EntityManager {
   }
 
   // TODO: type the return value { entities: entitiesToLink, tempKeyMapping: tempKeyMap }
-  importEntities(exportedString: string, config?: ImportConfig): any;
-  importEntities(exportedData: Object, config?: ImportConfig): any;
+  importEntities(exportedString: string, config?: ImportConfig): ImportResult;
+  importEntities(exportedData: Object, config?: ImportConfig): ImportResult;
   /**
   Imports a previously exported result into this EntityManager.
 
