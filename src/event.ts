@@ -117,7 +117,7 @@ export class BreezeEvent<T> {
   @param errorCallback - Function to be called for any errors that occur during publication. If omitted,
   errors will be eaten.
   **/
-  publishAsync(data: any, errorCallback: (e: Error) => any) {
+  publishAsync(data: T, errorCallback: (e: Error) => any) {
     this.publish(data, true, errorCallback);
   }
 
@@ -141,7 +141,7 @@ export class BreezeEvent<T> {
   @param callback.data - {Object} Whatever 'data' was published.  This should be documented on the specific event.
   @return This is a key for 'unsubscription'.  It can be passed to the 'unsubscribe' method.
   **/
-  subscribe(callback: (data: any) => any) {
+  subscribe(callback: (data: T) => any) {
     if (!this._subscribers) {
       this._subscribers = [];
     }
@@ -220,7 +220,7 @@ export class BreezeEvent<T> {
   children of this object will be enabled or disabled.
   @param isEnabled - A boolean, a null or a function that returns either a boolean or a null.
   **/
- static enable(eventName: string, obj: Object, isEnabled: boolean | (() => any)) {
+ static enable(eventName: string, obj: Object, isEnabled: boolean | ((x: any) => boolean)) {
     assertParam(eventName, "eventName").isNonEmptyString().check();
     assertParam(obj, "obj").isObject().check();
     assertParam(isEnabled, "isEnabled").isBoolean().isOptional().or().isFunction().check();
@@ -260,14 +260,14 @@ export class BreezeEvent<T> {
     }
     if (isEnabled != null) {
       if (typeof isEnabled === 'function') {
-        return isEnabled(obj);
+        return !!isEnabled(obj);
       } else {
         return !!isEnabled;
       }
     } else {
       let parent = ob._getEventParent && ob._getEventParent();
       if (parent) {
-        return this._isEnabled(eventName, parent);
+        return !!this._isEnabled(eventName, parent);
       } else {
         // default if not explicitly disabled.
         return true;

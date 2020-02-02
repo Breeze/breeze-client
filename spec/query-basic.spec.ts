@@ -1135,7 +1135,7 @@ describe("EntityQuery Basics", () => {
   });
 
   // skipTestIf(TestFns.isODataServer)
-  // ("webApi metadata", function (assert) {
+  // ("webApi metadata", function () {
   //     expect.hasAssertions();
 
   //     const metadataPath = TestFns.defaultServiceName + "/Metadata";

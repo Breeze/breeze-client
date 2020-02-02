@@ -1,7 +1,7 @@
 import { Entity, EntityQuery, EntityType, MetadataStore } from 'breeze-client';
 import { TestFns } from './test-fns';
 
-const metadata = require('./support/NorthwindIBMetadata.json');
+// const metadata = require('./support/NorthwindIBMetadata.json');
 
 TestFns.initServerEnv();
 

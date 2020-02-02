@@ -48,9 +48,7 @@ describe("EntityManager import/export", () => {
       expect(et.unmappedProperties.length).toBe(st2.unmappedProperties.length);
       expect(et.validators.length).toBe(st2.validators.length);
     }
-
   });
-
 
   test("export/import - entityManager", async function () {
     expect.hasAssertions();
@@ -384,7 +382,7 @@ describe("EntityManager import/export", () => {
     expect(cust1x.getProperty("city")).toBeNull();
   });
 
-  test("export/import with variety of first parameters", async function () {
+  test("export/import with constiety of first parameters", async function () {
     expect.hasAssertions();
     const queryOptions = new QueryOptions({
       mergeStrategy: MergeStrategy.OverwriteChanges,
@@ -684,6 +682,24 @@ describe("EntityManager import/export", () => {
       expect(em1.getChanges().length).toBe(1);
   });
 
+  
+  test("export/import with large data", async function () {
+    const em1 = TestFns.newEntityManager();
+    const q = new EntityQuery().from("CustomersAndOrders");
+
+    const qr1 = await em1.executeQuery(q);
+    const entities1 = em1.getEntities();
+    const exportedMs = em1.metadataStore.exportMetadata();
+    const exportedEm = em1.exportEntities() as string;
+    expect(exportedEm.length).toBeGreaterThan(200000);
+    const em2 = EntityManager.importEntities(exportedEm);
+    const entities2 = em2.getEntities();
+    expect(entities1.length).toBe(entities2.length);
+    const exportedMs2 = em2.metadataStore.exportMetadata();
+    const exportedEm2 = em2.exportEntities() as string;
+    expect(exportedMs.length).toBe(exportedMs2.length);
+    expect(exportedEm.length).toBe(exportedEm2.length);
+  });
   
 
   // ////////////////////////
