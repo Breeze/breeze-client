@@ -11,23 +11,22 @@ beforeAll(async () => {
 describe("Entity Aspect", () => {
 
 
-  test("entityAspect.wasLoaded", function (assert) {
-    var done = assert.async();
-    var em = newEm();
-    var orderType = em.metadataStore.getEntityType("Order");
-    var empType = em.metadataStore.getEntityType("Employee");
-    var custType = em.metadataStore.getEntityType("Customer");
-    var order1 = em.attachEntity(orderType.createEntity());
-    ok(!order1.entityAspect.wasLoaded);
-    var emp1 = em.attachEntity(empType.createEntity());
-    ok(!emp1.entityAspect.wasLoaded);
-    var q = new EntityQuery().from("Employees").take(2);
+  test("entityAspect.wasLoaded", async function () {
+    expect.hasAssertions();
+    const em = TestFns.newEntityManager();
+    const orderType = em.metadataStore.getAsEntityType("Order");
+    const empType = em.metadataStore.getAsEntityType("Employee");
     
-    em.executeQuery(q, function (data) {
-      ok(data.results.length == 2, "results.length should be 2");
-      data.results.forEach(function (r) {
-        ok(r.entityAspect.wasLoaded === true);
-      });
-    }).fail(testFns.handleFail).fin(done);
+    const order1 = em.attachEntity(orderType.createEntity());
+    expect(order1.entityAspect.wasLoaded).toBeFalsy();
+    const emp1 = em.attachEntity(empType.createEntity());
+    expect(emp1.entityAspect.wasLoaded).toBeFalsy();
+    const q = new EntityQuery().from("Employees").take(2);
+    
+    const qr1 = await em.executeQuery(q);
+    expect(qr1.results.length).toBe(2);
+    qr1.results.forEach( r => {
+      expect(r.entityAspect.wasLoaded).toBe(true);
+    });
   });
 });

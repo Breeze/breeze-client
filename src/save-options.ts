@@ -32,7 +32,7 @@ export class SaveOptions {
   /** The default value whenever SaveOptions are not specified. */
   static defaultInstance = new SaveOptions({ allowConcurrentSaves: false});
 
-  constructor(config: SaveOptionsConfig) {
+  constructor(config?: SaveOptionsConfig) {
     SaveOptions._updateWithConfig(this, config);
   }
 

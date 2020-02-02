@@ -46,7 +46,7 @@ export class ValidationOptions implements ValidationOptionsConfig {
   >     em1.setProperties( { validationOptions: newVo });
   @param config - A configuration object.
   **/
-  constructor(config: ValidationOptionsConfig) {
+  constructor(config?: ValidationOptionsConfig) {
     updateWithConfig(this, config);
   }
 

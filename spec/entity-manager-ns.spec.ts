@@ -1,4 +1,4 @@
-import { EntityManager, EntityType, ComplexType, EntityState, EntityAction, EntityChangedEventArgs, breeze, MetadataStore } from 'breeze-client';
+import { EntityManager, EntityType, ComplexType, EntityState, EntityAction, EntityChangedEventArgs, breeze, MetadataStore, SaveOptions, QueryOptions, ValidationOptions } from 'breeze-client';
 import { ModelLibraryBackingStoreAdapter } from 'breeze-client/adapter-model-library-backing-store';
 import { TestFns } from './test-fns';
 
@@ -13,11 +13,20 @@ describe("EntityManager - no server", () => {
 
   });
 
+  test("initialization", function () {
+    const em = new EntityManager("foo");
+    em.setProperties({
+      queryOptions: new QueryOptions(),
+      saveOptions: new SaveOptions(),
+      validationOptions: new ValidationOptions()
+    });
+    expect(em).toBeTruthy();
+  });
+
   test("should be able to create", () => {
     let em = new EntityManager('test');
     let r = em.getChanges();
     expect(r.length).toBe(0);
-
   });
 
   test("should load metadata", () => {
@@ -36,6 +45,8 @@ describe("EntityManager - no server", () => {
     expect(custProp.isNavigationProperty).toBeTruthy();
 
   });  
+
+
 
   test("should create entity", () => {
 
@@ -449,7 +460,7 @@ describe("EntityManager - no server", () => {
     expect(lastEntity).toBeUndefined();
   });
 
-  test("entityChanged event 'isEnabled'", function(){
+  test("entityChanged event 'isEnabled'", () => {
       // D#2652
       // see http://www.breezejs.com/sites/all/apidocs/classes/Event.html#method_isEnabled
       // which also describes EntityManager having propertyChanged event which it doesn't

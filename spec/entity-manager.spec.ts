@@ -1,4 +1,4 @@
-import { Entity, EntityQuery, EntityType, MetadataStore, EntityChangedEventArgs, EntityAction, MergeStrategy } from 'breeze-client';
+import { Entity, EntityQuery, EntityType, MetadataStore, EntityChangedEventArgs, EntityAction, MergeStrategy, QueryOptions, FetchStrategy, EntityManager } from 'breeze-client';
 import { TestFns } from './test-fns';
 
 TestFns.initServerEnv();
@@ -11,6 +11,77 @@ beforeAll(async () => {
 describe("Entity Manager", () => {
 
   beforeEach(function () {
+
+  });
+
+  test("createEmptyCopy", async function () {
+    expect.hasAssertions();
+    const em = TestFns.newEntityManager();
+    const em2 = em.createEmptyCopy();
+    const q = EntityQuery.from("Customers").take(1);
+    
+    const data = await em2.executeQuery(q);
+    expect(data.results.length).toBe(1);
+  });
+
+  test("mergeStrategy.overwrite", async function () {
+    expect.hasAssertions();
+    
+    const queryOptions = new QueryOptions({
+      mergeStrategy: MergeStrategy.OverwriteChanges,
+      fetchStrategy: FetchStrategy.FromServer
+    });
+
+    const em = new EntityManager({ serviceName: TestFns.defaultServiceName, metadataStore: TestFns.defaultMetadataStore, queryOptions: queryOptions });
+    const q = EntityQuery.from("Customers").take(2).using(em);
+    const val = Date.now().toString();
+    
+    const data = await q.execute();
+    const custs = data.results;
+    custs[0].setProperty("companyName", val);
+    custs[1].setProperty("city", val);
+    const data2 = await q.execute();
+    const custs2 = data2.results;
+    const companyName = custs2[0].getProperty("companyName");
+    const city = custs2[1].getProperty("city");
+    expect(companyName).not.toEqual(val);
+    expect(city).not.toEqual(val);
+  });
+
+  
+  test("mergeStrategy.overwriteChanges and change events", async function () {
+    expect.hasAssertions();
+    const em = TestFns.newEntityManager();
+    em.queryOptions = em.queryOptions.using(MergeStrategy.OverwriteChanges);
+    const alfredsID = '785efa04-cbf2-4dd7-a7de-083ee17b6ad2';
+    const query = EntityQuery.from("Customers")
+        .where(TestFns.wellKnownData.keyNames.customer, "==", alfredsID);
+
+    const entityChangedArgs = [];
+    const hasChangesChangedArgs = [];
+    
+    em.entityChanged.subscribe( args => {
+      entityChangedArgs.push(args);
+    });
+    em.hasChangesChanged.subscribe(function (args) {
+      hasChangesChangedArgs.push(args);
+    });
+    
+    const data = await query.using(em).execute();
+    expect(em.hasChanges()).toBe(false);
+    const customer = data.results[0];
+    customer.setProperty("companyName", "Foo");
+    expect(em.hasChanges()).toBe(true);
+    hasChangesChangedArgs.length = 0;
+    entityChangedArgs.length = 0;
+    await query.using(em).execute();
+    expect(em.hasChanges()).toBe(false);
+    expect(em.getChanges().length).toBe(0);
+    // hasChangeschanged should have been fired
+    expect(hasChangesChangedArgs.length).toBe(1);
+    // entityStateChange and propertyChange
+    // so entityChanged should have been fired twice
+    expect(entityChangedArgs.length).toBe(2);
 
   });
 
@@ -47,8 +118,8 @@ describe("Entity Manager", () => {
     
     const q2 = q1.using(MergeStrategy.OverwriteChanges);
     changedArgs = [];
-    const data2 = await em.executeQuery(q2);
-    expect(data2.results.length).toBe(2);
+    const qr3 = await em.executeQuery(q2);
+    expect(qr3.results.length).toBe(2);
     // two mergeOnQuery and 1 entityStateChange
     expect(changedArgs.length).toBe(3);
     

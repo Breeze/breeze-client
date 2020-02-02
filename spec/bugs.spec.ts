@@ -258,7 +258,7 @@ describe("Old Fixed Bugs", () => {
 
   test("bug with import relationship resolution", async function () {
     expect.hasAssertions();
-    
+
     const exportImportSample1 = require('./support/export-import-1.json');
 
     const ds = new breeze.DataService({
@@ -279,6 +279,20 @@ describe("Old Fixed Bugs", () => {
     //manager._linkRelatedEntities(order);
     const orderShipments = order.getProperty("orderShipments");
     expect(orderShipments.length).toBeGreaterThan(0);
+  });
+
+  
+  test("bug were detaching the parent modifies the in-cache children", async function () {
+    // Bug - D2460
+    expect.hasAssertions();
+    const em = TestFns.newEntityManager();
+    const q = EntityQuery.from("Employees").where("employeeID", "==", 1)
+        .expand("orders");
+    
+    const qr = await em.executeQuery(q);
+    const employee = qr.results[0];
+    employee.entityAspect.setDetached();
+    expect(em.hasChanges()).toBe(false);
   });
 
 

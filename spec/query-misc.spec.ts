@@ -56,10 +56,9 @@ describe("Entity Query Misc", () => {
     
     try {
       const x = await em.executeQuery("xxx");
-      ok(false, "shouldn't get here");
-    }
-    catch (e) {
-      ok(e.message.indexOf("foo") >= 0, "error message should mention 'foo'");
+      throw new Error('should not be here');
+    } catch (e) {
+      expect(e.message.indexOf("foo") >= 0).toBe(true);
     }
   });
 
@@ -98,6 +97,51 @@ describe("Entity Query Misc", () => {
 
     await Promise.all([prom1, prom2]);
     expect(successCount).toBe(2);
+  });
+
+  // testFns.skipIf("odata,sequelize,hibernate", "does not have any server unmapped properties").
+  test("querying server unmapped property", async function() {
+    expect.hasAssertions();
+    
+    const emBase = TestFns.newEntityManager();
+    if (emBase.metadataStore.isEmpty()) {
+      await emBase.fetchMetadata();
+    }
+    const store = MetadataStore.importMetadata(emBase.metadataStore.exportMetadata());
+
+    const Customer = function () {
+      this.extraString = "fromClient";
+      this.extraDouble = 0;
+    };
+
+    store.registerEntityTypeCtor("Customer", Customer);
+
+    const em = TestFns.newEntityManager(store);
+    // create a fake customer
+    const cust = em.createEntity("Customer", { CompanyName: "Acme" },
+        EntityState.Unchanged);
+    const extraString1 = cust.getProperty("extraString");
+    const extraDouble1 = cust.getProperty("extraDouble");
+    expect(extraString1).toBe("fromClient");
+    expect(extraDouble1).toBe(0);
+    const q1 = new EntityQuery().from("Customers").take(1);
+    
+    const qr1 = await em.executeQuery(q1);
+    const r1 = qr1.results;
+    expect(r1.length).toBe(1);
+    const extraString2 = r1[0].getProperty("extraString");
+    const extraDouble2 = r1[0].getProperty("extraDouble");
+    expect(extraString2).toBe("fromServer");
+    expect(extraDouble2).toBe(3.14159);
+
+    const em2 = TestFns.newEntityManager(store);
+    const q2 = q1.noTracking();
+    const qr2 = await em2.executeQuery(q2);
+    const r2 = qr2.results;
+    expect(r2.length).toBe(1);
+    expect(r2[0].extraString).toBe("fromServer");
+    expect(r2[0].extraDouble).toBe(3.14159);
+
   });
 
 
