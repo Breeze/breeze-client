@@ -299,6 +299,107 @@ describe("EntityManager - no server", () => {
     expect(c8.length).toBe(10);
   });
 
+  test("hasChanges basic", function () {
+    const em = TestFns.newEntityManager(sampleMetadataStore);
+    const orderType = em.metadataStore.getAsEntityType("Order");
+
+    let  count = 0;
+    em.hasChangesChanged.subscribe( args => {
+      count = count + 1;
+    });
+    expect(count).toBe(0);
+    expect(em.hasChanges()).toBe(false);
+    const order1 = orderType.createEntity();
+    // attach - no event
+    em.attachEntity(order1);
+    expect(count).toBe(0);
+    expect(em.hasChanges()).toBe(false);
+    const order2 = orderType.createEntity();
+    // add - event 
+    em.addEntity(order2);
+    expect(count).toBe(1);
+    expect(em.hasChanges()).toBe(true);
+
+    em.rejectChanges();
+    expect(em.hasChanges()).toBe(false);
+  });
+
+
+  test("hasChanges filtering by type", function () {
+    const em = TestFns.newEntityManager(sampleMetadataStore);
+    em.createEntity('Order');
+    em.createEntity('Product', null, breeze.EntityState.Unchanged);
+    // There are Order changes but there are no Product changes
+    expect(em.hasChanges()).toBe(true);
+    expect(em.hasChanges(['Order'])).toBe(true);
+    expect(em.hasChanges(['Product'])).toBe(false);
+  });
+
+  // D#2663
+  test("hasChanges is false when filter for a type that is not in cache", function () {
+    const em = TestFns.newEntityManager(sampleMetadataStore);
+    em.createEntity('Order');
+    // While 'Product' is a defined type, there are no Products in cache this time.
+    // There are changes but there are no Product changes
+    const hasChanges = em.hasChanges();
+    expect(em.hasChanges()).toBe(true);
+    expect(em.hasChanges(['Product'])).toBe(false);
+  });
+
+  test("hasChanges throws error when filter for a type that doesn't exist", function () {
+    const em = TestFns.newEntityManager(sampleMetadataStore);
+    em.createEntity('Order');
+    
+    expect(em.hasChanges()).toBe(true);
+    // There are changes but there is no 'Foo' type
+    expect(function() {
+      em.hasChanges(['Foo']);
+    }).toThrow(/unable to locate a 'Type'/i);
+  });
+
+  test("hasChanges with em.acceptChanges", function () {
+    const em = TestFns.newEntityManager(sampleMetadataStore);
+    const orderType = em.metadataStore.getAsEntityType("Order");
+    expect(em.hasChanges()).toBe(false);
+    const order1 = orderType.createEntity();
+    em.attachEntity(order1);
+    // attach causes no changes
+    expect(em.hasChanges()).toBe(false);
+    const order2 = orderType.createEntity();
+    em.addEntity(order2);
+    // but add does
+    expect(em.hasChanges()).toBe(true);
+    em.acceptChanges();
+    expect(em.hasChanges()).toBe(false);
+  });
+
+  test("hasChanges with rejectChanges", function () {
+    const em = TestFns.newEntityManager(sampleMetadataStore);
+    const orderType = em.metadataStore.getAsEntityType("Order");
+    let count = 0;
+    em.hasChangesChanged.subscribe(args => {
+      count = count + 1;
+     });
+    expect(count).toBe(0);
+    expect(em.hasChanges()).toBe(false);
+    const order1 = orderType.createEntity();
+    em.attachEntity(order1);
+    order1.entityAspect.setModified();
+    expect(count).toBe(1);
+    expect(em.hasChanges()).toBe(true);
+    const order2 = orderType.createEntity();
+    em.addEntity(order2);
+    expect(count).toBe(1);
+    expect(em.hasChanges()).toBe(true);
+    order1.entityAspect.rejectChanges();
+    expect(count).toBe(1);
+    expect(em.hasChanges()).toBe(true);
+    order2.entityAspect.rejectChanges();
+    expect(count).toBe(2);
+    expect(em.hasChanges()).toBe(false);
+  });
+
+
   test("entityChanged event", function () {
     const em = TestFns.newEntityManager(sampleMetadataStore);
     const orderType = em.metadataStore.getAsEntityType("Order");

@@ -65,4 +65,33 @@ describe("Entity Manager", () => {
     expect(moqCount === 2 && esCount === 1).toBe(true);
   });
 
+  test("hasChanges with query mods", async function () {
+    expect.hasAssertions();
+    const em = TestFns.newEntityManager();
+
+    let hasChanges = false;
+    let count = 0;
+    em.hasChangesChanged.subscribe( args => {
+      count = count + 1;
+      hasChanges = args.hasChanges;
+    });
+    expect(count).toBe(0);
+    expect(em.hasChanges()).toBe(false);
+    
+    const qr1 = await EntityQuery.from("Customers").take(3).using(em).execute();
+    const custs = qr1.results;
+    expect(em.hasChanges()).toBe(false);
+    custs[0].setProperty("companyName", "xxx");
+    custs[1].entityAspect.setDeleted();
+    custs[2].entityAspect.setModified();
+    expect(count).toBe(1);
+    expect(em.hasChanges()).toBe(true);
+    expect(hasChanges).toBe(true);
+    
+    em.rejectChanges();
+    expect(count).toBe(2);
+    expect(em.hasChanges()).toBe(false);
+    expect(hasChanges).toBe(false);
+  });
+
 });

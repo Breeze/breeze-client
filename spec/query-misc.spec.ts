@@ -50,7 +50,18 @@ describe("Entity Query Misc", () => {
     expect(query).toBe(sameQuery);
   });
 
-
+  test("query initialization error on first query", async function () {
+    expect.hasAssertions();
+    const em = new EntityManager("foo");
+    
+    try {
+      const x = await em.executeQuery("xxx");
+      ok(false, "shouldn't get here");
+    }
+    catch (e) {
+      ok(e.message.indexOf("foo") >= 0, "error message should mention 'foo'");
+    }
+  });
 
   test("queried date property is a DateTime", async () => {
     expect.hasAssertions();
