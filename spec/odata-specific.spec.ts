@@ -1,5 +1,5 @@
 // testFns.skipIf("mongo,sequelize,hibernate,aspcore", "does not support the 'add' OData predicate").
-import { breeze, EntityManager, EntityQuery, NamingConvention, Predicate, EntityType, EntityState, EntityKey, Entity } from 'breeze-client';
+import { breeze, EntityManager, EntityQuery, NamingConvention, Predicate, EntityType, EntityState, EntityKey, Entity, MetadataStore } from 'breeze-client';
 import { TestFns, expectPass, describeIf } from './test-fns';
 
 TestFns.initServerEnv();
@@ -60,4 +60,27 @@ describeIf(TestFns.isODataServer)("OData specific", () => {
     }
 
   });
+
+  // test("predicateBuilder simple toOData()", function () {
+  //   const ms = new MetadataStore();
+  //   const nullEt = new EntityType(ms);
+  //   const config = { entityType: nullEt }
+  //   const dt = new Date(88, 9, 12);
+  //   const dateStr = dt.toISOString(dt);
+  //   const p = Predicate.create("OrderDate", ">", dt);
+  //   const txt = p.toODataFragment(config);
+  //   equal(txt, "OrderDate gt datetime'" + dateStr + "'");
+  //   const p2 = Predicate.create("OrderDate", "gt", dt);
+  //   const txt2 = p2.toODataFragment(config);
+  //   equal(txt2, "OrderDate gt datetime'" + dateStr + "'");
+  //   const p3 = Predicate.create("OrderDate", "==", dt);
+  //   const txt3 = p3.toODataFragment(config);
+  //   equal(txt3, "OrderDate eq datetime'" + dateStr + "'");
+  //   const p4 = new Predicate("OrderDate", "ne", dt);
+  //   const txt4 = p4.toODataFragment(config);
+  //   equal(txt4, "OrderDate ne datetime'" + dateStr + "'");
+  //   const p5 = new Predicate("ShipCity", "stArtsWiTH", "C");
+  //   const txt5 = p5.toODataFragment(config);
+  //   equal(txt5, "startswith(ShipCity,'C') eq true");
+  // });
 });

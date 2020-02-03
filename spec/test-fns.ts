@@ -30,6 +30,7 @@ export class TestFns extends UtilFns {
   static isMongoServer: boolean;
   static isSequelizeServer: boolean;
   static isAspCoreServer: boolean;
+  static isAspWebApiServer: boolean;
   static isHibernateServer: boolean;
 
   static wellKnownData = {
@@ -60,6 +61,7 @@ export class TestFns extends UtilFns {
     TestFns.isMongoServer = serverEnvName === 'MONGO';
     TestFns.isSequelizeServer = serverEnvName === 'SEQUELIZE';
     TestFns.isAspCoreServer = serverEnvName === 'ASPCORE';
+    TestFns.isAspWebApiServer = serverEnvName === 'ASPWEBAPI';
     TestFns.isHibernateServer = serverEnvName === 'HIBERNATE';
 
     TestFns.initBrowserShims();
