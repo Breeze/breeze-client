@@ -1,15 +1,19 @@
-import { EntityManager, NamingConvention, MetadataStore, DataType, breeze, core, Entity } from 'breeze-client';
+import { EntityManager, NamingConvention, MetadataStore, DataType, breeze, core, Entity, config } from 'breeze-client';
 import { ModelLibraryBackingStoreAdapter } from 'breeze-client/adapter-model-library-backing-store';
 import { UriBuilderJsonAdapter } from 'breeze-client/adapter-uri-builder-json';
 import { AjaxFetchAdapter } from 'breeze-client/adapter-ajax-fetch';
 import { DataServiceWebApiAdapter } from 'breeze-client/adapter-data-service-webapi';
 import { UtilFns } from './util-fns';
 
+const northwindIBMetadata = require('./support/NorthwindIBMetadata.json');  
+
+
 export const testIf = (condition: boolean) => (condition ? test : test.skip);
 export const skipTestIf = (condition: boolean) => (condition ? test.skip : test);
 export const describeIf = (condition: boolean) => (condition ? describe : describe.skip);
 export const skipDescribeIf = (condition: boolean) => (condition ? describe.skip : describe);
 export const expectPass = () => expect(true).toBe(true);
+
 
 // Alt unused approach
 // export const skipTestIf = (condition: boolean) => (condition ? { test: test.skip } : { test: test });
@@ -23,8 +27,11 @@ export class TestFns extends UtilFns {
 
   static serverEnvName: string;
   static defaultServiceName: string;
-  static defaultMetadataStore: MetadataStore;
+  
   static metadataStoreIsBeingFetched: boolean;
+
+  static sampleMetadata = northwindIBMetadata;
+  static sampleMetadataStore = TestFns.initSampleMetadataStore();  
   
   static isODataServer: boolean;
   static isMongoServer: boolean;
@@ -52,19 +59,23 @@ export class TestFns extends UtilFns {
     }
   };
 
+  private static defaultMetadataStore: MetadataStore;
+
+  static initNonServerEnv() {
+    TestFns.serverEnvName = "NO SERVER";
+    TestFns.calcServerTypes(TestFns.serverEnvName);
+    TestFns.initBrowserShims();
+    TestFns.initAdapters();
+    
+  }
+
   static initServerEnv(serverEnvName?: string) {
     if (serverEnvName == null) {
       serverEnvName = TestFns.defaultServerEnvName;
     }
     TestFns.serverEnvName = serverEnvName.toLocaleUpperCase();
 
-    TestFns.isODataServer = serverEnvName === 'ODATA';
-    TestFns.isMongoServer = serverEnvName === 'MONGO';
-    TestFns.isSequelizeServer = serverEnvName === 'SEQUELIZE';
-    TestFns.isAspCoreServer = serverEnvName === 'ASPCORE';
-    TestFns.isAspWebApiServer = serverEnvName === 'ASPWEBAPI';
-    TestFns.isHibernateServer = serverEnvName === 'HIBERNATE';
-    TestFns.isNHibernateServer = serverEnvName === 'NHIBERNATE';
+    TestFns.calcServerTypes(serverEnvName);
 
     TestFns.initBrowserShims();
     TestFns.initAdapters();
@@ -74,6 +85,16 @@ export class TestFns extends UtilFns {
     } else {
 
     }
+  }
+
+  private static calcServerTypes(serverEnvName: string) {
+    TestFns.isODataServer = serverEnvName === 'ODATA';
+    TestFns.isMongoServer = serverEnvName === 'MONGO';
+    TestFns.isSequelizeServer = serverEnvName === 'SEQUELIZE';
+    TestFns.isAspCoreServer = serverEnvName === 'ASPCORE';
+    TestFns.isAspWebApiServer = serverEnvName === 'ASPWEBAPI';
+    TestFns.isHibernateServer = serverEnvName === 'HIBERNATE';
+    TestFns.isNHibernateServer = serverEnvName === 'NHIBERNATE';
   }
 
   private static initBrowserShims() {
@@ -100,8 +121,6 @@ export class TestFns extends UtilFns {
     NamingConvention.camelCase.setAsDefault();
   }
 
-  
-
   static async initDefaultMetadataStore() {
     if (TestFns.defaultMetadataStore == null) {
       const ms = new MetadataStore();
@@ -111,12 +130,24 @@ export class TestFns extends UtilFns {
     return TestFns.defaultMetadataStore;
   }
 
+  static initSampleMetadataStore(): MetadataStore {
+    if (TestFns.sampleMetadataStore == null) {
+      let ms = new MetadataStore();
+      ModelLibraryBackingStoreAdapter.register();
+      ms.importMetadata(TestFns.sampleMetadata);
+      TestFns.sampleMetadataStore = ms;
+    }
+    return TestFns.sampleMetadataStore;
+  }
+
   static newEntityManager(metadataStore?: MetadataStore) {
     let em: EntityManager;
     if (metadataStore) {
       em = new EntityManager({ serviceName: TestFns.defaultServiceName, metadataStore: metadataStore });
     } else if (TestFns.defaultMetadataStore) {
       em = new EntityManager({ serviceName: TestFns.defaultServiceName, metadataStore: TestFns.defaultMetadataStore });
+    } else if (TestFns.sampleMetadataStore) {
+      em = new EntityManager({ serviceName: TestFns.defaultServiceName, metadataStore: TestFns.sampleMetadataStore });
     } else {
       em = new EntityManager({ serviceName: TestFns.defaultServiceName });
     }

@@ -32,7 +32,8 @@ describe("Entity Manager", () => {
       fetchStrategy: FetchStrategy.FromServer
     });
 
-    const em = new EntityManager({ serviceName: TestFns.defaultServiceName, metadataStore: TestFns.defaultMetadataStore, queryOptions: queryOptions });
+    let em = TestFns.newEntityManager();
+    em.setProperties( { queryOptions: queryOptions });
     const q = EntityQuery.from("Customers").take(2).using(em);
     const val = Date.now().toString();
     

@@ -31,7 +31,7 @@ describe("Entity Materialization", () => {
 
   test("post create init after materialization", async() => {
     expect.hasAssertions();
-    const em = TestFns.newEntityManager(MetadataStore.importMetadata(TestFns.defaultMetadataStore.exportMetadata()));
+    const em = TestFns.newEntityManager();
     const Product = createProductCtor();
 
     const productType = em.metadataStore.getEntityType("Product") as EntityType;
@@ -48,7 +48,7 @@ describe("Entity Materialization", () => {
 
   test("post create init using materialized data", async() => {
     expect.hasAssertions();
-    const em = TestFns.newEntityManager(MetadataStore.importMetadata(TestFns.defaultMetadataStore.exportMetadata()));
+    const em = TestFns.newEntityManager();
 
     const Customer = function () {
       this.companyName = null;
@@ -71,7 +71,7 @@ describe("Entity Materialization", () => {
 
   test("post create init with no ctor", async() => {
     expect.hasAssertions();
-    const em = TestFns.newEntityManager(MetadataStore.importMetadata(TestFns.defaultMetadataStore.exportMetadata()));
+    const em = TestFns.newEntityManager();
     const dt = new Date();
 
     const empInitializer = function (emp: Entity) {

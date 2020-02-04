@@ -2,17 +2,16 @@ import { Entity, EntityQuery, EntityType, MetadataStore, EntityChangedEventArgs,
 import { TestFns } from './test-fns';
 import { ObservableArrayChangedArgs } from 'src/observable-array';
 import { PropertyChangedEventArgs } from 'src/entity-aspect';
-import { notDeepEqual } from 'assert';
 
-TestFns.initServerEnv();
+TestFns.initNonServerEnv();
 
 
-beforeAll(async () => {
-  await TestFns.initDefaultMetadataStore();
+beforeAll( () => {
+  TestFns.initSampleMetadataStore();
 
 });
 
-describe("Entity Aspect", () => {
+describe("Entity Attach", () => {
   let testContext: any;
 
   beforeEach(() => {
@@ -37,7 +36,7 @@ describe("Entity Aspect", () => {
   );
 
   test("infer unmapped boolean datatype", () => {
-    const em = TestFns.newEntityManager(MetadataStore.importMetadata(TestFns.defaultMetadataStore.exportMetadata()));
+    const em = TestFns.newEntityManager();
     const Customer = function () {
       testContext.isBeingEdited = false;
     };
@@ -81,7 +80,7 @@ describe("Entity Aspect", () => {
     order.entityAspect.setDetached();
 
     // Post-detach asserts
-    expect(order.getProperty('customerID')).toBe(cust);
+    expect(order.getProperty('customerID')).toBe(cust.getProperty('customerID'));
     expect(order.getProperty('employeeID')).toBe(emp.getProperty('employeeID'));
     expect(order.getProperty('customer')).toBe(null);
     expect(order.getProperty('employee')).toBe(null);
@@ -191,7 +190,7 @@ describe("Entity Aspect", () => {
       em1.attachEntity(cust);
 
       em1.clear(); // should detach cust
-      expect(cust.entityAspect.entityState.isDetached).toBe(true);
+      expect(cust.entityAspect.entityState.isDetached()).toBe(true);
 
       // therefore this should be ok
       const em2 = TestFns.newEntityManager();
@@ -293,7 +292,7 @@ describe("Entity Aspect", () => {
 
 
   test("post create init 1", () => {
-    const em = TestFns.newEntityManager(MetadataStore.importMetadata(TestFns.defaultMetadataStore.exportMetadata()));
+    const em = TestFns.newEntityManager(MetadataStore.importMetadata(TestFns.sampleMetadata));
     const Product = createProductCtor();
     const productType = em.metadataStore.getAsEntityType("Product");
     em.metadataStore.registerEntityTypeCtor("Product", Product, function (entity: Entity) {
@@ -310,7 +309,7 @@ describe("Entity Aspect", () => {
   });
 
   test("post create init 2", () => {
-    const em = TestFns.newEntityManager(MetadataStore.importMetadata(TestFns.defaultMetadataStore.exportMetadata()));
+    const em = TestFns.newEntityManager(MetadataStore.importMetadata(TestFns.sampleMetadata));
     const Product = createProductCtor();
 
     const productType = em.metadataStore.getAsEntityType("Product");
@@ -321,7 +320,7 @@ describe("Entity Aspect", () => {
   });
 
   test("post create init 3", () => {
-    const em = TestFns.newEntityManager(MetadataStore.importMetadata(TestFns.defaultMetadataStore.exportMetadata()));
+    const em = TestFns.newEntityManager(MetadataStore.importMetadata(TestFns.sampleMetadata));
     const Product = createProductCtor();
     const productType = em.metadataStore.getAsEntityType("Product");
     em.metadataStore.registerEntityTypeCtor("Product", Product, "init");
@@ -331,7 +330,7 @@ describe("Entity Aspect", () => {
   });
 
   test("post create init after new and attach", () => {
-    const em = TestFns.newEntityManager(MetadataStore.importMetadata(TestFns.defaultMetadataStore.exportMetadata()));
+    const em = TestFns.newEntityManager(MetadataStore.importMetadata(TestFns.sampleMetadata));
     const Product = createProductCtor() as any;
     const product = new Product();
     const productType = em.metadataStore.getAsEntityType("Product");

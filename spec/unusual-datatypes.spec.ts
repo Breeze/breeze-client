@@ -174,8 +174,9 @@ describe("Unusual Datatypes", () => {
     expect.hasAssertions();
     const duration = "PT7H17M40S";
     const sDuration = core.durationToSeconds(duration);
-
-    const newMs = MetadataStore.importMetadata(TestFns.defaultMetadataStore.exportMetadata());
+    const defaultMs = await TestFns.initDefaultMetadataStore();
+    const newMs = MetadataStore.importMetadata(defaultMs.exportMetadata());
+    
     const tlimitType = newMs.getEntityType("TimeLimit") as EntityType;
     core.arrayRemoveItem(tlimitType.dataProperties, dp => dp.dataType === DataType.Undefined);
 

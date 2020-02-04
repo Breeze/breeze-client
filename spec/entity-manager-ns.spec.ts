@@ -4,13 +4,12 @@ import { TestFns } from './test-fns';
 
 ModelLibraryBackingStoreAdapter.register();
 
-const sampleMetadata = require('./support/NorthwindIBMetadata.json');
-const sampleMetadataStore = getSampleMetadataStore();
+TestFns.initNonServerEnv();
 
 describe("EntityManager - no server", () => {
 
   beforeEach(function() {
-
+    TestFns.initSampleMetadataStore();
   });
 
   test("initialization", function () {
@@ -33,7 +32,7 @@ describe("EntityManager - no server", () => {
 
     let em = new EntityManager('test');
     let ms = em.metadataStore;
-    ms.importMetadata(sampleMetadata);
+    ms.importMetadata(TestFns.sampleMetadata);
 
     let orderType = ms.getEntityType("Order") as EntityType;
     expect(orderType).toBeTruthy();
@@ -52,7 +51,7 @@ describe("EntityManager - no server", () => {
 
     let em = new EntityManager('test');
     let ms = em.metadataStore;
-    ms.importMetadata(sampleMetadata);
+    ms.importMetadata(TestFns.sampleMetadata);
 
     let order = em.createEntity("Order", { shipName: "Barnum"});
     expect(order).toBeTruthy();
@@ -68,7 +67,7 @@ describe("EntityManager - no server", () => {
 
     let em = new EntityManager('test');
     let ms = em.metadataStore;
-    ms.importMetadata(sampleMetadata);
+    ms.importMetadata(TestFns.sampleMetadata);
 
     let supplier = em.createEntity("Supplier", { companyName: "ACME"});
     expect(supplier).toBeTruthy();
@@ -91,7 +90,7 @@ describe("EntityManager - no server", () => {
 
     let em = new EntityManager('test');
     let ms = em.metadataStore;
-    ms.importMetadata(sampleMetadata);
+    ms.importMetadata(TestFns.sampleMetadata);
 
     let custID = "88888888-4444-4444-4444-121212121212";
     let ordID = 22;
@@ -120,7 +119,7 @@ describe("EntityManager - no server", () => {
 
     let em = new EntityManager('test');
     let ms = em.metadataStore;
-    ms.importMetadata(sampleMetadata);
+    ms.importMetadata(TestFns.sampleMetadata);
 
     let custID = "88888888-4444-4444-4444-121212121212";
     let ordID = 22;
@@ -147,7 +146,7 @@ describe("EntityManager - no server", () => {
 
     let em = new EntityManager('test');
     let ms = em.metadataStore;
-    ms.importMetadata(sampleMetadata);
+    ms.importMetadata(TestFns.sampleMetadata);
 
     let custID = "88888888-4444-4444-4444-121212121212";
     let ordID = 22;
@@ -167,7 +166,7 @@ describe("EntityManager - no server", () => {
 
     let em = new EntityManager('test');
     let ms = em.metadataStore;
-    ms.importMetadata(sampleMetadata);
+    ms.importMetadata(TestFns.sampleMetadata);
 
     let custID = "88888888-4444-4444-4444-121212121212";
     let ordID = 22;
@@ -187,7 +186,7 @@ describe("EntityManager - no server", () => {
 
     let em = new EntityManager('test');
     let ms = em.metadataStore;
-    ms.importMetadata(sampleMetadata);
+    ms.importMetadata(TestFns.sampleMetadata);
 
     let custID = "88888888-4444-4444-4444-121212121212";
     let ordID = 22;
@@ -207,7 +206,7 @@ describe("EntityManager - no server", () => {
 
     let em = new EntityManager('test');
     let ms = em.metadataStore;
-    ms.importMetadata(sampleMetadata);
+    ms.importMetadata(TestFns.sampleMetadata);
 
     let custID = "88888888-4444-4444-4444-121212121212";
     let ordID = 22;
@@ -231,7 +230,7 @@ describe("EntityManager - no server", () => {
 
     let em = new EntityManager('test');
     let ms = em.metadataStore;
-    ms.importMetadata(sampleMetadata);
+    ms.importMetadata(TestFns.sampleMetadata);
 
     let custID = "88888888-4444-4444-4444-121212121212";
     let ordID = 22;
@@ -256,7 +255,7 @@ describe("EntityManager - no server", () => {
 
     let em = new EntityManager('test');
     let ms = em.metadataStore;
-    ms.importMetadata(sampleMetadata);
+    ms.importMetadata(TestFns.sampleMetadata);
 
     let custID = "88888888-4444-4444-4444-121212121212";
     let ordID = 22;
@@ -280,7 +279,7 @@ describe("EntityManager - no server", () => {
   });
 
   test("getChanges", function () {
-    const em = TestFns.newEntityManager(sampleMetadataStore);
+    const em = TestFns.newEntityManager(TestFns.sampleMetadataStore);
     const orderType = em.metadataStore.getAsEntityType("Order");
     const empType = em.metadataStore.getAsEntityType("Employee");
     const custType = em.metadataStore.getAsEntityType("Customer");
@@ -311,7 +310,7 @@ describe("EntityManager - no server", () => {
   });
 
   test("hasChanges basic", function () {
-    const em = TestFns.newEntityManager(sampleMetadataStore);
+    const em = TestFns.newEntityManager(TestFns.sampleMetadataStore);
     const orderType = em.metadataStore.getAsEntityType("Order");
 
     let  count = 0;
@@ -337,7 +336,7 @@ describe("EntityManager - no server", () => {
 
 
   test("hasChanges filtering by type", function () {
-    const em = TestFns.newEntityManager(sampleMetadataStore);
+    const em = TestFns.newEntityManager(TestFns.sampleMetadataStore);
     em.createEntity('Order');
     em.createEntity('Product', null, breeze.EntityState.Unchanged);
     // There are Order changes but there are no Product changes
@@ -348,7 +347,7 @@ describe("EntityManager - no server", () => {
 
   // D#2663
   test("hasChanges is false when filter for a type that is not in cache", function () {
-    const em = TestFns.newEntityManager(sampleMetadataStore);
+    const em = TestFns.newEntityManager(TestFns.sampleMetadataStore);
     em.createEntity('Order');
     // While 'Product' is a defined type, there are no Products in cache this time.
     // There are changes but there are no Product changes
@@ -358,7 +357,7 @@ describe("EntityManager - no server", () => {
   });
 
   test("hasChanges throws error when filter for a type that doesn't exist", function () {
-    const em = TestFns.newEntityManager(sampleMetadataStore);
+    const em = TestFns.newEntityManager(TestFns.sampleMetadataStore);
     em.createEntity('Order');
     
     expect(em.hasChanges()).toBe(true);
@@ -369,7 +368,7 @@ describe("EntityManager - no server", () => {
   });
 
   test("hasChanges with em.acceptChanges", function () {
-    const em = TestFns.newEntityManager(sampleMetadataStore);
+    const em = TestFns.newEntityManager(TestFns.sampleMetadataStore);
     const orderType = em.metadataStore.getAsEntityType("Order");
     expect(em.hasChanges()).toBe(false);
     const order1 = orderType.createEntity();
@@ -385,7 +384,7 @@ describe("EntityManager - no server", () => {
   });
 
   test("hasChanges with rejectChanges", function () {
-    const em = TestFns.newEntityManager(sampleMetadataStore);
+    const em = TestFns.newEntityManager(TestFns.sampleMetadataStore);
     const orderType = em.metadataStore.getAsEntityType("Order");
     let count = 0;
     em.hasChangesChanged.subscribe(args => {
@@ -412,7 +411,7 @@ describe("EntityManager - no server", () => {
 
 
   test("entityChanged event", function () {
-    const em = TestFns.newEntityManager(sampleMetadataStore);
+    const em = TestFns.newEntityManager(TestFns.sampleMetadataStore);
     const orderType = em.metadataStore.getAsEntityType("Order");
     const empType = em.metadataStore.getAsEntityType("Employee");
     const custType = em.metadataStore.getAsEntityType("Customer");
@@ -470,7 +469,7 @@ describe("EntityManager - no server", () => {
   });
 
   test("entityChanged event suppressed", function () {
-    const em = TestFns.newEntityManager(sampleMetadataStore);
+    const em = TestFns.newEntityManager(TestFns.sampleMetadataStore);
     const orderType = em.metadataStore.getAsEntityType("Order");
     const empType = em.metadataStore.getAsEntityType("Employee");
     const custType = em.metadataStore.getAsEntityType("Customer");
@@ -493,7 +492,7 @@ describe("EntityManager - no server", () => {
   });
 
   test("entityChanged event suppressed by function", function () {
-    const em = TestFns.newEntityManager(sampleMetadataStore);
+    const em = TestFns.newEntityManager(TestFns.sampleMetadataStore);
     const orderType = em.metadataStore.getAsEntityType("Order");
     const empType = em.metadataStore.getAsEntityType("Employee");
     em['tag'] = "foo";
@@ -517,8 +516,3 @@ describe("EntityManager - no server", () => {
 
 });
 
-function getSampleMetadataStore() {
-  let ms = new MetadataStore();
-  ms.importMetadata(sampleMetadata);
-  return ms;
-}
