@@ -32,6 +32,7 @@ export class TestFns extends UtilFns {
   static isAspCoreServer: boolean;
   static isAspWebApiServer: boolean;
   static isHibernateServer: boolean;
+  static isNHibernateServer: boolean;
 
   static wellKnownData = {
     nancyID: 1 as any,
@@ -63,6 +64,7 @@ export class TestFns extends UtilFns {
     TestFns.isAspCoreServer = serverEnvName === 'ASPCORE';
     TestFns.isAspWebApiServer = serverEnvName === 'ASPWEBAPI';
     TestFns.isHibernateServer = serverEnvName === 'HIBERNATE';
+    TestFns.isNHibernateServer = serverEnvName === 'NHIBERNATE';
 
     TestFns.initBrowserShims();
     TestFns.initAdapters();

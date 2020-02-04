@@ -198,7 +198,7 @@ export class DataType extends BreezeEnum {
         return value;
       };
     }
-  };
+  }
 
   /** Returns the DataType for a specified EDM type name.
   **/
@@ -220,7 +220,7 @@ export class DataType extends BreezeEnum {
     }
 
     return dt;
-  };
+  }
 
   /** Returns the DataType for a specified input. */
   static fromValue(val: any) {
@@ -239,7 +239,7 @@ export class DataType extends BreezeEnum {
         return DataType.Double;
     }
     return DataType.Undefined;
-  };
+  }
 
   static parseTimeFromServer(source: any) {
     if (typeof source === 'string') {
@@ -262,7 +262,7 @@ export class DataType extends BreezeEnum {
     }
     source = new Date(Date.parse(source));
     return source;
-  };
+  }
 
 
   /** Returns a raw value converted to the specified DataType */
@@ -344,21 +344,21 @@ function getValidatorCtor(dataType: DataType) {
 
 function getNextString() {
   return DataType.constants.stringPrefix + getNextNumber().toString();
-};
+}
 
 function getNextNumber() {
   let result = DataType.constants.nextNumber;
   DataType.constants.nextNumber += DataType.constants.nextNumberIncrement;
   return result;
-};
+}
 
 function getNextGuid() {
   return core.getUuid();
-};
+}
 
 function getNextDateTime() {
   return new Date();
-};
+}
 
 function getConcurrencyDateTime(val: any) {
   // use the current datetime but insure that it is different from previous call.
@@ -368,18 +368,18 @@ function getConcurrencyDateTime(val: any) {
     dt2 = new Date();
   }
   return dt2;
-};
+}
 
 function coerceToString(source: any, sourceTypeName?: string) {
   return (source == null) ? source : source.toString();
-};
+}
 
 function coerceToGuid(source: any, sourceTypeName: string) {
   if (sourceTypeName === "string") {
     return source.trim().toLowerCase();
   }
   return source;
-};
+}
 
 function coerceToInt(source: any, sourceTypeName: string) {
   if (sourceTypeName === "string") {
@@ -392,7 +392,7 @@ function coerceToInt(source: any, sourceTypeName: string) {
   }
   // do we want to coerce floats -> ints
   return source;
-};
+}
 
 function coerceToFloat(source: any, sourceTypeName: string) {
   if (sourceTypeName === "string") {
