@@ -15,7 +15,7 @@ export interface ObservableArray {
   length: number;
   
   getEntityAspect: () => EntityAspect;
-  arrayChanged: BreezeEvent<{ array: any[], added?: any[]; removed?: any[]; }>;
+  arrayChanged: BreezeEvent<ObservableArrayChangedArgs>;
   parent?: Object;
   parentProperty?: DataProperty;
   _getEventParent: () => Object;
@@ -25,6 +25,12 @@ export interface ObservableArray {
   _processRemoves(items: any[]): void;
   _origValues: any[];
   _pendingArgs: any;
+}
+
+export interface ObservableArrayChangedArgs {
+  array: any[];
+  added?: any[]; 
+  removed?: any[];
 }
 
 let mixin = {

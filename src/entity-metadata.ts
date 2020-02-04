@@ -1171,13 +1171,13 @@ export class EntityType {
   /**
   Create a new entity of this type.
   >      // assume em1 is an EntityManager containing a number of existing entities.
-  >      let custType = em1.metadataStore.getEntityType("Customer");
+  >      let custType = em1.metadataStore.getAsEntityType("Customer");
   >      let cust1 = custType.createEntity();
   >      em1.addEntity(cust1);
   @param initialValues- Configuration object of the properties to set immediately after creation.
   @return The new entity.
   **/
-  createEntity(initialValues?: any) {
+  createEntity(initialValues?: any): any {
     // ignore the _$eref once the entity is attached to an entityManager.
     if (initialValues && initialValues._$eref && !initialValues._$eref.entityAspect.entityManager) return initialValues._$eref;
 
