@@ -14,7 +14,7 @@ beforeAll(async () => {
 
 describe("Unusual Datatypes", () => {
 
- 
+
   test("byte w/save", async function () {
     expect.hasAssertions();
     const em = TestFns.newEntityManager();
@@ -59,6 +59,62 @@ describe("Unusual Datatypes", () => {
     const user3 = qr2.results[0];
     const modDate3 = user3.getProperty("modifiedDate");
     expect(modDate.getTime()).toBe(modDate3.getTime());
+  });
+
+  test("datatype coercion - null strings to empty strings", function () {
+    const em = TestFns.newEntityManager(); // new empty EntityManager
+    const oldParseFn = DataType.String.parse;
+    const newParseFn = function (source: any, sourceTypeName: string) {
+      if (source == null) {
+        return "";
+      } else if (sourceTypeName === "string") {
+        return source.trim();
+      } else {
+        return source.toString();
+      }
+    };
+    DataType.String.parse = newParseFn;
+    try {
+      const aType = em.metadataStore.getAsEntityType("Customer");
+      // OrderID, UnitPrice, Discount
+      const inst = aType.createEntity();
+
+      inst.setProperty("companyName", null);
+      let val = inst.getProperty("companyName");
+      expect(val).toBe("");
+
+      inst.setProperty("companyName", undefined);
+      val = inst.getProperty("companyName");
+      expect(val).toBe("");
+
+      inst.setProperty("companyName", "    now is the time    ");
+      val = inst.getProperty("companyName");
+      expect(val).toBe("now is the time");
+    } finally {
+      DataType.String.parse = oldParseFn;
+    }
+  });
+
+
+
+
+  test("nullable dateTime", async function () {
+    expect.hasAssertions();
+    const em = TestFns.newEntityManager();
+    const emp = em.createEntity("Employee", { firstName: "Joe", lastName: "Smith" });
+    expect(emp.entityAspect.entityState).toBe(EntityState.Added);
+    const birthDate = emp.getProperty("birthDate");
+    expect(birthDate).toBeNull;
+
+    const q = EntityQuery.from("Employees").where("birthDate", "==", null);
+
+    const qr1 = await em.executeQuery(q);
+    const empsWithNullBirthDates = qr1.results;
+    expect(empsWithNullBirthDates.length).toBeGreaterThan(0);
+    empsWithNullBirthDates.forEach(function (emp1) {
+      const birthDate1 = emp1.getProperty("birthDate");
+      expect(birthDate1).toBeNull;
+    });
   });
 
   test("dateTime w/invalid value", async function () {
@@ -176,7 +232,7 @@ describe("Unusual Datatypes", () => {
     const sDuration = core.durationToSeconds(duration);
     const defaultMs = await TestFns.initDefaultMetadataStore();
     const newMs = MetadataStore.importMetadata(defaultMs.exportMetadata());
-    
+
     const tlimitType = newMs.getEntityType("TimeLimit") as EntityType;
     core.arrayRemoveItem(tlimitType.dataProperties, dp => dp.dataType === DataType.Undefined);
 
@@ -315,7 +371,7 @@ describe("Unusual Datatypes", () => {
     const qr1 = await em.executeQuery(query);
     const roles = qr1.results;
     expect(roles.length).toBeGreaterThan(1);
-    const isOk = roles.every( r => r.getProperty("roleType") === "Restricted");
+    const isOk = roles.every(r => r.getProperty("roleType") === "Restricted");
     expect(isOk).toBe(true);
   });
 
@@ -324,9 +380,9 @@ describe("Unusual Datatypes", () => {
     expect.hasAssertions();
     const em = TestFns.newEntityManager();
     const query = new EntityQuery("Roles").where("roleType", "==", 'Restricted');
-    const roleType = em.metadataStore.getEntityType("Role")  as EntityType;
+    const roleType = em.metadataStore.getEntityType("Role") as EntityType;
     const qr1 = await em.executeQuery(query);
-    
+
     expect(qr1.results.length).toBeGreaterThan(1);
     let role = roleType.createEntity();
     role.setProperty("name", "test1");
@@ -472,7 +528,7 @@ describe("Unusual Datatypes", () => {
     expect.hasAssertions();
     const em = TestFns.newEntityManager();
     // const discPropName = (TestFns.isSequelizeServer) ? "discontinued" : "isDiscontinued";
-    const discPropName = "discontinued" ;
+    const discPropName = "discontinued";
     const query = new EntityQuery("Products")
       .where(discPropName, "==", true)
       .take(10);
@@ -480,14 +536,14 @@ describe("Unusual Datatypes", () => {
     const qr1 = await em.executeQuery(query);
     const products = qr1.results;
     expect(qr1.results.length).toBeGreaterThan(0);
-    expect(products.every( p => p.getProperty(discPropName) === true)).toBe(true);
+    expect(products.every(p => p.getProperty(discPropName) === true)).toBe(true);
   });
 
   test("nonnullable bool == null", async function () {
     expect.hasAssertions();
     const em = TestFns.newEntityManager();
     // const discPropName = TestFns.isSequelizeServer ? "discontinued" : "isDiscontinued";
-    const discPropName = "discontinued" ;
+    const discPropName = "discontinued";
     const query = new EntityQuery("Products")
       .where(discPropName, "==", null)
       .take(30);
@@ -553,6 +609,73 @@ describe("Unusual Datatypes", () => {
       expect(region != null).toBe(true);
     });
   });
+
+  test("datatype coercion - date", function () {
+    const em = TestFns.newEntityManager(); // new empty EntityManager
+    const userType = em.metadataStore.getAsEntityType("User");
+
+    const user = userType.createEntity();
+    const dt = new Date(2000, 2, 15); // 2 => 3 below because date ctor is 0 origin on months.
+    user.setProperty("createdDate", "3/15/2000");
+    const sameDt = user.getProperty("createdDate");
+    expect(dt.getTime()).toBe(sameDt.getTime());
+    user.setProperty("modifiedDate", dt.getTime());
+    const sameDt2 = user.getProperty("modifiedDate");
+    expect(dt.getTime()).toBe(sameDt2.getTime());
+  });
+
+
+  test("datatype coercion - integer", function () {
+    const em = TestFns.newEntityManager(); // new empty EntityManager
+    const odType = em.metadataStore.getAsEntityType("OrderDetail");
+    // OrderID, UnitPrice, Discount
+    const od = odType.createEntity();
+
+    od.setProperty("orderID", "3.4");
+    let val = od.getProperty("orderID");
+    expect(val).toBe(3);
+
+    od.setProperty("orderID", 3.4);
+    val = od.getProperty("orderID");
+    expect(val).toBe(3);
+  });
+
+
+  test("datatype coercion - decimal", function () {
+    const em = TestFns.newEntityManager(); // new empty EntityManager
+    const odType = em.metadataStore.getAsEntityType("OrderDetail");
+    // OrderID, UnitPrice, Discount
+    const od = odType.createEntity();
+    od.setProperty("unitPrice", "3.4");
+    let val = od.getProperty("unitPrice");
+    expect(val).toBe(3.4);
+    od.setProperty("unitPrice", "3");
+    val = od.getProperty("unitPrice");
+    expect(val).toBe(3);
+
+    od.setProperty("unitPrice", 3.4);
+    val = od.getProperty("unitPrice");
+    expect(val).toBe(3.4);
+  });
+
+  test("datatype coercion - float", function () {
+    const em = TestFns.newEntityManager(); // new empty EntityManager
+    const odType = em.metadataStore.getAsEntityType("OrderDetail");
+    // OrderID, UnitPrice, Discount
+    const od = odType.createEntity();
+    od.setProperty("discount", "3.4");
+    let val = od.getProperty("discount");
+    expect(val).toBe(3.4);
+
+    od.setProperty("discount", "3");
+    val = od.getProperty("discount");
+    expect(val).toBe(3);
+
+    od.setProperty("discount", 3.4);
+    val = od.getProperty("discount");
+    expect(val).toBe(3.4);
+  });
+
 
 
 });

@@ -7,6 +7,7 @@ import { UtilFns } from './util-fns';
 
 const northwindIBMetadata = require('./support/NorthwindIBMetadata.json');  
 
+export type JsonObj = {[k: string]: any};
 
 export const testIf = (condition: boolean) => (condition ? test : test.skip);
 export const skipTestIf = (condition: boolean) => (condition ? test.skip : test);
@@ -153,6 +154,45 @@ export class TestFns extends UtilFns {
     }
     return em;
   }
+  
+
+  static CustomerWithES5Props() {
+    const ctor = function () {    };
+    TestFns.createES5Props(ctor.prototype);
+    return ctor;
+  }
+
+  static createES5Props(target: any) {
+    Object.defineProperty(target, "companyName", {
+      get: function () {
+        return this["_companyName"] || null;
+      },
+      set: function (value) {
+        this["_companyName"] = value && value.toUpperCase();
+      },
+      enumerable: true,
+      configurable: true
+    });
+    Object.defineProperty(target, "idAndName", {
+      get: function () {
+        return this.customerID + ":" + (this._companyName || "");
+      },
+      enumerable: true,
+      configurable: true
+    });
+
+    Object.defineProperty(target, "miscData", {
+      get: function () {
+        return this["_miscData"] || "asdf";
+      },
+      set: function (value) {
+        this["_miscData"] = value;
+      },
+      enumerable: true,
+      configurable: true
+    });
+  }
+
 
   // private static updateWellKnownDataIfMongo() {
   //   if (TestFns.serverEnvName !== 'MONGO') {

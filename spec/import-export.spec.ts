@@ -382,7 +382,7 @@ describe("EntityManager import/export", () => {
     expect(cust1x.getProperty("city")).toBeNull();
   });
 
-  test("export/import with constiety of first parameters", async function () {
+  test("export/import with variety of first parameters", async function () {
     expect.hasAssertions();
     const queryOptions = new QueryOptions({
       mergeStrategy: MergeStrategy.OverwriteChanges,
@@ -416,6 +416,40 @@ describe("EntityManager import/export", () => {
     customers = em4.executeQueryLocally(all);
     expect(customers && customers.length === 1).toBe(true);
   });
+
+  /*********************************************************
+    * Create an EM with parent/child relationship data.  Export the EM and import it into a new one, delete the child item in the exported EM
+    * export the 2nd EM into the first EM.
+    *********************************************************/
+   test("test imported deleted nav properties", function () {
+    const em = TestFns.newEntityManager();
+
+    const parentCustomer = createCustomerAndOrders(em, true, 1);
+
+    const newOrder = parentCustomer.getProperty("orders")[0];
+
+    // clone the EM data; includeMetadata is true by default but we're being explicit in this test
+    const expEntities = em.exportEntities(null, {includeMetadata: true});
+
+    //const newEm = newEm();
+    const newEM = new breeze.EntityManager();
+    newEM.importEntities(expEntities, { mergeStrategy: breeze.MergeStrategy.OverwriteChanges });
+
+    // delete the order
+    const newOrderCopy = newEM.getEntities("Order")[0];
+    newOrderCopy.entityAspect.setDeleted();
+
+    // export the cloned EM
+    const expEntitiesNew = newEM.exportEntities();
+    // merge to the original EM
+    em.importEntities(expEntitiesNew, { mergeStrategy: breeze.MergeStrategy.OverwriteChanges });
+
+    const deletedOrders = parentCustomer.getProperty("orders");
+
+    expect(newOrder.entityAspect.entityState.isDeleted()).toBe(true);
+    expect(deletedOrders.length).toBe(0);
+  });
+
 
   test("export/import with custom metadata", function () {
     const jsonMetadata = {
@@ -703,6 +737,43 @@ describe("EntityManager import/export", () => {
   
 
   // ////////////////////////
+  function createCustomerAndOrders(em: EntityManager, shouldAttachUnchanged: boolean, orderCount: number) {
+    if (!orderCount) orderCount = 3;
+    if (shouldAttachUnchanged === undefined) shouldAttachUnchanged = true;
+    const metadataStore = em.metadataStore;
+    const customerType = em.metadataStore.getAsEntityType("Customer");
+    const orderType = em.metadataStore.getAsEntityType("Order");
+
+    const customer = em.createEntity(customerType);
+    expect(customer.entityAspect.entityState.isAdded()).toBe(true);
+    for (let i = 0; i < orderCount; i++) {
+      const order = em.createEntity(orderType);
+      customer.getProperty("orders").push(order);
+      expect(order.entityAspect.entityState.isAdded()).toBe(true);
+    }
+
+    if (shouldAttachUnchanged) {
+      customer.entityAspect.acceptChanges();
+      const custId = customer.getProperty("customerID");
+      customer.getProperty("orders").forEach((order: Entity) => {
+        order.entityAspect.acceptChanges();
+        expect(order.getProperty("customer")).toBe(customer);
+        expect(order.getProperty("customerID")).toBe(custId);
+        expect(order.entityAspect.entityState.isUnchanged()).toBe(true);
+      });
+    } else {
+      const custId = customer.getProperty("customerID");
+      customer.getProperty("orders").forEach((order: Entity) => {
+        expect(order.getProperty("customer")).toBe(customer);
+        expect(order.getProperty("customerID")).toBe(custId);
+        expect(order.entityAspect.entityState.isAdded()).toBe(true);
+      });
+    }
+    return customer;
+  }
+
+
+
   function createCachedData(em: EntityManager) {
     const DEL = breeze.EntityState.Deleted;
     const UNCHG = breeze.EntityState.Unchanged;

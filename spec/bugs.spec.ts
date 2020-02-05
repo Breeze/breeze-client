@@ -295,5 +295,81 @@ describe("Old Fixed Bugs", () => {
     expect(em.hasChanges()).toBe(false);
   });
 
+  test("bug where registerEntityTypeCtor causes error on importEntities1", function () {
+    // 4/25/13 - sbelini - this test should not fail - it's just to ensure the third parameter is causing the error
+    const em = TestFns.newEntityManager(MetadataStore.importMetadata(TestFns.sampleMetadata));
+    const customerKeyName = TestFns.wellKnownData.keyNames.customer;
+
+    em.metadataStore.registerEntityTypeCtor("Customer", Customer);
+
+    const m1 = em.createEmptyCopy();
+    
+    const cfg = {};
+    cfg[customerKeyName] = breeze.core.getUuid();
+    const customer = m1.createEntity("Customer", cfg);
+    const exported = m1.exportEntities([customer], { includeMetadata: false });
+    const m2 = em.createEmptyCopy();
+
+    m2.importEntities(exported);
+    expect(m2.getEntities().length).toBe(1);
+  });
+
+  test("bug with registerEntityTypeCtor with ES5 props and importEntities", function () {
+    // 4/25/13 - sbelini - this test should not fail - it's just to ensure the third parameter is causing the error
+    const em = TestFns.newEntityManager(MetadataStore.importMetadata(TestFns.sampleMetadata));
+    const customerKeyName = TestFns.wellKnownData.keyNames.customer;
+    const Customer = TestFns.CustomerWithES5Props();
+    em.metadataStore.registerEntityTypeCtor("Customer", Customer);
+
+    const m1 = em.createEmptyCopy();
+    const cfg = {};
+    cfg[customerKeyName] = breeze.core.getUuid();
+    const customer = m1.createEntity("Customer", cfg);
+    const exported = m1.exportEntities([customer], { includeMetadata: false });
+    const m2 = em.createEmptyCopy();
+
+    m2.importEntities(exported);
+    expect(m2.getEntities().length).toBe(1);
+  });
+
+  test("bug with registerEntityTypeCtor causing error on importEntities2", function () {
+    // 4/25/13 - sbelini - this test is failing due to the third parameter in registerEntityTypeCtor
+    const em = TestFns.newEntityManager(MetadataStore.importMetadata(TestFns.sampleMetadata));
+    const customerKeyName = TestFns.wellKnownData.keyNames.customer;
+
+    em.metadataStore.registerEntityTypeCtor("Customer", null, function (entity: any) {
+      const a = 1;
+    });
+
+    const m1 = em.createEmptyCopy();
+    const customerType = m1.metadataStore.getEntityType("Customer");
+    const cfg = {};
+    cfg[customerKeyName] = breeze.core.getUuid();
+    const customer = m1.createEntity("Customer", cfg);
+    const exported = m1.exportEntities([customer]);
+    const m2 = em.createEmptyCopy();
+
+    m2.importEntities(exported);
+    expect(m2.getEntities().length).toBe(1);
+  });
+
+
+  // const Customer = function () {
+  //   this.miscData = "asdf";
+  //   this.getNameLength = function () {
+  //     return (this.getProperty("companyName") || "").length;
+  //   };
+  // };
+
+  class Customer {
+    miscData: string;
+    constructor() {
+      this.miscData = "asdf";
+    }
+
+    getNameLength() {
+      return ((this as any).getProperty("companyName") || "").length;
+    }
+  }
 
 });
