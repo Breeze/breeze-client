@@ -21,7 +21,17 @@
         "typeRoots": [
             "./node_modules/@types"
         ],
-        "lib": ["es2017", "dom"]
+        "downlevelIteration": true,
+        "importHelpers": true,
+        "lib": [
+          "dom",
+          "es5",
+          "es2015.collection",
+          "es2015.iterable",
+          "es2017",
+        ]
+        
+        
     },
     "exclude": [
         "node_modules",
