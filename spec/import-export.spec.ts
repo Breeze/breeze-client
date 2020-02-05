@@ -558,7 +558,7 @@ describe("EntityManager import/export", () => {
   test("unmapped import export with ES5 props", function () {
     // use a different metadata store for this em - so we don't polute other tests
     const em1 = TestFns.newEntityManager(MetadataStore.importMetadata(TestFns.sampleMetadata));
-    const Customer = TestFns.CustomerWithES5Props();
+    const Customer = TestFns.getCustomerWithES5PropsCtor();
     em1.metadataStore.registerEntityTypeCtor("Customer", Customer);
 
     const custType = em1.metadataStore.getAsEntityType("Customer");

@@ -318,7 +318,7 @@ describe("Old Fixed Bugs", () => {
     // 4/25/13 - sbelini - this test should not fail - it's just to ensure the third parameter is causing the error
     const em = TestFns.newEntityManager(MetadataStore.importMetadata(TestFns.sampleMetadata));
     const customerKeyName = TestFns.wellKnownData.keyNames.customer;
-    const Customer = TestFns.CustomerWithES5Props();
+    const Customer = TestFns.getCustomerWithES5PropsCtor();
     em.metadataStore.registerEntityTypeCtor("Customer", Customer);
 
     const m1 = em.createEmptyCopy();

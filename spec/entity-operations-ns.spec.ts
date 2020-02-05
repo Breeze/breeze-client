@@ -53,7 +53,7 @@ describe("Entity operations - no server", () => {
 
   test("new instead of createEntity with entityAspect", function () {
     const em = TestFns.newEntityManager(MetadataStore.importMetadata(TestFns.sampleMetadata));
-    const Customer = getCustomerCtor();
+    const Customer = TestFns.getCustomerCtor();
     em.metadataStore.registerEntityTypeCtor("Customer", Customer);
     const customerKeyName = TestFns.wellKnownData.keyNames.customer;
 
@@ -74,7 +74,7 @@ describe("Entity operations - no server", () => {
 
   test("new instead of createEntity w/o entityAspect", function () {
     const em = TestFns.newEntityManager(MetadataStore.importMetadata(TestFns.sampleMetadata));
-    const Customer = getCustomerCtor();
+    const Customer = TestFns.getCustomerCtor();
     em.metadataStore.registerEntityTypeCtor("Customer", Customer);
     const customerKeyName = TestFns.wellKnownData.keyNames.customer;
 
@@ -186,10 +186,6 @@ describe("Entity operations - no server", () => {
     expect(parentProduct.entityAspect.entityState.isAdded()).toBe(true);
   });
 
-
-
-
-
   test("create entity with non-null dates", function () {
     const em = TestFns.newEntityManager(); // new empty EntityManager
     const userType = em.metadataStore.getAsEntityType("User");
@@ -254,9 +250,6 @@ describe("Entity operations - no server", () => {
     expect(prop1).toBeTruthy();
     expect(prop1).toBe(prop2);
   });
-
-
-
 
   test("generate ids", function () {
     const orderType = TestFns.sampleMetadataStore.getAsEntityType("Order");
@@ -527,34 +520,8 @@ describe("Entity operations - no server", () => {
     expect(valid).toBe(true);
   });
 
-  function getCustomerCtor() {
-    const ctor = function () {
-      this.miscData = "asdf";
-      this.getNameLength = function () {
-        return (this.getProperty("companyName") || "").length;
-      };
-    };
-    return ctor;
-  }
-
-  // const Customer = function () {
-  //   this.miscData = "asdf";
-  //   this.getNameLength = function () {
-  //     return (this.getProperty("companyName") || "").length;
-  //   };
-  // };
-
-  // class Customer {
-  //   miscData: string;
-  //   constructor() {
-  //     this.miscData = "asdf";
-  //   }
-
-  //   getNameLength() {
-  //     return ((this as any).getProperty("companyName") || "").length;
-  //   }
-  // }
-
+  
+  
   function assertFooPropertyDefined(metadataStore: MetadataStore, shouldBe: boolean) {
     const custType = metadataStore.getAsEntityType("Customer");
     const fooProp = custType.getDataProperty('foo');

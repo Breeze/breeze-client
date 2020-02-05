@@ -37,7 +37,7 @@ describe("Entity Materialization", () => {
     expect.hasAssertions();
     const em = TestFns.newEntityManager(new MetadataStore());
 
-    const Customer = TestFns.CustomerWithES5Props();
+    const Customer = TestFns.getCustomerWithES5PropsCtor();
     Customer.prototype.getNameLength = function () {
       return (this.getProperty("companyName") || "").length;
     };
@@ -116,7 +116,7 @@ describe("Entity Materialization", () => {
   test("custom Customer type with ES5 props and new", async function () {
     expect.hasAssertions();
     const em = TestFns.newEntityManager(new MetadataStore());
-    const Customer = TestFns.CustomerWithES5Props();
+    const Customer = TestFns.getCustomerWithES5PropsCtor();
     Customer.prototype.getNameLength = function () {
       return (this.getProperty("companyName") || "").length;
     };
@@ -146,7 +146,7 @@ describe("Entity Materialization", () => {
   test("custom Customer type with ES5 proand and new - v2", async function () {
     expect.hasAssertions();
     const em = TestFns.newEntityManager(new MetadataStore());
-    const Customer = TestFns.CustomerWithES5Props();
+    const Customer = TestFns.getCustomerWithES5PropsCtor();
     Customer.prototype.getNameLength = function () {
       return (this.getProperty("companyName") || "").length;
     };
@@ -199,7 +199,7 @@ describe("Entity Materialization", () => {
     expect.hasAssertions();
     // use a different metadata store for this em - so we don't polute other tests
     const em1 = TestFns.newEntityManager(new MetadataStore());
-    const Customer = TestFns.CustomerWithES5Props();
+    const Customer = TestFns.getCustomerWithES5PropsCtor();
     em1.metadataStore.registerEntityTypeCtor("Customer", Customer);
     const qr1 = await em1.executeQuery(newCustomerQuery());
     // use a different metadata store for this em - so we don't polute other tests

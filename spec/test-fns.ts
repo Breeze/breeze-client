@@ -154,9 +154,19 @@ export class TestFns extends UtilFns {
     }
     return em;
   }
+
+  static getCustomerCtor() {
+    const ctor = function () {
+      this.miscData = "asdf";
+      this.getNameLength = function () {
+        return (this.getProperty("companyName") || "").length;
+      };
+    };
+    return ctor;
+  }
   
 
-  static CustomerWithES5Props() {
+  static getCustomerWithES5PropsCtor() {
     const ctor = function () {    };
     TestFns.createES5Props(ctor.prototype);
     return ctor;

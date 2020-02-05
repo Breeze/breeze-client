@@ -1265,7 +1265,7 @@ describe("EntityManager - no server", () => {
   test("rejectChanges with ES5 props", function () {
     expect.hasAssertions();
     const em1 = TestFns.newEntityManager(MetadataStore.importMetadata(TestFns.sampleMetadata));
-    const Customer = TestFns.CustomerWithES5Props();
+    const Customer = TestFns.getCustomerWithES5PropsCtor();
     em1.metadataStore.registerEntityTypeCtor("Customer", Customer);
 
     const custType = em1.metadataStore.getAsEntityType("Customer");
