@@ -41,6 +41,7 @@ export interface MetadataStoreConfig {
   /** The  [[LocalQueryComparisonOptions]] associated with this MetadataStore. */
   localQueryComparisonOptions?: LocalQueryComparisonOptions;
   serializerFn?: (prop: EntityProperty, val: any) => any;
+  name?: string;
 }
 
 export interface MetadataFetchedEventArgs {

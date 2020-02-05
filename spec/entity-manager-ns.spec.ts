@@ -1245,12 +1245,11 @@ describe("EntityManager - no server", () => {
     expect(lastArgs.entity.entityAspect.entityState.isUnchanged()).toBe(true);
   });
 
-  test("rejectChanges on unmapped property", async function () {
+  test("rejectChanges on unmapped property", function () {
     expect.hasAssertions();
     const em1 = TestFns.newEntityManager(MetadataStore.importMetadata(TestFns.sampleMetadata));
     em1.metadataStore.registerEntityTypeCtor("Customer", Customer);
 
-    await em1.fetchMetadata();
     const custType = em1.metadataStore.getAsEntityType("Customer");
     const cust = custType.createEntity();
     em1.addEntity(cust);
@@ -1263,25 +1262,24 @@ describe("EntityManager - no server", () => {
     expect(miscData).toBe('zzz');
   });
 
-  test("rejectChanges with ES5 props", async function () {
+  test("rejectChanges with ES5 props", function () {
     expect.hasAssertions();
     const em1 = TestFns.newEntityManager(MetadataStore.importMetadata(TestFns.sampleMetadata));
     const Customer = TestFns.CustomerWithES5Props();
     em1.metadataStore.registerEntityTypeCtor("Customer", Customer);
 
-    await em1.fetchMetadata();
     const custType = em1.metadataStore.getAsEntityType("Customer");
     const cust = custType.createEntity();
     em1.addEntity(cust);
     cust.setProperty("companyName", "foo2");
-    const companyName = cust.getProperty("companyName");
+    let companyName = cust.getProperty("companyName");
     expect(companyName).toBe("FOO2");
     cust.entityAspect.acceptChanges();
     cust.setProperty("companyName", "foo3");
-    const companyName_1 = cust.getProperty("companyName");
+    companyName = cust.getProperty("companyName");
     expect(companyName).toBe("FOO3");
     cust.entityAspect.rejectChanges();
-    const companyName_2 = cust.getProperty("companyName");
+    companyName = cust.getProperty("companyName");
     expect(companyName).toBe('FOO2');
   });
 

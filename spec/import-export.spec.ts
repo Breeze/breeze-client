@@ -450,6 +450,136 @@ describe("EntityManager import/export", () => {
     expect(deletedOrders.length).toBe(0);
   });
 
+  test("unmapped import export", function () {
+    // use a different metadata store for this em - so we don't polute other tests
+
+    const em1 = TestFns.newEntityManager(MetadataStore.importMetadata(TestFns.sampleMetadata));
+    const Customer = function () {
+      this.miscData = "asdf";
+    };
+    em1.metadataStore.registerEntityTypeCtor("Customer", Customer);
+
+    const custType = em1.metadataStore.getAsEntityType("Customer");
+    const cust = custType.createEntity();
+    em1.addEntity(cust);
+    cust.setProperty("companyName", "foo2");
+    cust.setProperty("miscData", "zzz");
+    const bundle = em1.exportEntities();
+    const em2 = TestFns.newEntityManager(em1.metadataStore);
+    em2.importEntities(bundle);
+    const entities = em2.getEntities();
+    expect(entities.length).toBe(1);
+    const sameCust = entities[0];
+    const cname = sameCust.getProperty("companyName");
+    expect(cname).toBe("foo2");
+    const miscData = sameCust.getProperty("miscData");
+    expect(miscData).toBe("zzz");
+  });
+
+  test("unmapped import export unmapped suppressed", function () {
+    // use a different metadata store for this em - so we don't polute other tests
+    const em1 = TestFns.newEntityManager(MetadataStore.importMetadata(TestFns.sampleMetadata));
+    const Customer = function () {
+      this.miscData = "asdf";
+    };
+    em1.metadataStore.registerEntityTypeCtor("Customer", Customer);
+
+    const custType = em1.metadataStore.getAsEntityType("Customer");
+    const cust = custType.createEntity();
+    em1.addEntity(cust);
+    cust.setProperty("companyName", "foo2");
+    cust.setProperty("miscData", "zzz");
+    em1.metadataStore.setProperties({
+      serializerFn: function (dp, value) {
+        return dp.isUnmapped ? undefined : value;
+      }
+    });
+    const bundle = em1.exportEntities(null, { includeMetadata: false });
+
+    const em2 = TestFns.newEntityManager(em1.metadataStore);
+    em2.importEntities(bundle);
+
+    const entities = em2.getEntities();
+    expect(entities.length).toBe(1);
+    const sameCust = entities[0];
+    const cname = sameCust.getProperty("companyName");
+    expect(cname).toBe("foo2");
+    const miscData = sameCust.getProperty("miscData");
+    expect(miscData).toBeNull();
+
+  });
+
+  test("unmapped import export version mismatch", function () {
+
+    // use a different metadata store for this em - so we don't polute other tests
+    const em1 = TestFns.newEntityManager(MetadataStore.importMetadata(TestFns.sampleMetadata));
+    const Customer = function () {
+      this.miscData = "asdf";
+    };
+    em1.metadataStore.registerEntityTypeCtor("Customer", Customer);
+
+    const custType = em1.metadataStore.getAsEntityType("Customer");
+    const cust = custType.createEntity();
+    em1.addEntity(cust);
+    cust.setProperty("companyName", "foo2");
+    cust.setProperty("miscData", "zzz");
+    em1.metadataStore.setProperties({
+      name: "version 1.1"
+    });
+    const bundle = em1.exportEntities(null, { includeMetadata: false });
+    const em2 = TestFns.newEntityManager(em1.metadataStore);
+    try {
+      em2.importEntities(bundle, {
+        metadataVersionFn: function (cfg) {
+          if (em2.metadataStore.name !== cfg.metadataStoreName) {
+            throw new Error("bad version");
+          }
+        }
+      });
+
+      em1.metadataStore.setProperties({
+        name: "version 1.2"
+      });
+
+      em2.importEntities(bundle, {
+        metadataVersionFn: function (cfg) {
+          if (em2.metadataStore.name !== cfg.metadataStoreName) {
+            throw new Error("bad version 2");
+          }
+        }
+      });
+      throw new Error('should not get here');
+    } catch (e) {
+      expect(e.message).toMatch(/bad version 2/);
+    }
+
+  });
+
+  test("unmapped import export with ES5 props", function () {
+    // use a different metadata store for this em - so we don't polute other tests
+    const em1 = TestFns.newEntityManager(MetadataStore.importMetadata(TestFns.sampleMetadata));
+    const Customer = TestFns.CustomerWithES5Props();
+    em1.metadataStore.registerEntityTypeCtor("Customer", Customer);
+
+    const custType = em1.metadataStore.getAsEntityType("Customer");
+    const cust = custType.createEntity();
+    em1.addEntity(cust);
+    cust.setProperty("companyName", "foo2");
+    const cname = cust.getProperty("companyName");
+    expect(cname).toBe("FOO2");
+    cust.setProperty("miscData", "zzz");
+    const bundle = em1.exportEntities();
+    const em2 = TestFns.newEntityManager(em1.metadataStore);
+    em2.importEntities(bundle);
+    const entities = em2.getEntities();
+    expect(entities.length).toBe(1);
+    const sameCust = entities[0];
+    const cname2 = sameCust.getProperty("companyName");
+    expect(cname2).toBe("FOO2");
+    const miscData = sameCust.getProperty("miscData");
+    expect(miscData).toBe("zzz");
+  });
+
 
   test("export/import with custom metadata", function () {
     const jsonMetadata = {
