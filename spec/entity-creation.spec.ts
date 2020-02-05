@@ -8,7 +8,7 @@ beforeAll(async () => {
 
 });
 
-describe("Entity Materialization", () => {
+describe("Entity Creation", () => {
 
   beforeEach(function () {
 
@@ -17,7 +17,7 @@ describe("Entity Materialization", () => {
   test("createEntity with custom Customer type", async function () {
     expect.hasAssertions();
     const em = TestFns.newEntityManager(new MetadataStore());
-    let Customer = getCustomerJsCtor();
+    let Customer = TestFns.getCustomerCtor();
     em.metadataStore.registerEntityTypeCtor("Customer", Customer);
 
     await em.fetchMetadata();
@@ -69,7 +69,7 @@ describe("Entity Materialization", () => {
     //     return (this.getProperty("companyName") || "").length;
     //   };
     // });
-    let Customer = getCustomerJsCtor();
+    let Customer = TestFns.getCustomerCtor();
 
     em.metadataStore.registerEntityTypeCtor("Customer", Customer);
 
@@ -95,7 +95,7 @@ describe("Entity Materialization", () => {
     await em.fetchMetadata();
 
     // register after fetchMetadata
-    let Customer = getCustomerJsCtor();
+    let Customer = TestFns.getCustomerCtor();
     em.metadataStore.registerEntityTypeCtor("Customer", Customer);
 
     const custType = em.metadataStore.getEntityType("Customer");
@@ -185,7 +185,7 @@ describe("Entity Materialization", () => {
     expect.hasAssertions();
     // use a different metadata store for this em - so we don't polute other tests
     const em1 = TestFns.newEntityManager(new MetadataStore());
-    let Customer = getCustomerJsCtor();
+    let Customer = TestFns.getCustomerCtor();
     em1.metadataStore.registerEntityTypeCtor("Customer", Customer);
     const qr1 = await em1.executeQuery(newCustomerQuery());
 
@@ -211,6 +211,8 @@ describe("Entity Materialization", () => {
     expect(custName.toUpperCase()).toBe(custName);
     testEntityState(cust, true);
   });
+
+  
 
   test("post create init after materialization", async () => {
     expect.hasAssertions();
@@ -271,27 +273,6 @@ describe("Entity Materialization", () => {
     expect(dt.getTime()).toBe(sameDt.getTime());
   });
 
-
-  function getCustomerJsCtor() {
-    const Customer = function () {
-      this.miscData = "asdf";
-      this.getNameLength = function () {
-        return (this.getProperty("companyName") || "").length;
-      };
-    };
-    return Customer;
-  }
-
-  // class Customer {
-  //   miscData: string;
-  //   constructor() {
-  //     this.miscData = "asdf";
-  //   }
-
-  //   getNameLength() {
-  //     return ((this as any).getProperty("companyName") || "").length;
-  //   }
-  // }
 
   function newCustomerQuery() {
     return new EntityQuery()

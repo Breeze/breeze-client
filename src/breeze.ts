@@ -8,7 +8,7 @@ import { ComplexArray } from './complex-array';
 import { DataService, DataServiceConfig, JsonResultsAdapter, JsonResultsAdapterConfig, NodeContext } from './data-service';
 import { DataType  } from './data-type';
 import { EntityAction } from './entity-action';
-import { EntityAspect, ComplexAspect, Entity, StructuralObject } from './entity-aspect';
+import { EntityAspect, ComplexAspect, Entity, StructuralObject, PropertyChangedEventArgs } from './entity-aspect';
 import { EntityKey } from './entity-key';
 import { EntityManager, EntityManagerConfig, EntityError, EntityChangedEventArgs, SaveContext, SaveBundle, HttpResponse, KeyMapping, ServerError, SaveResult, QueryResult } from './entity-manager';
 import { EntityQuery, FilterQueryOp, BooleanQueryOp, OrderByClause, ExpandClause, SelectClause } from './entity-query';
@@ -30,6 +30,7 @@ import { core } from './core';
 import { makeRelationArray, makePrimitiveArray, makeComplexArray } from './array';
 
 import { RelationArray } from './relation-array';
+import { ArrayChangedArgs } from './observable-array';
 export { BreezeConfig, ComplexArray, RelationArray };
 
 export {
@@ -55,6 +56,8 @@ export {
   EntityManager,
   EntityManagerConfig,
   EntityChangedEventArgs,
+  PropertyChangedEventArgs,
+  ArrayChangedArgs,
   EntityProperty,
   EntityQuery,
   EntityState,

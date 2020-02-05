@@ -15,7 +15,7 @@ export interface ObservableArray {
   length: number;
   
   getEntityAspect: () => EntityAspect;
-  arrayChanged: BreezeEvent<ObservableArrayChangedArgs>;
+  arrayChanged: BreezeEvent<ArrayChangedArgs>;
   parent?: Object;
   parentProperty?: DataProperty;
   _getEventParent: () => Object;
@@ -27,7 +27,7 @@ export interface ObservableArray {
   _pendingArgs: any;
 }
 
-export interface ObservableArrayChangedArgs {
+export interface ArrayChangedArgs {
   array: any[];
   added?: any[]; 
   removed?: any[];

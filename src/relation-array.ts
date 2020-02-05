@@ -9,7 +9,6 @@ import { QuerySuccessCallback, QueryErrorCallback, QueryResult } from './entity-
 
 // TODO: mixin impl is not very typesafe
 
-/** @hidden */
 export interface RelationArray extends ObservableArray {
   [index: number]: Entity;
   parentEntity: Entity;

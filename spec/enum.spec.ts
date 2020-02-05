@@ -1,5 +1,5 @@
 // import { BreezeEnum } from '../src/enum';
-import { BreezeEnum } from 'breeze-client';
+import { BreezeEnum, EntityAction, EntityState, assertParam } from 'breeze-client';
 
 
 class DayOfWeek extends BreezeEnum {
@@ -20,22 +20,13 @@ class DayOfWeek extends BreezeEnum {
 
 }
 
-class EntityState extends BreezeEnum {
-  isGood: boolean;
-  static Added = new EntityState({ isGood: true });
-  static Modified = new EntityState({ isGood: true });
-  static Deleted = new EntityState({ isGood: false });
-}
-
-
 describe("Breeze Enums", () => {
 
    test("should support full enum capabilities", () => {
     // // custom methods
       let dowSymbols = DayOfWeek.getSymbols();
-      let esSymbols = EntityState.getSymbols();
       expect(dowSymbols.length).toBe(7);
-      expect(esSymbols.length).toBe(3);
+      
       expect(DayOfWeek.Monday.nextDay()).toBe(DayOfWeek.Tuesday);
       expect(DayOfWeek.Sunday.nextDay()).toBe(DayOfWeek.Monday);
     // // custom properties
@@ -49,6 +40,38 @@ describe("Breeze Enums", () => {
       expect(json._$typeName).toBe('DayOfWeek');
 
       expect(DayOfWeek.Friday.toString()).toBe("Friday");
+    });
+
+    test("EntityAction - should have static members", () => {
+      expect(EntityAction.contains(EntityAction.Attach));
+      // expect(EntityAction.name).toBe("EntityAction");
+      expect(EntityAction.Attach.name).toBe("Attach");
+      expect(EntityAction.Attach instanceof EntityAction);
+      expect(EntityAction.Attach.isAttach()).toBe(true);
+      expect(EntityAction.Attach.isDetach()).toBe(false);
+      expect(EntityAction.Detach.isAttach()).toBe(false);
+      expect(EntityAction.Detach.isDetach()).toBe(true);
+    });
+
+    test("EntityState - should have static members", () => {
+      expect(EntityState.contains(EntityState.Modified));
+      expect(EntityState.fromName('Added')).toBe(EntityState.Added);
+      let est = EntityState;
+      let nm = est.Added.name;
+      if (nm == null) {
+        fail("should not get here");
+      }
+      expect(EntityState.Added.name).toBe("Added");
+      expect(EntityState.Added instanceof EntityState).toBe(true);
+      expect(EntityState.Added.constructor).toBe(EntityState);
+      let es = EntityState.Detached;
+      assertParam(es, "entityState").isEnumOf(EntityState).check();
+      try {
+        assertParam(es, "entityState").isEnumOf(EntityAction).check();
+        fail("should not get here");
+      } catch (e) {
+        // should get here
+      }
     });
 
 });

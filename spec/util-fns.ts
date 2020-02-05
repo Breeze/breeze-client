@@ -1,5 +1,7 @@
 import { Entity, DataType, core } from 'breeze-client';
 
+export type JsonObj = {[k: string]: any};
+
 export class UtilFns {
 
   static containSameItems(a1: any[], a2: any[]) {

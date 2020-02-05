@@ -8,7 +8,7 @@ beforeAll(async () => {
 
 });
 
-describe("Entity Manager", () => {
+describe("Entity Operations", () => {
 
   beforeEach(function () {
 
