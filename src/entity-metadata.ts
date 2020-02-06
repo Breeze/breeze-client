@@ -310,7 +310,9 @@ export class MetadataStore {
   importMetadata(exportedMetadata: string | Object, allowMerge: boolean = false) {
     assertParam(allowMerge, "allowMerge").isOptional().isBoolean().check();
     this._deferredTypes = {};
-    let metadataJson = (typeof (exportedMetadata) === "string") ? JSON.parse(exportedMetadata) : exportedMetadata;
+    // insure that we don't mutate incoming exportedMetadata ( if its an object)
+    let metadataAsString = (typeof (exportedMetadata) === "string") ? exportedMetadata : JSON.stringify(exportedMetadata);
+    const metadataJson = JSON.parse(metadataAsString);
 
     if (metadataJson.schema) {
       return CsdlMetadataParser.parse(this, metadataJson.schema, metadataJson.altMetadata);

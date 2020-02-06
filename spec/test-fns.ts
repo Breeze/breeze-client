@@ -31,7 +31,7 @@ export class TestFns extends UtilFns {
   
   static metadataStoreIsBeingFetched: boolean;
 
-  static sampleMetadata = northwindIBMetadata;
+  static sampleMetadata: string;
   static sampleMetadataStore = TestFns.initSampleMetadataStore();  
   
   static isODataServer: boolean;
@@ -100,12 +100,6 @@ export class TestFns extends UtilFns {
 
   private static initBrowserShims() {
     global['fetch'] = require('node-fetch');
-    // const LocalStorage = require('node-localstorage').LocalStorage;
-    // global['localStorage'] = new LocalStorage('./scratch');
-    // if (typeof localStorage === "undefined" || localStorage === null) {
-    //   const LocalStorage = require('node-localstorage').LocalStorage;
-    //   global['localStorage'] = new LocalStorage('./scratch');
-    // }
   }
 
   private static initAdapters() {
@@ -135,6 +129,8 @@ export class TestFns extends UtilFns {
     if (TestFns.sampleMetadataStore == null) {
       let ms = new MetadataStore();
       ModelLibraryBackingStoreAdapter.register();
+      // Import is faster with a string than with an already created object.
+      TestFns.sampleMetadata = JSON.stringify(northwindIBMetadata);
       ms.importMetadata(TestFns.sampleMetadata);
       TestFns.sampleMetadataStore = ms;
     }

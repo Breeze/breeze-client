@@ -9,8 +9,10 @@ import { ModelLibraryBackingStoreAdapter } from 'breeze-client/adapter-model-lib
 import 'breeze-client/mixin-get-entity-graph';
 import { HasEntityGraph } from 'breeze-client/mixin-get-entity-graph';
 
+import { TestFns } from './test-fns';
+
 ModelLibraryBackingStoreAdapter.register();
-const metadata = require('./support/NorthwindIBMetadata.json');
+
 
 // TODO migrate tests from https://github.com/Breeze/breeze.js.samples/blob/master/net/DocCode/DocCode/tests/getEntityGraphTests.js
 describe("GetEntityGraph", () => {
@@ -21,7 +23,7 @@ describe("GetEntityGraph", () => {
   test("should graph Order expand Customer", () => {
     let em = new EntityManager('test');
     let ms = em.metadataStore;
-    ms.importMetadata(metadata);
+    ms.importMetadata(TestFns.sampleMetadata);
 
     let customer = em.createEntity("Customer", { companyName: "ACME"});
     expect(customer).toBeTruthy();
@@ -38,7 +40,7 @@ describe("GetEntityGraph", () => {
   test("should graph Customer expand Orders", () => {
     let em = new EntityManager('test');
     let ms = em.metadataStore;
-    ms.importMetadata(metadata);
+    ms.importMetadata(TestFns.sampleMetadata);
 
     let customer = em.createEntity("Customer", { companyName: "ACME"});
     expect(customer).toBeTruthy();

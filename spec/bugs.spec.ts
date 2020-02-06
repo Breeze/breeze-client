@@ -1,8 +1,6 @@
 import { Entity, EntityQuery, EntityType, MetadataStore, Predicate, breeze, MergeStrategy, EntityState } from 'breeze-client';
 import { TestFns, skipTestIf } from './test-fns';
 
-const metadata = require('./support/NorthwindIBMetadata.json');
-
 TestFns.initServerEnv();
 
 beforeAll(async () => {
