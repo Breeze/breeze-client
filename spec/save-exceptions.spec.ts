@@ -401,7 +401,9 @@ describe("EntityManager Save Sync", () => {
     });
 
   //TestFns.skipIf("sequelize,hibernate", " is unsupported because MySQL does not support millisecond resolution").
-  test("custom data annotation validation", async function () {
+  // ASP Core is skipped because it does not do server validations 
+  skipTestIf(TestFns.isAspCoreServer)
+  ("custom data annotation validation", async function () {
     expect.hasAssertions();
 
     // This test will fail currently with the DATABASEFIRST_OLD define.
@@ -420,7 +422,7 @@ describe("EntityManager Save Sync", () => {
       cust1.setProperty("contactName", newRegion);
       await em.saveChanges();
 
-      throw new Error("should not get here - except with DATABASEFIRST_OLD");
+      throw new Error("should not get here - except with servers that do not perform validation");
     } catch (error) {
       expect(error.entityErrors.length).toBe(1);
       expect(error.entityErrors[0].errorMessage).toMatch(/the word 'Error'/);
@@ -489,9 +491,12 @@ describe("EntityManager Save Sync", () => {
       throw new Error('should not get here');
     } catch (error) {
       expect(em.hasChanges()).toBeTrue();
-      const exceptionType = error.detail.ExceptionType.toLowerCase();
-      expect((exceptionType.indexOf("concurrency") >= 0
-        || exceptionType.indexOf("staleobjectstate") >= 0)).toBeTrue();
+      if (TestFns.isAspCoreServer) {
+        expect(error.message).toMatch(/optimistic concurrency/);
+      } else {
+        // expect(error.message).toMatch(/staleobjectstate/);
+        throw new Error('need to determine correct error message for this server type');
+      }
     }
   });
 

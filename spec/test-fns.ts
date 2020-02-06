@@ -24,7 +24,6 @@ export class TestFns extends UtilFns {
   static defaultServerEnvName = "ASPCORE";
   // static currentServerEnvName = "SEQUELIZE";
   // static currentServerEnvName = "HIBERNATE";
-  // static currentServerEnvName = "MONGO";
 
   static serverEnvName: string;
   static defaultServiceName: string;
@@ -63,14 +62,11 @@ export class TestFns extends UtilFns {
     }
   };
 
-  
-
   static initNonServerEnv() {
     TestFns.serverEnvName = "NO SERVER";
     TestFns.calcServerTypes(TestFns.serverEnvName);
     TestFns.initBrowserShims();
     TestFns.initAdapters();
-    
   }
 
   static initServerEnv(serverEnvName?: string) {

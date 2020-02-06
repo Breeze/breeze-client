@@ -147,11 +147,11 @@ describe("EntityManager import/export", () => {
     const changes = em.getChanges();
     const changesExport = em.exportEntities(changes, {includeMetadata: false});
     const LocalStorage = require('node-localstorage').LocalStorage;
-    const localStorage = new LocalStorage('./scratch');
+    const localStorage = new LocalStorage('./support');
 
     expect(localStorage).toBeTruthy();
 
-    const stashName = "stash_newTodos";
+    const stashName = "import-export-test-stash";
     localStorage.setItem(stashName, changesExport as string);
 
     em.clear();
