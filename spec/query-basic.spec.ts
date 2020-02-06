@@ -3,10 +3,6 @@ import { skipTestIf, TestFns, expectPass } from './test-fns';
 
 TestFns.initServerEnv();
 
-function ok(a: any, b?: any) {
-  throw new Error('for test conversion purposes');
-}
-
 beforeAll(async () => {
   await TestFns.initDefaultMetadataStore();
 });

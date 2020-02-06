@@ -188,6 +188,17 @@ export interface EntityChangedEventArgs {
   args?: PropertyChangedEventArgs;
 }
 
+export interface ValidationErrorsChangedEventArgs {
+  entity: Entity; 
+  added: ValidationError[]; 
+  removed: ValidationError[];
+}
+
+export interface HasChangesChangedEventArgs {
+  entityManager: EntityManager; 
+  hasChanges: boolean;
+}
+
 /**
 Instances of the EntityManager contain and manage collections of entities, either retrieved from a backend datastore or created on the client.
 **/
@@ -256,7 +267,7 @@ export class EntityManager {
   >      });
   @event
   **/
-  validationErrorsChanged: BreezeEvent<{ entity: Entity; added: ValidationError[]; removed: ValidationError[]; }>;
+  validationErrorsChanged: BreezeEvent<ValidationErrorsChangedEventArgs>;
 
   /**
   A [[BreezeEvent]] that fires whenever an EntityManager transitions to or from having changes. __Read Only__
@@ -272,7 +283,7 @@ export class EntityManager {
   >      });
   @event 
   **/
-  hasChangesChanged: BreezeEvent<{ entityManager: EntityManager; hasChanges: boolean }>;
+  hasChangesChanged: BreezeEvent<HasChangesChangedEventArgs>;
 
 
   /** @hidden @internal */

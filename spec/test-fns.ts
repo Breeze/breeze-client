@@ -33,6 +33,9 @@ export class TestFns extends UtilFns {
 
   static sampleMetadata: string;
   static sampleMetadataStore = TestFns.initSampleMetadataStore();  
+
+  static defaultMetadata: string;
+  static defaultMetadataStore: MetadataStore;
   
   static isODataServer: boolean;
   static isMongoServer: boolean;
@@ -60,7 +63,7 @@ export class TestFns extends UtilFns {
     }
   };
 
-  private static defaultMetadataStore: MetadataStore;
+  
 
   static initNonServerEnv() {
     TestFns.serverEnvName = "NO SERVER";
@@ -119,7 +122,8 @@ export class TestFns extends UtilFns {
   static async initDefaultMetadataStore() {
     if (TestFns.defaultMetadataStore == null) {
       const ms = new MetadataStore();
-      const x = await ms.fetchMetadata(TestFns.defaultServiceName);
+      await ms.fetchMetadata(TestFns.defaultServiceName);
+      TestFns.defaultMetadata = ms.exportMetadata();
       TestFns.defaultMetadataStore = ms;  
     }
     return TestFns.defaultMetadataStore;

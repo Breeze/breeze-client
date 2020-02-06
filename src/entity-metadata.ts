@@ -1929,7 +1929,7 @@ export class ComplexType {
   @param config - Custom config object
   @param config.custom - {Object}
   **/
-  setProperties(config: { custom: Object }) {
+  setProperties(config: { custom?: Object }) {
     assertConfig(config)
       .whereParam("custom").isOptional()
       .applyAll(this);
