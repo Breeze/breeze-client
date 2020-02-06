@@ -1,11 +1,15 @@
-import { Entity, EntityQuery, EntityType, MetadataStore, EntityChangedEventArgs, EntityAction, MergeStrategy, QueryOptions, FetchStrategy, EntityManager } from 'breeze-client';
-import { TestFns } from './test-fns';
+import { Entity, EntityQuery, EntityType, MetadataStore, EntityChangedEventArgs, EntityAction, MergeStrategy, QueryOptions, FetchStrategy, EntityManager, SaveOptions, ValidationErrorsChangedEventArgs } from 'breeze-client';
+import { TestFns, JsonObj, skipTestIf } from './test-fns';
+import { SaveTestFns } from './save-test-fns';
 
 TestFns.initServerEnv();
 
 beforeAll(async () => {
   await TestFns.initDefaultMetadataStore();
+});
 
+afterAll( async () => {
+  await SaveTestFns.cleanup();
 });
 
 // NOTE: Promises and async 'done' are DELIBERATELY used in this test file.  Do not try to convert to 'await'.
@@ -16,8 +20,8 @@ describe("EntityManager Save Sync", () => {
   beforeEach(function () {
 
   });
- 
-  
+
+
   test("should throw when delete saved added entity (store-gen key) before server save response", async function (done) {
     expect.assertions(7);
     // Fails D#2649 "Internal Error in key fixup - unable to locate entity"
@@ -39,7 +43,7 @@ describe("EntityManager Save Sync", () => {
     }).catch(function (e) {
       throw new Error('should not get here');
     }).finally(done);
-      
+
 
     // try to delete the 2nd new employee before save can return;
     try {
@@ -71,7 +75,7 @@ describe("EntityManager Save Sync", () => {
     }).catch(function (e) {
       throw new Error('should not get here');
     }).finally(done);
-    
+
     // try to detach the added entity before save can return;
     try {
       em.detachEntity(emp1);
@@ -108,7 +112,7 @@ describe("EntityManager Save Sync", () => {
     } catch (error) {
       // hope to trap error when call em.rejectChanges on added entity that is being saved.
       expect(error.message).toMatch(/in the process of being saved/);
-      
+
     }
   });
 
@@ -124,7 +128,7 @@ describe("EntityManager Save Sync", () => {
     }).catch(function (e) {
       throw new Error('should not get here');
     }).finally(done);
-      
+
 
     // try to clear the manager before save can return;
     try {
@@ -132,7 +136,7 @@ describe("EntityManager Save Sync", () => {
     } catch (error) {
       // hope to trap error when call em.clear() when an added entity is being saved.
       expect(error.message).toMatch(/in the process of being saved/);
-      
+
     }
   });
 
@@ -179,7 +183,7 @@ describe("EntityManager Save Sync", () => {
       expect(emp1.entityAspect.entityState.isUnchanged()).toBe(true);
       expect(emp1.getProperty('firstName')).toBe('Test fn1');
     }).finally(done);
-    
+
     // modify it while save is in-flight
     emp1.setProperty('firstName', 'Test fn1 mod');
   });
@@ -204,7 +208,7 @@ describe("EntityManager Save Sync", () => {
       expect(emp1.entityAspect.entityState.isUnchanged()).toBe(true);
       expect(emp1.getProperty('firstName')).toBe('Test fn1 mod1');
     }).finally(done);
-    
+
   });
 
   // This test passes when the server returns the whole saved entity
@@ -229,7 +233,7 @@ describe("EntityManager Save Sync", () => {
       expect(emp1.entityAspect.entityState.isUnchanged()).toBe(true);
       expect(emp1.getProperty('lastName')).toBe('Test ln1');
     }).finally(done);
-    
+
   });
 
 
@@ -252,6 +256,270 @@ describe("EntityManager Save Sync", () => {
 
   });
 
-  
+  //TestFns.skipIf("odata", "does not support server interception or alt resources").
+  test("adds with EntityErrorsException", async function () {
+    expect.hasAssertions();
+    const em = TestFns.newEntityManager();
+    const zzz = SaveTestFns.createParentAndChildren(em);
+    const cust1 = zzz.cust1;
+    const so = new SaveOptions({ resourceName: "SaveWithEntityErrorsException", tag: "entityErrorsException" });
+    const order1ValErrorsChangedArgs: ValidationErrorsChangedEventArgs[] = [];
+    zzz.order1.entityAspect.validationErrorsChanged.subscribe(function (e: ValidationErrorsChangedEventArgs) {
+      order1ValErrorsChangedArgs.push(e);
+    });
+
+    try {
+      await em.saveChanges(null, so);
+      throw new Error("should not get here");
+
+    } catch (e) {
+      expect(e.message).toMatch(/test of custom exception message/);
+      expect(order1ValErrorsChangedArgs.length).toBe(1);
+      expect(order1ValErrorsChangedArgs[0].added.length).toBe(1);
+      expect(order1ValErrorsChangedArgs[0].removed.length).toBe(0);
+      expect(e.entityErrors.length).toBe(2);
+      expect(zzz.order1.entityAspect.getValidationErrors().length).toBe(1);
+      const order2Errs = zzz.order2.entityAspect.getValidationErrors();
+      expect(order2Errs.length).toBe(1);
+      expect(order2Errs[0].propertyName).toBe("orderID");
+      // now save it properly
+      order1ValErrorsChangedArgs.length = 0;
+
+      const sr = await em.saveChanges();
+
+      expect(sr.entities.length).toBe(4);
+      expect(order1ValErrorsChangedArgs.length).toBe(1);
+      expect(order1ValErrorsChangedArgs[0].added.length).toBe(0);
+      expect(order1ValErrorsChangedArgs[0].removed.length).toBe(1);
+    }
+
+  });
+
+  test("mods with EntityErrorsException", async function () {
+    expect.hasAssertions();
+
+    const em = TestFns.newEntityManager();
+    const zzz = SaveTestFns.createParentAndChildren(em);
+    const cust1 = zzz.cust1;
+
+    try {
+      const sr = await em.saveChanges();
+      zzz.cust1.setProperty("contactName", "foo");
+      zzz.cust2.setProperty("contactName", "foo");
+      zzz.order1.setProperty("freight", 888.11);
+      zzz.order2.setProperty("freight", 888.11);
+      expect(zzz.cust1.entityAspect.entityState.isModified()).toBe(true);
+      expect(zzz.order1.entityAspect.entityState.isModified()).toBe(true);
+      const so = new SaveOptions({ resourceName: "SaveWithEntityErrorsException", tag: "entityErrorsException" });
+      await em.saveChanges(null, so);
+      throw new Error("should not get here");
+    } catch (e) {
+      expect(e.message).toBe("test of custom exception message");
+      expect(e.entityErrors.length).toBe(2);
+      expect(zzz.order1.entityAspect.getValidationErrors().length).toBe(1);
+      const order2Errs = zzz.order2.entityAspect.getValidationErrors();
+      expect(order2Errs.length).toBe(1);
+      expect(order2Errs[0].propertyName).toBe("orderID");
+      // now save it properly
+      const sr = await em.saveChanges();
+      expect(sr.entities.length).toBe(4);
+    }
+
+  });
+
+  test("with client side validation error", async function () {
+    expect.hasAssertions();
+    const em = TestFns.newEntityManager();
+    const zzz = SaveTestFns.createParentAndChildren(em);
+    const cust1 = zzz.cust1;
+    cust1.setProperty("companyName", null);
+
+    try {
+      await em.saveChanges();
+      throw new Error("should not get here");
+    } catch (e) {
+      expect(e.entityErrors.length).toBe(1);
+      // should NOT be a server error
+      expect(e.entityErrors[0].isServerError).toBe(false);
+      const custErrors = cust1.entityAspect.getValidationErrors();
+      // error message should appear on the cust
+      expect(custErrors[0].errorMessage).toBe(e.entityErrors[0].errorMessage);
+    }
+  });
+
+  //TestFns.skipIf("odata", "does not support server interception or alt resources").
+  // skipIf("hibernate", "is not applicable because this test uses EF validation annotations")
+  skipTestIf(TestFns.isAspCoreServer)
+    ("with server side entity level validation error", async function () {
+      expect.hasAssertions();
+      const em = TestFns.newEntityManager();
+      const zzz = SaveTestFns.createParentAndChildren(em);
+      const cust1 = zzz.cust1;
+      cust1.setProperty("companyName", "error");
+
+      try {
+        await em.saveChanges();
+        throw new Error('should not get here');
+      } catch (e) {
+        expect(e.entityErrors.length).toBe(1);
+        expect(e.entityErrors[0].isServerError).toBe(true);
+        const custErrors = cust1.entityAspect.getValidationErrors();
+        // error message should appear on the cust
+        expect(custErrors[0].errorMessage).toBe(e.entityErrors[0].errorMessage);
+      }
+    });
+
+  //TestFns.skipIf("odata", "does not support server interception or alt resources").
+  // AspCore does not have server validation.
+  skipTestIf(TestFns.isAspCoreServer)
+    ("with server side entity level validation error + repeat", async function () {
+      expect.hasAssertions();
+
+      const em = TestFns.newEntityManager();
+      const zzz = SaveTestFns.createParentAndChildren(em);
+      const cust1 = zzz.cust1;
+      cust1.setProperty("companyName", "error");
+
+      try {
+        await em.saveChanges();
+        throw new Error('should not get here');
+      } catch (e) {
+        expect(e.entityErrors.length).toBe(1);
+        const custErrors = cust1.entityAspect.getValidationErrors();
+        expect(custErrors.length).toBe(1);
+        expect(custErrors[0].errorMessage).toBe(e.entityErrors[0].errorMessage);
+        try {
+          await em.saveChanges();
+          throw new Error('should not get here');
+        } catch (e2) {
+          expect(e2.entityErrors.length).toBe(1);
+          const custError = cust1.entityAspect.getValidationErrors();
+          expect(custErrors.length).toBe(1);
+          expect(custErrors[0].errorMessage).toBe(e.entityErrors[0].errorMessage);
+        }
+      }
+    });
+
+  //TestFns.skipIf("sequelize,hibernate", " is unsupported because MySQL does not support millisecond resolution").
+  test("custom data annotation validation", async function () {
+    expect.hasAssertions();
+
+    // This test will fail currently with the DATABASEFIRST_OLD define.
+    // This is because ObjectContext.SaveChanges() does not automatically validate
+    // entities. It must be done manually.
+    const em = TestFns.newEntityManager();
+    const q = new EntityQuery("Customers").skip(20).take(1).orderBy("contactName");
+
+    let cust1;
+    try {
+      const qr1 = await q.using(em).execute();
+      expect(qr1.results.length).toBe(1);
+      cust1 = qr1.results[0];
+      const region = cust1.getProperty("contactName");
+      const newRegion = region === "Error" ? "Error again" : "Error";
+      cust1.setProperty("contactName", newRegion);
+      await em.saveChanges();
+
+      throw new Error("should not get here - except with DATABASEFIRST_OLD");
+    } catch (error) {
+      expect(error.entityErrors.length).toBe(1);
+      expect(error.entityErrors[0].errorMessage).toMatch(/the word 'Error'/);
+      const custErrors = cust1.entityAspect.getValidationErrors();
+      expect(error.entityErrors[0].errorMessage).toBe(custErrors[0].errorMessage);
+    }
+  });
+
+  test("insert of existing entity", async function () {
+    expect.hasAssertions();
+    const em = TestFns.newEntityManager();
+    const em2 = TestFns.newEntityManager();
+    // need to use a resource that does NOT do autoGeneratedKeys
+    const resourceName = "OrderDetails";
+    const q = new EntityQuery()
+      .from(resourceName)
+      .take(2);
+
+    const data = await em.executeQuery(q);
+    const o = data.results[0];
+    em.detachEntity(o);
+
+    em2.addEntity(o);
+    try {
+      await em2.saveChanges();
+      throw new Error('should not get here');
+    } catch (error) {
+      expect(em2.hasChanges()).toBeTrue();
+
+      let frag;
+      if (TestFns.isSequelizeServer) {
+        frag = "SequelizeUniqueConstraintError".toLowerCase();
+      } else if (TestFns.isHibernateServer) {
+        frag = "duplicate entry";
+      } else {
+        frag = "primary key constraint";
+      }
+      expect(error.message.toLowerCase()).toInclude(frag);
+    }
+  });
+
+  test("concurrency violation", async function () {
+    expect.hasAssertions();
+    const em = TestFns.newEntityManager();
+    const em2 = TestFns.newEntityManager();
+    const q = new EntityQuery()
+      .from("Customers")
+      .take(2);
+
+    const qr1 = await em.executeQuery(q);
+    // query cust
+    const cust = qr1.results[0];
+    const q2 = EntityQuery.fromEntities(cust);
+    const qr2 = await em2.executeQuery(q2);
+    // query same cust in dif em
+    // and modify it and resave it
+    expect(qr2.results.length).toBe(1);
+    const sameCust = qr2.results[0];
+    expect(cust.entityAspect.getKey().equals(sameCust.entityAspect.getKey()));
+    TestFns.morphStringProp(sameCust, "companyName");
+    const sr2 = await em2.saveChanges();
+    TestFns.morphStringProp(cust, "companyName");
+    try {
+      // different em
+      await em.saveChanges();
+      throw new Error('should not get here');
+    } catch (error) {
+      expect(em.hasChanges()).toBeTrue();
+      const exceptionType = error.detail.ExceptionType.toLowerCase();
+      expect((exceptionType.indexOf("concurrency") >= 0
+        || exceptionType.indexOf("staleobjectstate") >= 0)).toBeTrue();
+    }
+  });
+
+  //test("concurrency violation on delete", function() {
+  //    expect.hasAssertions();
+  //    expect(false, "not yet implemented");
+  //});
+
+  test("bad save call", function () {
+    const em = TestFns.newEntityManager();
+    try {
+      // we have to cast as 'any' to allow typescript to even call this with invalid args
+      (em as any).saveChanges(null, new SaveOptions(), "adfa");
+    } catch (e) {
+      expect(e.message).toMatch(/callback/);
+    }
+    try {
+      // we have to cast as 'any' to allow typescript to even call this with invalid args
+      (em as any).saveChanges(null, "adfa");
+    } catch (e) {
+      expect(e.message).toMatch(/saveOptions/);
+    }
+    try {
+      (em as any).saveChanges("adfa");
+    } catch (e) {
+      expect(e.message).toMatch(/entities/);
+    }
+  });
+
 
 });
