@@ -21,8 +21,8 @@ export const expectPass = () => expect(true).toBe(true);
 
 export class TestFns extends UtilFns {
   // Uncomment just one
-  // static defaultServerEnvName = "ASPCORE";
-  static defaultServerEnvName = "SEQUELIZE";
+  static defaultServerEnvName = "ASPCORE";
+  // static defaultServerEnvName = "SEQUELIZE";
   // static defaultServerEnvName = "HIBERNATE";
 
   static serverEnvName: string;
@@ -102,15 +102,15 @@ export class TestFns extends UtilFns {
   }
 
   private static initAdapters() {
-    // ModelLibraryBackingStoreAdapter.register();
-    // UriBuilderJsonAdapter.register();
-    // AjaxFetchAdapter.register();
-    // DataServiceWebApiAdapter.register();
-    
-    DataServiceWebApiAdapter.register();
+    ModelLibraryBackingStoreAdapter.register();
     UriBuilderJsonAdapter.register();
     AjaxFetchAdapter.register();
-    ModelLibraryBackingStoreAdapter.register();
+    DataServiceWebApiAdapter.register();
+    
+    // DataServiceWebApiAdapter.register();
+    // UriBuilderJsonAdapter.register();
+    // AjaxFetchAdapter.register();
+    // ModelLibraryBackingStoreAdapter.register();
 
     NamingConvention.camelCase.setAsDefault();
   }

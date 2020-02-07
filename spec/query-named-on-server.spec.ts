@@ -1,5 +1,5 @@
-import { Entity, EntityQuery, EntityType, MetadataStore, Predicate, breeze, MergeStrategy, DataProperty, NavigationProperty, core, QueryOptions, EntityManager, EntityKey, FetchStrategy, EntityState, FilterQueryOp } from 'breeze-client';
-import { TestFns, skipTestIf, skipDescribeIf } from './test-fns';
+import { breeze, core, Entity, EntityKey, EntityQuery, FilterQueryOp } from 'breeze-client';
+import { skipTestIf, TestFns } from './test-fns';
 
 TestFns.initServerEnv();
 
@@ -35,12 +35,10 @@ describe("Entity Queries with named endpoints on the server", function () {
   test("withParameters using an array", async function () {
     expect.hasAssertions();
     const em = TestFns.newEntityManager();
-    const query = EntityQuery.from("SearchEmployees")
-      .withParameters({ employeeIds: [1, 4] });
-
-    const data = await em.executeQuery(query);
-    const results = data.results;
-    expect(data.results.length).toBe(2);
+    const query = EntityQuery.from("SearchEmployees").withParameters({ employeeIds: [1, 4] });
+    
+    const qr1 = await em.executeQuery(query);
+    expect(qr1.results.length).toBe(2);
   });
 
   test("withParameters using an object", async function () {
@@ -50,9 +48,9 @@ describe("Entity Queries with named endpoints on the server", function () {
     const query = EntityQuery.from("SearchCustomers")
       .withParameters({ CompanyName: "A", ContactNames: ["B", "C"], City: "Los Angeles" });
 
-    const data = await em.executeQuery(query);
-    const results = data.results;
-    expect(data.results.length).toBe(3);
+    const qr1 = await em.executeQuery(query);
+    const results = qr1.results;
+    expect(qr1.results.length).toBe(3);
   });
 
   // "aspcore", " endpoint has not yet been implemented"  
