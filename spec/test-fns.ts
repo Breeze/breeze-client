@@ -21,9 +21,9 @@ export const expectPass = () => expect(true).toBe(true);
 
 export class TestFns extends UtilFns {
   // Uncomment just one
-  static defaultServerEnvName = "ASPCORE";
-  // static currentServerEnvName = "SEQUELIZE";
-  // static currentServerEnvName = "HIBERNATE";
+  // static defaultServerEnvName = "ASPCORE";
+  static defaultServerEnvName = "SEQUELIZE";
+  // static defaultServerEnvName = "HIBERNATE";
 
   static serverEnvName: string;
   static defaultServiceName: string;
@@ -82,8 +82,8 @@ export class TestFns extends UtilFns {
 
     if (TestFns.isAspCoreServer) {
       TestFns.defaultServiceName = 'http://localhost:61552/breeze/NorthwindIBModel';
-    } else {
-
+    } else if (TestFns.isSequelizeServer) {
+      TestFns.defaultServiceName = 'http://localhost:3000/breeze/NorthwindIBModel';
     }
   }
 
