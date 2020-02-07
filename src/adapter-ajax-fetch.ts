@@ -46,11 +46,20 @@ export class AjaxFetchAdapter implements breeze.AjaxAdapter {
     };
     if (config.type !== "GET" && config.type !== "HEAD") {
       // body data type must match "Content-Type" header
-      let data = config.params || config.data;
+      // let data = config.params || config.data;
+      let data = config.data;
       if (typeof(data) !== "string") {
         data = JSON.stringify(data);
       }
       init.body = data;
+    }
+
+    let url = config.url;
+    if (!core.isEmpty(config.params)) {
+      // Hack: Not sure how Fetch handles writing 'search' parameters to the url.
+      // so this approach takes over the url param writing completely.
+      let delim = (url.indexOf('?') >= 0) ? '&' : '?';
+      url = url + delim + encodeParams(config.params);
     }
 
     if (!core.isEmpty(this.defaultSettings)) {
@@ -78,7 +87,7 @@ export class AjaxFetchAdapter implements breeze.AjaxAdapter {
     }
 
     if (requestInfo.config) { // exists unless requestInterceptor killed it.
-      fetch(config.url, requestInfo.config).then(response => {
+      fetch(url, requestInfo.config).then(response => {
         if (!response.ok) {
           response.text().then(s => {
             requestInfo.error(response.status, response.statusText, s, response, null);
@@ -91,6 +100,45 @@ export class AjaxFetchAdapter implements breeze.AjaxAdapter {
       }).catch(err => {
         requestInfo.error(0, err && err.message || err, null, null, err);
       });
+    }
+
+    function encodeParams(obj: {}) {
+      let query = '';
+      let subValue: any, innerObj: any, fullSubName: any;
+    
+      for (let name in obj) {
+        if (!obj.hasOwnProperty(name)) { continue; }
+    
+        let value = obj[name];
+    
+        if (value instanceof Array) {
+          for (let i = 0; i < value.length; ++i) {
+            subValue = value[i];
+            fullSubName = name + '[' + i + ']';
+            innerObj = {};
+            innerObj[fullSubName] = subValue;
+            query += encodeParams(innerObj) + '&';
+          }
+        } else if (value && value.toISOString) { // a feature of Date-like things
+          query += encodeURIComponent(name) + '=' + encodeURIComponent(value.toISOString()) + '&';
+        } else if (value instanceof Object) {
+          for (let subName in value) {
+            if (obj.hasOwnProperty(name)) {
+              subValue = value[subName];
+              fullSubName = name + '[' + subName + ']';
+              innerObj = {};
+              innerObj[fullSubName] = subValue;
+              query += encodeParams(innerObj) + '&';
+            }
+          }
+        } else if (value === null) {
+          query += encodeURIComponent(name) + '=&';
+        } else if (value !== undefined) {
+          query += encodeURIComponent(name) + '=' + encodeURIComponent(value) + '&';
+        }
+      }
+    
+      return query.length ? query.substr(0, query.length - 1) : query;
     }
 
     function successFn(data: any, statusText: string, response: Response) {
