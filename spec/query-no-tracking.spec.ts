@@ -1,5 +1,5 @@
 import { Entity, EntityQuery, Predicate, EntityState, MergeStrategy, MetadataStore, EntityType } from 'breeze-client';
-import { TestFns } from './test-fns';
+import { TestFns, skipTestIf } from './test-fns';
 import { UtilFns } from './util-fns';
 
 TestFns.initServerEnv();
@@ -83,8 +83,8 @@ describe("Entity Query wih noTracking", () => {
     expect(r2.length).toBe(0);
   });
 
-  // testFns.skipIf("sequelize", "does not yet support complex types").
-    test("query with complex type", async function () {
+  // "sequelize", "does not yet support complex types"
+  skipTestIf(TestFns.isSequelizeServer, "query with complex type", async function () {
       expect.hasAssertions();
       const em = TestFns.newEntityManager();
 

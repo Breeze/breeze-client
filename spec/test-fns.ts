@@ -9,20 +9,43 @@ const northwindIBMetadata = require('./support/NorthwindIBMetadata.json');
 
 export type JsonObj = {[k: string]: any};
 
-export const testIf = (condition: boolean) => (condition ? test : test.skip);
-export const skipTestIf = (condition: boolean) => (condition ? test.skip : test);
-export const describeIf = (condition: boolean) => (condition ? describe : describe.skip);
-export const skipDescribeIf = (condition: boolean) => (condition ? describe.skip : describe);
+// export const testIf = (condition: boolean) => (condition ? test : test.skip);
+// export const skipTestIf = (condition: boolean) => (condition ? test.skip : test);
+// export const describeIf = (condition: boolean) => (condition ? describe : describe.skip);
+// export const skipDescribeIf = (condition: boolean) => (condition ? describe.skip : describe);
 export const expectPass = () => expect(true).toBe(true);
 
+export const describeIf = (condition: boolean, name: string, fn: jest.EmptyFunction ) => {
+  if (condition) {
+    return describe(name, fn);
+  } else {
+    return describe.skip(name, fn);
+  }
+};
+
+export const skipDescribeIf = (condition: boolean, name: string, fn: jest.EmptyFunction ) => {
+  if (condition) {
+    return describe.skip(name, fn);
+  } else {
+    return describe(name, fn);
+  }
+};
+
+export const skipTestIf = (condition: boolean, name: string, fn: jest.EmptyFunction) => {
+  if (condition) {
+    return test.skip(name, fn);
+  } else {
+    return test(name, fn);
+  }
+};
 
 // Alt unused approach
 // export const skipTestIf = (condition: boolean) => (condition ? { test: test.skip } : { test: test });
 
 export class TestFns extends UtilFns {
   // Uncomment just one
-  static defaultServerEnvName = "ASPCORE";
-  // static defaultServerEnvName = "SEQUELIZE";
+  // static defaultServerEnvName = "ASPCORE";
+  static defaultServerEnvName = "SEQUELIZE";
   // static defaultServerEnvName = "HIBERNATE";
 
   static serverEnvName: string;
@@ -199,6 +222,32 @@ export class TestFns extends UtilFns {
     });
   }
 
+  // NO LONGER USED
+
+  // private static initNamingConvention() {
+    
+  //   if (!testFns.DEBUG_HIBERNATE && !testFns.DEBUG_SEQUELIZE) {
+  //     var namingConv = new NamingConvention({
+  //       name: "camelCase2",
+  //       serverPropertyNameToClient: function (serverPropertyName, prop) {
+  //         if (prop && prop.isDataProperty && prop.dataType === DataType.Boolean) {
+  //           return "is" + serverPropertyName;
+  //         } else {
+  //           return serverPropertyName.substr(0, 1).toLowerCase() + serverPropertyName.substr(1);
+  //         }
+  //       },
+  //       clientPropertyNameToServer: function (clientPropertyName, prop) {
+  //         if (prop && prop.isDataProperty && prop.dataType === DataType.Boolean) {
+  //           return clientPropertyName.substr(2);
+  //         } else {
+  //           return clientPropertyName.substr(0, 1).toUpperCase() + clientPropertyName.substr(1);
+  //         }
+  //       }
+  //     });
+  //     var altNamingConv = NamingConvention.camelCase;
+  //     namingConv.setAsDefault();
+  //   }
+  // }
 
   // private static updateWellKnownDataIfMongo() {
   //   if (TestFns.serverEnvName !== 'MONGO') {

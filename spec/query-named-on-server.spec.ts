@@ -36,7 +36,7 @@ describe("Entity Queries with named endpoints on the server", function () {
     expect.hasAssertions();
     const em = TestFns.newEntityManager();
     const query = EntityQuery.from("SearchEmployees").withParameters({ employeeIds: [1, 4] });
-    
+
     const qr1 = await em.executeQuery(query);
     expect(qr1.results.length).toBe(2);
   });
@@ -54,8 +54,8 @@ describe("Entity Queries with named endpoints on the server", function () {
   });
 
   // "aspcore", " endpoint has not yet been implemented"  
-  skipTestIf(TestFns.isAspCoreServer)
-    ("withParameters using a array of objects", async function () {
+  skipTestIf(TestFns.isAspCoreServer,
+    "withParameters using a array of objects", async function () {
       expect.hasAssertions();
       const em = TestFns.newEntityManager();
       const qbeArray = [
@@ -151,8 +151,8 @@ describe("Entity Queries with named endpoints on the server", function () {
 
   // endpoint has not yet been implemented
   // testFns.skipIf("mongo,sequelize,hibernate", " endpoint has not yet been implemented").
-  skipTestIf(TestFns.isSequelizeServer || TestFns.isHibernateServer)
-    ("with parameter and count", async function () {
+  skipTestIf(TestFns.isSequelizeServer || TestFns.isHibernateServer,
+    "with parameter and count", async function () {
       expect.hasAssertions();
       const em = TestFns.newEntityManager();
       const q = EntityQuery.from("CustomerCountsByCountry")
@@ -176,7 +176,7 @@ describe("Entity Queries with named endpoints on the server", function () {
       return r1.getProperty("companyName").toUpperCase().substr(0, 1) === "C";
     });
     expect(allOk).toBeTrue();
-    
+
     const q2 = q.toType("Customer").where("fax", "!=", null);
     const qr2 = await em.executeQuery(q2);
     const r2 = qr2.results;
@@ -190,26 +190,26 @@ describe("Entity Queries with named endpoints on the server", function () {
   });
 
   // TODO: need to review this one later
-  skipTestIf(true)
-  ("with parameter - null", async function () {
-    expect.hasAssertions();
-    const em = TestFns.newEntityManager();
-    const q = EntityQuery.from("CustomersStartingWith")
-      .withParameters({ companyName: null });
+  skipTestIf(true, 
+    "with parameter - null", async function () {
+      expect.hasAssertions();
+      const em = TestFns.newEntityManager();
+      const q = EntityQuery.from("CustomersStartingWith")
+        .withParameters({ companyName: null });
 
-    const qr1 = await em.executeQuery(q);
-    const r = qr1.results;
-    expect(r.length).toBeGreaterThan(0);
-    const q2 = q.where("fax", "!=", null);
-    const qr2 = await em.executeQuery(q2);
-    const r2 = qr2.results;
-    expect(r2.length).toBeGreaterThan(0);
-    expect(r2.length).toBeLessThan(r.length);
-    const qr3 = await em.executeQuery(q2.take(1));
-    const r3 = qr3.results;
-    expect(r3.length).toBe(1);
-    expect(r.indexOf(r3[0]) >= 0).toBeTrue();
-  });
+      const qr1 = await em.executeQuery(q);
+      const r = qr1.results;
+      expect(r.length).toBeGreaterThan(0);
+      const q2 = q.where("fax", "!=", null);
+      const qr2 = await em.executeQuery(q2);
+      const r2 = qr2.results;
+      expect(r2.length).toBeGreaterThan(0);
+      expect(r2.length).toBeLessThan(r.length);
+      const qr3 = await em.executeQuery(q2.take(1));
+      const r3 = qr3.results;
+      expect(r3.length).toBe(1);
+      expect(r.indexOf(r3[0]) >= 0).toBeTrue();
+    });
 
   test("with two parameters (date as string)", async function () {
     expect.hasAssertions();
@@ -245,8 +245,8 @@ describe("Entity Queries with named endpoints on the server", function () {
   });
 
   // TODO: we don't yet handle the error coming back from the server correctly
-  skipTestIf(TestFns.isAspCoreServer)
-  ("with bad parameters", async function () {
+  skipTestIf(TestFns.isAspCoreServer,
+    "with bad parameters", async function () {
       expect.hasAssertions();
       const em = TestFns.newEntityManager();
       const q = EntityQuery.from("CustomersStartingWith")
@@ -329,8 +329,8 @@ describe("Entity Queries with named endpoints on the server", function () {
   });
 
   // This is a .NET only test
-  skipTestIf(TestFns.isSequelizeServer || TestFns.isHibernateServer)
-    ("project enumerables", async function () {
+  skipTestIf(TestFns.isSequelizeServer || TestFns.isHibernateServer,
+    "project enumerables", async function () {
       expect.hasAssertions();
 
       const em = TestFns.newEntityManager();
@@ -347,8 +347,8 @@ describe("Entity Queries with named endpoints on the server", function () {
     });
 
   // This is a .NET only test
-  skipTestIf(TestFns.isSequelizeServer || TestFns.isHibernateServer)
-    ("project enumerables with filter", async function () {
+  skipTestIf(TestFns.isSequelizeServer || TestFns.isHibernateServer,
+    "project enumerables with filter", async function () {
       expect.hasAssertions();
       const em = TestFns.newEntityManager();
       const query = EntityQuery.from("TypeEnvelopes")
@@ -400,13 +400,13 @@ describe("Entity Queries with named endpoints on the server", function () {
       expect(r.customer.entityAspect).toBeTruthy();
       expect(r.bigOrders).toBeTruthy();
     });
-    
+
   });
 
-  
-    // "hibernate", "cannot 'project' collections of entities"
-    skipTestIf(TestFns.isHibernateServer)
-    ("project objects containing entities", async function () {
+
+  // "hibernate", "cannot 'project' collections of entities"
+  skipTestIf(TestFns.isHibernateServer,
+    "project objects containing entities", async function () {
       expect.hasAssertions();
       const em = TestFns.newEntityManager();
 
@@ -439,78 +439,78 @@ describe("Entity Queries with named endpoints on the server", function () {
     expect(qr1.results.length).toBeGreaterThan(0);
   });
 
-    test("server side include many with filter - customers and orders", async function () {
-      expect.hasAssertions();
+  test("server side include many with filter - customers and orders", async function () {
+    expect.hasAssertions();
 
-      const em = TestFns.newEntityManager();
+    const em = TestFns.newEntityManager();
 
-      const query = new EntityQuery()
-        .from("CustomersAndOrders")
-        .where("companyName", "startsWith", "A")
-        .orderBy("companyName")
-        .take(4);
+    const query = new EntityQuery()
+      .from("CustomersAndOrders")
+      .where("companyName", "startsWith", "A")
+      .orderBy("companyName")
+      .take(4);
 
-      const qr1 = await em.executeQuery(query);
-      const customers = qr1.results;
-      expect(customers.length).toBeGreaterThan(2);
-      const isSorted = TestFns.isSorted(customers, "companyName", breeze.DataType.String, false, em.metadataStore.localQueryComparisonOptions.isCaseSensitive);
-      expect(isSorted).toBeTrue();
-      customers.forEach(function (c) {
-        expect(c.getProperty("companyName")).toBeTruthy();
-        const orders = c.getProperty("orders");
-        expect(orders.length).toBeGreaterThan(0);
-        const matchingCust = orders[0].getProperty("customer");
-        expect(c).toBe(matchingCust);
-        const ckey = c.entityAspect.getKey();
-        expect(ckey).toBeTruthy();
-        const c2 = em.findEntityByKey(ckey);
-        expect(c2).toBe(c);
-        const okey = orders[0].entityAspect.getKey();
-        const o2 = em.getEntityByKey(okey);
-        expect(o2).toBe(orders[0]);
-      });
+    const qr1 = await em.executeQuery(query);
+    const customers = qr1.results;
+    expect(customers.length).toBeGreaterThan(2);
+    const isSorted = TestFns.isSorted(customers, "companyName", breeze.DataType.String, false, em.metadataStore.localQueryComparisonOptions.isCaseSensitive);
+    expect(isSorted).toBeTrue();
+    customers.forEach(function (c) {
+      expect(c.getProperty("companyName")).toBeTruthy();
+      const orders = c.getProperty("orders");
+      expect(orders.length).toBeGreaterThan(0);
+      const matchingCust = orders[0].getProperty("customer");
+      expect(c).toBe(matchingCust);
+      const ckey = c.entityAspect.getKey();
+      expect(ckey).toBeTruthy();
+      const c2 = em.findEntityByKey(ckey);
+      expect(c2).toBe(c);
+      const okey = orders[0].entityAspect.getKey();
+      const o2 = em.getEntityByKey(okey);
+      expect(o2).toBe(orders[0]);
     });
+  });
 
-  
-    test("server side include many with take - customers and orders", async function () {
-      expect.hasAssertions();
-      expect(5);
-      const em = TestFns.newEntityManager();
 
-      const query = new EntityQuery()
-        .from("CustomersAndOrders")
-        .where("companyName", FilterQueryOp.StartsWith, "C")
-        .take(1);
+  test("server side include many with take - customers and orders", async function () {
+    expect.hasAssertions();
+    expect(5);
+    const em = TestFns.newEntityManager();
 
-      const qr1 = await em.executeQuery(query);
-      expect(qr1.results.length).toBe(1);
-      const cust = qr1.results[0];
-      const custKey = cust.entityAspect.getKey();
-      const orders = cust.getProperty("orders");
-      const orderKeys = orders.map(function (o: Entity) {
+    const query = new EntityQuery()
+      .from("CustomersAndOrders")
+      .where("companyName", FilterQueryOp.StartsWith, "C")
+      .take(1);
+
+    const qr1 = await em.executeQuery(query);
+    expect(qr1.results.length).toBe(1);
+    const cust = qr1.results[0];
+    const custKey = cust.entityAspect.getKey();
+    const orders = cust.getProperty("orders");
+    const orderKeys = orders.map(function (o: Entity) {
+      return o.entityAspect.getKey();
+    });
+    orderKeys.sort(entityKeyCompare);
+    const custQuery = EntityQuery.fromEntities(cust);
+    const ordersQuery = EntityQuery.fromEntities(orders);
+    const em2 = TestFns.newEntityManager();
+    const p1 = em2.executeQuery(custQuery).then(function (data2) {
+      expect(data2.results.length).toBe(1);
+      const cust2 = data2.results[0];
+      const cust2Key = cust2.entityAspect.getKey();
+      expect(custKey).toEqual(cust2Key);
+    });
+    const p2 = em2.executeQuery(ordersQuery).then(function (data3) {
+      const orders3 = data3.results;
+      expect(orders3.length).toBe(orders.length);
+      const order3Keys = orders3.map(function (o) {
         return o.entityAspect.getKey();
       });
       orderKeys.sort(entityKeyCompare);
-      const custQuery = EntityQuery.fromEntities(cust);
-      const ordersQuery = EntityQuery.fromEntities(orders);
-      const em2 = TestFns.newEntityManager();
-      const p1 = em2.executeQuery(custQuery).then(function (data2) {
-        expect(data2.results.length).toBe(1);
-        const cust2 = data2.results[0];
-        const cust2Key = cust2.entityAspect.getKey();
-        expect(custKey).toEqual(cust2Key);
-      });
-      const p2 = em2.executeQuery(ordersQuery).then(function (data3) {
-        const orders3 = data3.results;
-        expect(orders3.length).toBe(orders.length);
-        const order3Keys = orders3.map(function (o) {
-          return o.entityAspect.getKey();
-        });
-        orderKeys.sort(entityKeyCompare);
-        expect(core.arrayEquals(orderKeys, order3Keys, EntityKey.equals)).toBeTrue();
-      });
-      return Promise.all([p1, p2]);
+      expect(core.arrayEquals(orderKeys, order3Keys, EntityKey.equals)).toBeTrue();
     });
+    return Promise.all([p1, p2]);
+  });
 
   function entityKeyCompare(ek1: any, ek2: any) {
     const value1 = ek1["_keyInGroup"];
@@ -524,79 +524,79 @@ describe("Entity Queries with named endpoints on the server", function () {
     }
   }
 
-    test("server side include, followed by local query", async function () {
-      expect.hasAssertions();
-      const em = TestFns.newEntityManager();
+  test("server side include, followed by local query", async function () {
+    expect.hasAssertions();
+    const em = TestFns.newEntityManager();
 
-      const query = new EntityQuery()
-        .from("CustomersAndOrders")
-        .where("companyName", "startsWith", "A")
-        .orderBy("companyName")
-        .take(4);
-      const queryUrl = query._toUri(em);
+    const query = new EntityQuery()
+      .from("CustomersAndOrders")
+      .where("companyName", "startsWith", "A")
+      .orderBy("companyName")
+      .take(4);
+    const queryUrl = query._toUri(em);
 
-      const qr1 = await em.executeQuery(query);
-      const customers = qr1.results;
-      expect(customers.length).toBe(4);
-      customers.forEach(function (c) {
-        expect(c.getProperty("companyName")).toBeTruthy();
-        const orders = c.getProperty("orders");
-        expect(orders.length).toBeGreaterThan(0);
-        const matchingCust = orders[0].getProperty("customer");
-        expect(c).toBe(matchingCust);
-        const ckey = c.entityAspect.getKey();
-        expect(ckey).toBeTruthy();
-        const c2 = em.findEntityByKey(ckey);
-        expect(c2).toBe(c);
-        const okey = orders[0].entityAspect.getKey();
-        const o2 = em.findEntityByKey(okey);
-        expect(o2).toBe(orders[0]);
-      });
+    const qr1 = await em.executeQuery(query);
+    const customers = qr1.results;
+    expect(customers.length).toBe(4);
+    customers.forEach(function (c) {
+      expect(c.getProperty("companyName")).toBeTruthy();
+      const orders = c.getProperty("orders");
+      expect(orders.length).toBeGreaterThan(0);
+      const matchingCust = orders[0].getProperty("customer");
+      expect(c).toBe(matchingCust);
+      const ckey = c.entityAspect.getKey();
+      expect(ckey).toBeTruthy();
+      const c2 = em.findEntityByKey(ckey);
+      expect(c2).toBe(c);
+      const okey = orders[0].entityAspect.getKey();
+      const o2 = em.findEntityByKey(okey);
+      expect(o2).toBe(orders[0]);
     });
+  });
 
-    test("select scalar anon with two collection props", async function () {
-      expect.hasAssertions();
-      const em = TestFns.newEntityManager();
-      const query = EntityQuery
-        .from("CustomersAndProducts");
+  test("select scalar anon with two collection props", async function () {
+    expect.hasAssertions();
+    const em = TestFns.newEntityManager();
+    const query = EntityQuery
+      .from("CustomersAndProducts");
 
-      const qr1 = await em.executeQuery(query);
-      const r = qr1.results;
-      expect(r.length).toBeGreaterThan(0);
-    });
+    const qr1 = await em.executeQuery(query);
+    const r = qr1.results;
+    expect(r.length).toBeGreaterThan(0);
+  });
 
   // endpoint is .NET WebApi specific
-  
-    test("server returns HttpResponseMessage containing Customers", async function () {
-      expect.hasAssertions();
-      const em = TestFns.newEntityManager();
 
-      const query = new EntityQuery()
-        .from("CustomersAsHRM")
-        .where("companyName", "startsWith", "A")
-        .orderBy("companyName")
-        .expand("orders")
-        .take(4);
-  
-      const qr1 = await em.executeQuery(query);
-      const customers = qr1.results;
-      let len = customers.length;
-      expect(len).toBe(4);
-      const isSorted = TestFns.isSorted(customers, "companyName", breeze.DataType.String, false, em.metadataStore.localQueryComparisonOptions.isCaseSensitive);
-      expect(isSorted).toBeTrue();
-      len = (len > 4) ? 4 : len;
-      for (let i = 0; i < len; i++) {
-        const c = customers[i];
-        const companyName = c.getProperty("companyName");
-        expect(companyName).toBeTruthy();
-        expect(companyName.indexOf('A') === 0).toBeTrue();
-        const ckey = c.entityAspect.getKey();
-        expect(ckey).toBeTruthy();
-        const c2 = em.findEntityByKey(ckey);
-        expect(c2).toBe(c);
-        const orders = c.getProperty("orders");
-        expect(orders.length).toBeGreaterThan(1);
-      }
-    });
+  test("server returns HttpResponseMessage containing Customers", async function () {
+    expect.hasAssertions();
+    const em = TestFns.newEntityManager();
+
+    const query = new EntityQuery()
+      .from("CustomersAsHRM")
+      .where("companyName", "startsWith", "A")
+      .orderBy("companyName")
+      .expand("orders")
+      .take(4);
+
+    const qr1 = await em.executeQuery(query);
+    const customers = qr1.results;
+    let len = customers.length;
+    expect(len).toBe(4);
+    const isSorted = TestFns.isSorted(customers, "companyName", breeze.DataType.String, false, em.metadataStore.localQueryComparisonOptions.isCaseSensitive);
+    expect(isSorted).toBeTrue();
+    len = (len > 4) ? 4 : len;
+    for (let i = 0; i < len; i++) {
+      const c = customers[i];
+      const companyName = c.getProperty("companyName");
+      expect(companyName).toBeTruthy();
+      expect(companyName.indexOf('A') === 0).toBeTrue();
+      const ckey = c.entityAspect.getKey();
+      expect(ckey).toBeTruthy();
+      const c2 = em.findEntityByKey(ckey);
+      expect(c2).toBe(c);
+      const orders = c.getProperty("orders");
+      expect(orders.length).toBeGreaterThan(1);
+    }
+  });
 
 });

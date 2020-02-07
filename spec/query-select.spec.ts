@@ -28,7 +28,8 @@ describe("Entity Query Select clause", () => {
   });
 
   // testFns.skipIf("sequelize", "does not yet support complex types").
-  test("complex type", async function () {
+  skipTestIf(TestFns.isSequelizeServer ,
+    "complex type", async function () {
     expect.hasAssertions();
 
     const em = TestFns.newEntityManager();

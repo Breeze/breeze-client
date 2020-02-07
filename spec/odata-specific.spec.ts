@@ -9,7 +9,7 @@ beforeAll( async() => {
   await TestFns.initDefaultMetadataStore();
 });
 
-describeIf(TestFns.isODataServer)("OData specific", () => {
+describeIf(TestFns.isODataServer, "OData specific", () => {
 
   beforeEach(function () {
 

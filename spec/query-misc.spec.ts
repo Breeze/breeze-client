@@ -100,7 +100,8 @@ describe("Entity Query Misc", () => {
   });
 
   // testFns.skipIf("odata,sequelize,hibernate", "does not have any server unmapped properties").
-  test("querying server unmapped property", async function() {
+  skipTestIf(TestFns.isSequelizeServer || TestFns.isHibernateServer || TestFns.isODataServer,
+    "querying server unmapped property", async function() {
     expect.hasAssertions();
     
     const emBase = TestFns.newEntityManager();
@@ -155,8 +156,8 @@ describe("Entity Query Misc", () => {
     expect(alfredsID).toEqual(TestFns.wellKnownData.alfredsID);
   });
 
-  // testFns.skipIf("odata,mongo", "has not yet implemented server side interception").
-  test("insure that query is Not a duration query even without type mapping", async function () {
+  // "odata", "has not yet implemented server side interception").
+  skipTestIf(TestFns.isODataServer, "insure that query is Not a duration query even without type mapping", async function () {
     expect.hasAssertions();
     const em = TestFns.newEntityManager();
     const q = EntityQuery.from("AltCustomers").where('companyName', '==', 'Papa');
@@ -165,8 +166,8 @@ describe("Entity Query Misc", () => {
     expect(data.results.length).toBe(0);
   });
 
-  // testFns.skipIf("mongo,odata,sequelize,hibernate", "is N/A for this EF specific test").
-  test("query involving multiple entities on the server", async function () {
+  //"odata,sequelize,hibernate", "is N/A for this EF specific test").
+  skipTestIf(TestFns.isSequelizeServer || TestFns.isHibernateServer || TestFns.isODataServer, "query involving multiple entities on the server", async function () {
     expect.hasAssertions();
 
     const em = TestFns.newEntityManager();

@@ -12,7 +12,7 @@ beforeAll(async () => {
 
 });
 
-skipDescribeIf(TestFns.isHibernateServer)("Entity Query Functions", () => {
+skipDescribeIf(TestFns.isHibernateServer, "Entity Query Functions", () => {
 
   beforeEach(function () {
 

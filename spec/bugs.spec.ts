@@ -105,9 +105,7 @@ describe("Old Fixed Bugs", () => {
 
   });
 
-  // no expand support in Mongo
-  skipTestIf(TestFns.isMongoServer)
-    ("bug with detached unresolved children", async () => {
+  test("bug with detached unresolved children", async () => {
       expect.hasAssertions();
       const em1 = TestFns.newEntityManager();
       const metadataStore = em1.metadataStore;
@@ -137,7 +135,7 @@ describe("Old Fixed Bugs", () => {
       expect(orders.length).toBe(10);
     });
 
-  skipTestIf(TestFns.isMongoServer)("bug with duplicates after relation query", async () => {
+  test("bug with duplicates after relation query", async () => {
     expect.hasAssertions();
     const em1 = TestFns.newEntityManager();
     em1.queryOptions = em1.queryOptions.using(MergeStrategy.OverwriteChanges);

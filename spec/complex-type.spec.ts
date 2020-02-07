@@ -13,6 +13,7 @@ import { UriBuilderJsonAdapter } from 'breeze-client/adapter-uri-builder-json';
 import { DataServiceWebApiAdapter } from 'breeze-client/adapter-data-service-webapi';
 // import { AjaxFakeAdapter } from 'breeze-client/adapter-ajax-fake';  // OK
 import { AjaxFakeAdapter } from './adapter-ajax-fake';    // OK
+import { TestFns, skipDescribeIf } from './test-fns';
 // import { AjaxFakeAdapter } from '../src/adapter-ajax-fake'; // BAD
 
 ModelLibraryBackingStoreAdapter.register();
@@ -22,7 +23,8 @@ AjaxFakeAdapter.register();
 
 const metadata = require('./support/ComplexTypeMetadata.json');
 
-describe('ComplexType', () => {
+// Sequelize does not support complex types.
+skipDescribeIf(TestFns.isSequelizeServer, 'ComplexType', () => {
   beforeEach(() => { 
     
   });

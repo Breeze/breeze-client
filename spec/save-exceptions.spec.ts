@@ -349,8 +349,8 @@ describe("EntityManager Save Sync", () => {
 
   //TestFns.skipIf("odata", "does not support server interception or alt resources").
   // skipIf("hibernate", "is not applicable because this test uses EF validation annotations")
-  skipTestIf(TestFns.isAspCoreServer)
-    ("with server side entity level validation error", async function () {
+  skipTestIf(TestFns.isAspCoreServer,
+    "with server side entity level validation error", async function () {
       expect.hasAssertions();
       const em = TestFns.newEntityManager();
       const zzz = SaveTestFns.createParentAndChildren(em);
@@ -371,8 +371,8 @@ describe("EntityManager Save Sync", () => {
 
   //TestFns.skipIf("odata", "does not support server interception or alt resources").
   // AspCore does not have server validation.
-  skipTestIf(TestFns.isAspCoreServer)
-    ("with server side entity level validation error + repeat", async function () {
+  skipTestIf(TestFns.isAspCoreServer,
+    "with server side entity level validation error + repeat", async function () {
       expect.hasAssertions();
 
       const em = TestFns.newEntityManager();
@@ -402,8 +402,8 @@ describe("EntityManager Save Sync", () => {
 
   //TestFns.skipIf("sequelize,hibernate", " is unsupported because MySQL does not support millisecond resolution").
   // ASP Core is skipped because it does not do server validations 
-  skipTestIf(TestFns.isAspCoreServer)
-  ("custom data annotation validation", async function () {
+  skipTestIf(TestFns.isAspCoreServer || TestFns.isSequelizeServer || TestFns.isHibernateServer,
+  "custom data annotation validation", async function () {
     expect.hasAssertions();
 
     // This test will fail currently with the DATABASEFIRST_OLD define.

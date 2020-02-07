@@ -23,7 +23,7 @@ describe("EntityQuery Basics", () => {
     expect(query.resourceName).toEqual("Customers");
 
     const qr = await em.executeQuery(query);
-    expect(qr.results.length).toBeGreaterThan(100);
+    expect(qr.results.length).toBeGreaterThan(50);
 
   });
 
@@ -528,7 +528,7 @@ describe("EntityQuery Basics", () => {
     const qr1 = await em1.executeQuery(q);
     const r = qr1.results;
     const inlineCount = qr1.inlineCount;
-    expect(inlineCount).toBe(null);
+    expect(inlineCount == null).toBeTrue();
   });
 
   // no expand support in Mongo
@@ -938,13 +938,16 @@ describe("EntityQuery Basics", () => {
   });
 
 
-  test("take, skip, orderby and expand", async () => {
+  // BUG: with Sequelize that causes node to run out of memory.
+  skipTestIf(TestFns.isSequelizeServer, "take, skip, orderby and expand", async () => {
     expect.hasAssertions();
     const em1 = TestFns.newEntityManager();
     const q1 = EntityQuery.from("Products")
       .expand("category")
-      .orderBy("category.categoryName, productName");
+      .orderBy("category.categoryName, productName")
+      .take(10);
     const qr1 = await em1.executeQuery(q1);
+    expect(qr1.results.length).toBe(10);
     const nextTen = qr1.results.slice(10, 20);
     const q2 = q1.skip(10).take(10);
     const qr2 = await em1.executeQuery(q2);

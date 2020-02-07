@@ -151,8 +151,9 @@ describe("Unusual Datatypes", () => {
     }
   });
 
-  // testFns.skipIf("mongo,sequelize,hibernate,odata", "does not have these datatypes").
-  test("dateTimeOffset & dateTime2 w/save", async function () {
+  // sequelize,hibernate,odata", "does not have these datatypes").
+  skipTestIf(TestFns.isSequelizeServer || TestFns.isHibernateServer || TestFns.isODataServer,
+    "dateTimeOffset & dateTime2 w/save", async function () {
     expect.hasAssertions();
     const em = TestFns.newEntityManager();
     const query = new EntityQuery("UnusualDates").take(10);
@@ -194,7 +195,8 @@ describe("Unusual Datatypes", () => {
   });
 
   // testFns.skipIf("mongo,sequelize,hibernate,odata", "does not have these datatypes").
-  test("where dateTimeOffset & dateTime2", async function () {
+  skipTestIf(TestFns.isSequelizeServer || TestFns.isHibernateServer || TestFns.isODataServer,
+    "where dateTimeOffset & dateTime2", async function () {
     expect.hasAssertions();
     const em = TestFns.newEntityManager();
     const dt1 = new Date(1950, 1, 1, 1, 1, 1);
@@ -205,7 +207,8 @@ describe("Unusual Datatypes", () => {
   });
 
   // testFns.skipIf("mongo,sequelize,hibernate,odata", "does not have these datatypes").
-  test("export/import dateTimeOffset with nulls", async function () {
+  skipTestIf(TestFns.isSequelizeServer || TestFns.isHibernateServer || TestFns.isODataServer,
+    "export/import dateTimeOffset with nulls", async function () {
     expect.hasAssertions();
     const em = TestFns.newEntityManager();
     const p1 = Predicate.create("modificationDate2", "==", null);
@@ -226,7 +229,8 @@ describe("Unusual Datatypes", () => {
 
   // testFns.skipIf("mongo,sequelize", "does not have this datatype").
   // skipIf("hibernate","requires the TimeLimits table which has not yet been created").
-  test("time w/save", async function () {
+  skipTestIf(TestFns.isSequelizeServer || TestFns.isHibernateServer,
+    "time w/save", async function () {
     expect.hasAssertions();
     const duration = "PT7H17M40S";
     const sDuration = core.durationToSeconds(duration);
@@ -278,7 +282,8 @@ describe("Unusual Datatypes", () => {
 
   // testFns.skipIf("mongo,sequelize", "does not have this datatype").
   // skipIf("hibernate","requires the TimeLimits table which has not yet been created").
-  test("time 2", async function () {
+  skipTestIf(TestFns.isSequelizeServer || TestFns.isHibernateServer ,
+    "time 2", async function () {
     expect.hasAssertions();
     const em = TestFns.newEntityManager();
     const query = new EntityQuery("TimeLimits").where("maxTime", ">", "PT4H").take(10);
@@ -295,7 +300,8 @@ describe("Unusual Datatypes", () => {
 
   // testFns.skipIf("mongo,sequelize", "does not have this datatype").
   // skipIf("hibernate","requires the TimeLimits table which has not yet been created").
-  test("time not null", async function () {
+  skipTestIf(TestFns.isSequelizeServer || TestFns.isHibernateServer ,
+    "time not null", async function () {
     expect.hasAssertions();
     const em = TestFns.newEntityManager();
     const query = new EntityQuery("TimeLimits").where("minTime", "!=", null).take(10);
@@ -327,7 +333,8 @@ describe("Unusual Datatypes", () => {
   });
 
   // testFns.skipIf("mongo,sequelize,hibernate", "do not update the ts file (varbinary(8)) on the server. This is SQLServer specific").
-  test("timestamp w/save", async function () {
+  skipTestIf(TestFns.isSequelizeServer || TestFns.isHibernateServer,
+    "timestamp w/save", async function () {
     expect.hasAssertions();
     const em = TestFns.newEntityManager();
     const query = new EntityQuery("Roles").take(10);
@@ -348,7 +355,8 @@ describe("Unusual Datatypes", () => {
   });
 
   // testFns.skipIf("mongo,sequelize,odata", "does not have enum support").
-  test("enum query on Role", async function () {
+  skipTestIf(TestFns.isSequelizeServer || TestFns.isODataServer,
+    "enum query on Role", async function () {
     expect.hasAssertions();
     const em = TestFns.newEntityManager();
     const query = EntityQuery.from('Roles').using(em);
@@ -363,7 +371,8 @@ describe("Unusual Datatypes", () => {
   });
 
   // testFns.skipIf("mongo,sequelize,odata", "does not have enum support").
-  test("enum query filter on Role", async function () {
+  skipTestIf(TestFns.isSequelizeServer  || TestFns.isODataServer,
+    "enum query filter on Role", async function () {
     expect.hasAssertions();
     const em = TestFns.newEntityManager();
     const query = new EntityQuery("Roles").where("roleType", "==", 'Restricted');
@@ -376,7 +385,8 @@ describe("Unusual Datatypes", () => {
   });
 
   // testFns.skipIf("mongo,sequelize,odata", "does not have enum support").
-  test("enums w/save", async function () {
+  skipTestIf(TestFns.isSequelizeServer || TestFns.isODataServer,
+    "enums w/save", async function () {
     expect.hasAssertions();
     const em = TestFns.newEntityManager();
     const query = new EntityQuery("Roles").where("roleType", "==", 'Restricted');
@@ -406,7 +416,8 @@ describe("Unusual Datatypes", () => {
   });
 
   // testFns.skipIf("mongo,sequelize,odata", "does not yet support enums").
-  test("enums null - w/save", async function () {
+  skipTestIf(TestFns.isSequelizeServer ||  TestFns.isODataServer,
+    "enums null - w/save", async function () {
     expect.hasAssertions();
     const em = TestFns.newEntityManager();
     const roleType = em.metadataStore.getEntityType("Role") as EntityType;
@@ -436,7 +447,8 @@ describe("Unusual Datatypes", () => {
   });
 
   // testFns.skipIf("mongo,sequelize,odata", "does not yet support enums").
-  test("enums change value, detect on server", async function () {
+  skipTestIf(TestFns.isSequelizeServer || TestFns.isODataServer,
+    "enums change value, detect on server", async function () {
     expect.hasAssertions();
     const em = TestFns.newEntityManager();
     const roleType = em.metadataStore.getEntityType("Role") as EntityType;
