@@ -194,7 +194,7 @@ describe("Unusual Datatypes", () => {
 
   });
 
-  // testFns.skipIf("mongo,sequelize,hibernate,odata", "does not have these datatypes").
+  // sequelize,hibernate,odata: "does not have these datatypes").
   skipTestIf(TestFns.isSequelizeServer || TestFns.isHibernateServer || TestFns.isODataServer,
     "where dateTimeOffset & dateTime2", async function () {
     expect.hasAssertions();

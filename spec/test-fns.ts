@@ -31,6 +31,15 @@ export const skipDescribeIf = (condition: boolean, name: string, fn: jest.EmptyF
   }
 };
 
+export const testIf = (condition: boolean, name: string, fn: jest.EmptyFunction) => {
+  if (condition) {
+    return test(name, fn);
+  } else {
+    return test.skip(name, fn);
+  }
+};
+
+
 export const skipTestIf = (condition: boolean, name: string, fn: jest.EmptyFunction) => {
   if (condition) {
     return test.skip(name, fn);

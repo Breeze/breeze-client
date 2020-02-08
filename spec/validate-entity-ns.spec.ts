@@ -1,8 +1,8 @@
-import { EntityManager, EntityType, ComplexType, EntityState, EntityAction, EntityChangedEventArgs, breeze, MetadataStore, SaveOptions, QueryOptions, ValidationOptions, Entity, DataType, core, EntityKey, RelationArray, MergeStrategy, AnyAllPredicate, EntityQuery, QueryResult, StructuralType, EntityProperty, DataProperty, NavigationProperty, EntityAspect, PropertyChangedEventArgs, Validator, ValidationError } from 'breeze-client';
+import { EntityManager, EntityType, ComplexType, EntityState, EntityAction, EntityChangedEventArgs, breeze, MetadataStore, SaveOptions, QueryOptions, ValidationOptions, Entity, DataType, core, EntityKey, RelationArray, MergeStrategy, AnyAllPredicate, EntityQuery, QueryResult, StructuralType, EntityProperty, DataProperty, NavigationProperty, EntityAspect, PropertyChangedEventArgs, Validator, ValidationError, ValidationErrorsChangedEventArgs } from 'breeze-client';
 import { ModelLibraryBackingStoreAdapter } from 'breeze-client/adapter-model-library-backing-store';
 import { TestFns, JsonObj } from './test-fns';
 import 'jest-extended';
-import { ValidationErrorsChangedEventArgs } from 'src/entity-aspect';
+
 
 ModelLibraryBackingStoreAdapter.register();
 

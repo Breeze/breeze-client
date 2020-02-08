@@ -5,7 +5,7 @@ import { BreezeConfig } from './config';
 import { BreezeEnum} from './enum';
 import { BreezeEvent } from './event';
 import { ComplexArray } from './complex-array';
-import { DataService, DataServiceConfig, JsonResultsAdapter, JsonResultsAdapterConfig, NodeContext } from './data-service';
+import { DataService, DataServiceConfig, JsonResultsAdapter, JsonResultsAdapterConfig, NodeContext, NodeMeta } from './data-service';
 import { DataType  } from './data-type';
 import { EntityAction } from './entity-action';
 import { EntityAspect, ComplexAspect, Entity, StructuralObject, PropertyChangedEventArgs } from './entity-aspect';
@@ -95,6 +95,7 @@ export {
   NamingConvention,
   NavigationProperty,
   NodeContext,
+  NodeMeta,
   OrderByClause,
   Predicate,
   PropertyChangedEventArgs,

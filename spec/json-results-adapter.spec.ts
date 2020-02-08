@@ -1,6 +1,6 @@
-import { breeze, EntityManager, EntityQuery, NamingConvention, Predicate, EntityType, EntityState, EntityKey, Entity, DataService, MappingContext, NodeContext } from 'breeze-client';
+import { breeze, EntityManager, EntityQuery, NamingConvention, Predicate, EntityType, EntityState, EntityKey, Entity, DataService, MappingContext, NodeContext, NodeMeta } from 'breeze-client';
 import { skipTestIf, TestFns, expectPass } from './test-fns';
-import { NodeMeta } from 'src/data-service';
+
 
 TestFns.initServerEnv();
 

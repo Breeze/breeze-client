@@ -1,6 +1,6 @@
 {
   "name": "breeze-tests",
-  "version": "1.0.0",
+  "version": "1.0.8",
   "private": true,
   "description": "Breeze tests",
   "repository": "https://github.com/Breeze/breeze-client.git",
@@ -19,14 +19,15 @@
     "rimraf": "^2.7.1",
     "rxjs": "^6.5.3",
     "ts-jest": "^25.0.0",
-    "tslint": "^5.17.0",
-    "typescript": "^3.4.5"
+    "tslint": "^6.0.0",
+    "typescript": "^3.5.3"
   },
   "scripts": {
-    "test": "rimraf *.spec.js && jest",
-    "debug-old": "tsc && node tools/set-breeze-client.js && node --inspect-brk node_modules/jasmine/bin/jasmine.js",
+    "test": "npm run clean && jest",
+    "clean": "rimraf *.spec.js && rimraf *-fns.js",
     "tsc": "tsc",
-    "watch-tsc": "tsc -w"
+    "watch-tsc": "tsc -w",
+    "debug-old": "tsc && node tools/set-breeze-client.js && node --inspect-brk node_modules/jasmine/bin/jasmine.js"
   },
   "author": {
     "name": "IdeaBlade",
