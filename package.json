@@ -1,9 +1,9 @@
 {
   "name": "breeze-client",
-  "version": "2.0.6",
+  "version": "2.0.7",
   "private": true,
   "description": "Breeze data management for JavaScript clients",
-  "repositoryx": "https://github.com/Breeze/breeze-client.git",
+  "repository": "https://github.com/Breeze/breeze-client.git",
   "dependencies": {},
   "devDependencies": {
     "@angular/common": "^8.2.10",
@@ -18,13 +18,13 @@
     "rimraf": "^2.7.1",
     "rxjs": "^6.5.3",
     "tslint": "^5.17.0",
-    "typedoc": "^0.14.2",
+    "typedoc": "^0.16.9",
     "typescript": "^3.5.3"
   },
   "scripts": {
     "build": "npm run clean && npm run packagr && npm pack ./dist && npm run install-to-spec",
     "clean": "rimraf temp && rimraf src/*.js* && rimraf src/*.d.ts && rimraf ./*.d.ts && rimraf dist && rimraf node_modules/breeze-client.js",
-    "install-to-spec": "cd spec && npm uninstall breeze-client && npm install ../breeze-client-2.0.6.tgz",
+    "install-to-spec": "cd spec && npm install ../breeze-client-2.0.7.tgz",
     "publish": "npm publish --tag latest ./dist",
     "tsc": "tsc",
     "watch-tsc": "tsc -w",

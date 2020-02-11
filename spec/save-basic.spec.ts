@@ -1201,6 +1201,8 @@ describe("EntityManager Save", () => {
 
   });
 
+  // Issue with Sequelize on this one because Sequelize seems to run both under
+  // same trx... not sure... but...
   test("allow concurrent saves with NO concurrency column", async function () {
     expect.hasAssertions();
     const em = TestFns.newEntityManager();
@@ -1481,6 +1483,7 @@ describe("EntityManager Save", () => {
   });
 
   //TestFns.skipIf("odata", "does not support custom server side key generation").
+  // skipTestIf(TestFns.isODataServer
   test("insert with generated key", async function () {
     expect.hasAssertions();
     const em = SaveTestFns.newEntityManager();

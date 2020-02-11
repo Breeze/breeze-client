@@ -1,6 +1,6 @@
 
 import { AbstractDataServiceAdapter} from './abstract-data-service-adapter';
-import { assertParam, assertConfig, Param, IConfigParam} from './assert-param';
+import { assertParam, assertConfig, Param } from './assert-param';
 import { BreezeConfig } from './config';
 import { BreezeEnum} from './enum';
 import { BreezeEvent } from './event';
@@ -26,7 +26,7 @@ import { ValidationError, Validator } from './validate';
 import { ValidationOptions } from './validation-options';
 
 import { config, BaseAdapter } from './config';
-import { core } from './core';
+import { core, Callback, ErrorCallback } from './core';
 import { makeRelationArray, makePrimitiveArray, makeComplexArray } from './array';
 
 import { RelationArray } from './relation-array';
@@ -34,7 +34,6 @@ import { ArrayChangedArgs } from './observable-array';
 export { BreezeConfig, ComplexArray, RelationArray };
 
 export {
-  // Param,
   AbstractDataServiceAdapter,
   AjaxAdapter,
   AjaxConfig,
@@ -48,6 +47,7 @@ export {
   BinaryPredicate,
   BreezeEnum,
   BreezeEvent, 
+  Callback,
   ChangeRequestInterceptor,
   ComplexAspect,
   ComplexType,
@@ -70,6 +70,7 @@ export {
   EntityQuery,
   EntityState,
   EntityType,
+  ErrorCallback,
   ExpandClause,
   ExpressionContext,
   FetchStrategy,
@@ -156,6 +157,7 @@ export const breeze = {
   NamingConvention: NamingConvention,
   NavigationProperty: NavigationProperty,
   OrderByClause: OrderByClause, // for testing only
+  Param,
   Predicate: Predicate,
   QueryOptions: QueryOptions,
   SaveOptions: SaveOptions,

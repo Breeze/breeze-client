@@ -1,11 +1,11 @@
-import { core, Callback, ErrorCallback } from './core';
-import { ObservableArray, observableArray } from './observable-array';
-import { BreezeEvent } from './event';
-import { Entity  } from './entity-aspect';
+import { core } from './core';
+import { Entity } from './entity-aspect';
+import { QueryErrorCallback, QueryResult, QuerySuccessCallback } from './entity-manager';
 import { DataProperty, NavigationProperty } from './entity-metadata';
-import { EntityState } from './entity-state';
 import { EntityQuery } from './entity-query';
-import { QuerySuccessCallback, QueryErrorCallback, QueryResult } from './entity-manager';
+import { EntityState } from './entity-state';
+import { BreezeEvent } from './event';
+import { ObservableArray, observableArray } from './observable-array';
 
 // TODO: mixin impl is not very typesafe
 
