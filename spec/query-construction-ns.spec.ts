@@ -3,7 +3,7 @@ import { TestFns } from './test-fns';
 
 declare let console: any;
 
-describe("Predicate", () => {
+describe("Query Construction", () => {
   let entities: any[];
 
   beforeEach(() => {

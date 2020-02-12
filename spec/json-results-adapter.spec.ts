@@ -19,7 +19,7 @@ const jsonResultsAdapter = new breeze.JsonResultsAdapter({
     const propertyName = nodeContext.propertyName;
     const ignore = propertyName && propertyName.substr(0, 1) === "$";
     if (entityType) {
-      if (TestFns.isHibernateServer) {
+      if (TestFns.isSequelizeServer || TestFns.isHibernateServer) {
         node.rowVersion = 77;
       } else {
         node.RowVersion = 77;

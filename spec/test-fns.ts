@@ -53,8 +53,8 @@ export const skipTestIf = (condition: boolean, name: string, fn: jest.EmptyFunct
 
 export class TestFns extends UtilFns {
   // Uncomment just one
-  // static defaultServerEnvName = "ASPCORE";
-  static defaultServerEnvName = "SEQUELIZE";
+  static defaultServerEnvName = "ASPCORE";
+  // static defaultServerEnvName = "SEQUELIZE";
   // static defaultServerEnvName = "HIBERNATE";
 
   static serverEnvName: string;

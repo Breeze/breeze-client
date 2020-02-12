@@ -12,7 +12,7 @@ beforeAll(async () => {
 
 });
 
-describe("Entity Query Alternatives", () => {
+describe("Query Alternatives", () => {
 
   test("using EntityManager.fetchEntityByKey", async () => {
     expect.hasAssertions();

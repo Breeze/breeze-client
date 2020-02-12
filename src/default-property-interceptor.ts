@@ -242,7 +242,7 @@ function setDpValueSimple(context: IContext, rawAccessorFn: any) {
       if (np.isScalar) {
         npValue.setProperty(fkName, newValue);
       } else {
-        npValue.forEach(function (iv: any) {
+        npValue.slice(0).forEach(function (iv: any) {
           iv.setProperty(fkName, newValue);
         });
       }

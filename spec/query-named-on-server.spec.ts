@@ -8,7 +8,7 @@ beforeAll(async () => {
 
 });
 
-describe("Entity Queries with named endpoints on the server", function () {
+describe("Queries with named endpoints on the server", function () {
 
   test("enumerable query", async function () {
     expect.hasAssertions();

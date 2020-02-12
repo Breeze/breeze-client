@@ -12,7 +12,7 @@ beforeAll(async () => {
 
 });
 
-describe("Entity Query Misc", () => {
+describe("Query Misc", () => {
 
   test("queryOptions using", () => {
     let qo = QueryOptions.defaultInstance;

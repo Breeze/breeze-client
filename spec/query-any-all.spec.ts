@@ -12,7 +12,7 @@ beforeAll(async () => {
 
  
 
-describe( "Entity Query Any/All predicates", () => {
+describe( "Query Any/All predicates", () => {
 
   beforeEach(function () {
 

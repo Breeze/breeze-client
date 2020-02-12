@@ -135,18 +135,19 @@ describe("Entity Query Exceptions", () => {
       const qr1 = await em1.executeQuery(query);
       throw new Error('should not get here');
     } catch (error) {
+      const msg = error.message.toLowerCase();
       if (TestFns.isMongoServer) {
-        expect(error.message.indexOf("Unable to locate") >= 0).toBe(true);
+        expect(msg).toMatch(/unable to locate/);
       } else if (TestFns.isODataServer) {
-        expect(error.message.indexOf("Not Found") >= 0).toBe(true);
+        expect(msg).toMatch(/not found/);
       } else if (TestFns.isSequelizeServer) {
-        expect(error.message.indexOf("Cannot find an entityType") > 0).toBe(true);
+        expect(msg).toMatch(/cannot find an entitytype/);
       } else if (TestFns.isHibernateServer) {
-        expect(error.message.indexOf("no entityType name registered") > 0).toBe(true);
+        expect(msg).toMatch(/no entitytype name registered/);
       } else if (TestFns.isAspCoreServer) {
         expect(error.status === 404).toBe(true);
       } else {
-        expect(error.message.indexOf("No HTTP resource was found") >= 0).toBe(true);
+        expect(msg).toMatch(/no http resource was found/);
       }
     }
   });

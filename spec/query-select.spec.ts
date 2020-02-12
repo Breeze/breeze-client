@@ -8,7 +8,7 @@ beforeAll(async () => {
 
 });
 
-describe("Entity Query Select clause", () => {
+describe("Query Select clause", () => {
 
   test("company names of orders with Freight > 500", async function () {
     expect.hasAssertions();
@@ -50,7 +50,7 @@ describe("Entity Query Select clause", () => {
     });
   });
 
-  // testFns.skipIf("odata,mongo,sequelize", "does not use the WebApi jsonResultsAdapter that this test assumes").
+  // testFns.skipIf("odata,mongo", "does not use the WebApi jsonResultsAdapter that this test assumes").
   // skipIf("hibernate", "does not have the 'UnusualDates' table this test assumes").
   test("anon with jra & dateTimes", async function () {
     expect.hasAssertions();
@@ -59,14 +59,26 @@ describe("Entity Query Select clause", () => {
       name: "foo",
 
       visitNode: function (node) {
-        if (node.$id) {
-          node.CreationDate = breeze.DataType.parseDateFromServer(node.CreationDate);
-          const dt = breeze.DataType.parseDateFromServer(node.ModificationDate);
-          if (!isNaN(dt.getTime())) {
-            node.ModificationDate = dt;
+        if (TestFns.isSequelizeServer) {
+          // no casing change and no node.$id
+          if (node.creationDate) { // node.$id doesn't exist on Sequelize
+            node.creationDate = breeze.DataType.parseDateFromServer(node.creationDate);
+            const dt = breeze.DataType.parseDateFromServer(node.modificationDate);
+            if (!isNaN(dt.getTime())) {
+              node.modificationDate = dt;
+            }
           }
+          return null;
+        } else {
+          if (node.$id) { // node.$id doesn't exist on Sequelize
+            node.CreationDate = breeze.DataType.parseDateFromServer(node.CreationDate);
+            const dt = breeze.DataType.parseDateFromServer(node.ModificationDate);
+            if (!isNaN(dt.getTime())) {
+              node.ModificationDate = dt;
+            }
+          }
+          return null;
         }
-        return null;
       }
     });
     const query = new EntityQuery()
@@ -221,6 +233,7 @@ describe("Entity Query Select clause", () => {
   });
 
 
+  // TODO: this should fail on Sequelize but doesn't but the category returned may not be correct...
   test("with expand should fail with good msg", async function () {
     expect.hasAssertions();
     const em = TestFns.newEntityManager();

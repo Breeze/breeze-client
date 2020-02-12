@@ -332,7 +332,6 @@ describe("Entity Creation - no server", () => {
   });
 
 
-
   test("attaching entities in ctor makes fk values update", function () {
     const em = TestFns.newEntityManager(MetadataStore.importMetadata(TestFns.sampleMetadata));
     const initializer = function (sup: any) {

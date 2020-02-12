@@ -15,7 +15,7 @@ afterAll( async () => {
 // NOTE: Promises and async 'done' are DELIBERATELY used in this test file.  Do not try to convert to 'await'.
 // It will break the intent. 
 
-describe("EntityManager Save Sync", () => {
+describe("Save exception handling", () => {
 
   beforeEach(function () {
 
@@ -493,9 +493,10 @@ describe("EntityManager Save Sync", () => {
       expect(em.hasChanges()).toBeTrue();
       if (TestFns.isAspCoreServer) {
         expect(error.message).toMatch(/optimistic concurrency/);
+      } else if (TestFns.isSequelizeServer) {
+        expect(error.message).toMatch(/concurrency violation/);
       } else {
-        // expect(error.message).toMatch(/staleobjectstate/);
-        throw new Error('need to determine correct error message for this server type');
+        expect(error.message).toMatch('need to determine correct error message for this server type');
       }
     }
   });

@@ -1,4 +1,4 @@
-import { Entity, EntityQuery, EntityType, MetadataStore, Predicate, breeze, MergeStrategy, DataProperty, NavigationProperty } from 'breeze-client';
+import { Entity, EntityQuery, EntityType, MetadataStore, Predicate, breeze, MergeStrategy, DataProperty, NavigationProperty, NamingConvention } from 'breeze-client';
 import { TestFns, skipTestIf } from './test-fns';
 
 function ok(a: any, b?: any) {
@@ -25,7 +25,7 @@ beforeAll(async () => {
 
 });
 
-describe("Entity Query Navigation", () => {
+describe("Query Navigation", () => {
 
   beforeEach(function () {
 
@@ -190,6 +190,7 @@ describe("Entity Query Navigation", () => {
     ms.addDataService(em1.dataService);
 
     // const query = EntityQuery.from("Employees").where("reportsToEmployeeID", "!=", null).orderBy("employeeID");
+    // OrderBy - normal
     const query = EntityQuery.from("Employees").where("employeeID", "<=", 10).orderBy("reportsToEmployeeID")
       .select("employeeID, firstName, reportsToEmployeeID").toType("Employee");
 
@@ -208,6 +209,7 @@ describe("Entity Query Navigation", () => {
     });
 
     em1 = TestFns.newEntityManager(ms);
+    // OrderBy  = desc
     const query2 = EntityQuery.from("Employees").where("employeeID", "<=", 10).orderByDesc("reportsToEmployeeID")
       .select("employeeID, firstName, reportsToEmployeeID").toType("Employee");
     const qr2 = await query2.using(em1).execute();
@@ -230,6 +232,9 @@ describe("Entity Query Navigation", () => {
 
 function buildUnidirectionalMetadataStore(isBossVersion: boolean) {
   const ms = new MetadataStore();
+  if (TestFns.isSequelizeServer) {
+    ms.namingConvention = NamingConvention.none;
+  }
   ms.addEntityType({
     shortName: "Employee",
     namespace: "Foo",

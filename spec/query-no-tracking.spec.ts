@@ -9,7 +9,7 @@ beforeAll(async () => {
 
 });
 
-describe("Entity Query wih noTracking", () => {
+describe("Query wih noTracking", () => {
 
   beforeEach(function () {
 
