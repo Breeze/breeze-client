@@ -7,54 +7,10 @@ import { UtilFns } from './util-fns';
 
 const northwindIBMetadata = require('./support/NorthwindIBMetadata.json');  
 
-export type JsonObj = {[k: string]: any};
-
-// export const testIf = (condition: boolean) => (condition ? test : test.skip);
-// export const skipTestIf = (condition: boolean) => (condition ? test.skip : test);
-// export const describeIf = (condition: boolean) => (condition ? describe : describe.skip);
-// export const skipDescribeIf = (condition: boolean) => (condition ? describe.skip : describe);
-export const expectPass = () => expect(true).toBe(true);
-
-export const describeIf = (condition: boolean, name: string, fn: jest.EmptyFunction ) => {
-  if (condition) {
-    return describe(name, fn);
-  } else {
-    return describe.skip(name, fn);
-  }
-};
-
-export const skipDescribeIf = (condition: boolean, name: string, fn: jest.EmptyFunction ) => {
-  if (condition) {
-    return describe.skip(name, fn);
-  } else {
-    return describe(name, fn);
-  }
-};
-
-export const testIf = (condition: boolean, name: string, fn: jest.EmptyFunction) => {
-  if (condition) {
-    return test(name, fn);
-  } else {
-    return test.skip(name, fn);
-  }
-};
-
-
-export const skipTestIf = (condition: boolean, name: string, fn: jest.EmptyFunction) => {
-  if (condition) {
-    return test.skip(name, fn);
-  } else {
-    return test(name, fn);
-  }
-};
-
-// Alt unused approach
-// export const skipTestIf = (condition: boolean) => (condition ? { test: test.skip } : { test: test });
-
 export class TestFns extends UtilFns {
   // Uncomment just one
-  static defaultServerEnvName = "ASPCORE";
-  // static defaultServerEnvName = "SEQUELIZE";
+  // static defaultServerEnvName = "ASPCORE";
+  static defaultServerEnvName = "SEQUELIZE";
   // static defaultServerEnvName = "HIBERNATE";
 
   static serverEnvName: string;
@@ -82,7 +38,7 @@ export class TestFns extends UtilFns {
     dummyOrderID: 999 as any,
     dummyEmployeeID: 9999 as any,
     chaiProductID: 1 as any,
-    alfredsOrderDetailKey: { OrderID: 10643, ProductID: 28 /*R?ssle Sauerkraut*/ }, 
+    alfredsOrderDetailKey: { orderID: 10643, productID: 28 /*R?ssle Sauerkraut*/ }, 
     keyNames:  {
       order: "orderID",
       customer: "customerID",
@@ -144,7 +100,14 @@ export class TestFns extends UtilFns {
     // AjaxFetchAdapter.register();
     // ModelLibraryBackingStoreAdapter.register();
 
-    NamingConvention.camelCase.setAsDefault();
+    if (TestFns.isAspCoreServer || TestFns.isAspWebApiServer || TestFns.isODataServer) {
+      NamingConvention.camelCase.setAsDefault();
+    } else if (TestFns.isSequelizeServer) {
+      NamingConvention.none.setAsDefault();
+    } else {
+      NamingConvention.camelCase.setAsDefault();
+    }
+    
   }
 
   static async initDefaultMetadataStore() {
@@ -230,58 +193,52 @@ export class TestFns extends UtilFns {
       configurable: true
     });
   }
-
-  // NO LONGER USED
-
-  // private static initNamingConvention() {
-    
-  //   if (!testFns.DEBUG_HIBERNATE && !testFns.DEBUG_SEQUELIZE) {
-  //     var namingConv = new NamingConvention({
-  //       name: "camelCase2",
-  //       serverPropertyNameToClient: function (serverPropertyName, prop) {
-  //         if (prop && prop.isDataProperty && prop.dataType === DataType.Boolean) {
-  //           return "is" + serverPropertyName;
-  //         } else {
-  //           return serverPropertyName.substr(0, 1).toLowerCase() + serverPropertyName.substr(1);
-  //         }
-  //       },
-  //       clientPropertyNameToServer: function (clientPropertyName, prop) {
-  //         if (prop && prop.isDataProperty && prop.dataType === DataType.Boolean) {
-  //           return clientPropertyName.substr(2);
-  //         } else {
-  //           return clientPropertyName.substr(0, 1).toUpperCase() + clientPropertyName.substr(1);
-  //         }
-  //       }
-  //     });
-  //     var altNamingConv = NamingConvention.camelCase;
-  //     namingConv.setAsDefault();
-  //   }
-  // }
-
-  // private static updateWellKnownDataIfMongo() {
-  //   if (TestFns.serverEnvName !== 'MONGO') {
-  //     return;
-  //   }
-  //   TestFns.wellKnownData = {
-  //     nancyID: "51a6d50e1711572dcc8ce7d1",
-  //     alfredsID: null,
-  //     dummyOrderID: "50a6d50e1711572dcc8ce7d1",
-  //     dummyEmployeeID: "50a6d50e1711572dcc8ce7d2",
-  //     chaiProductID: 10001,
-  //     alfredsOrderDetailKey: null,
-  //     keyNames: {
-  //       order: "_id",
-  //       customer: "_id",
-  //       employee: "_id",
-  //       product: "_id",
-  //       user: "_id",
-  //       supplier: "_id",
-  //       region: "_id"
-  //     }
-  //   };
-    
-  // }
-
+ 
   
 }
+
+export type JsonObj = {[k: string]: any};
+
+// export const testIf = (condition: boolean) => (condition ? test : test.skip);
+// export const skipTestIf = (condition: boolean) => (condition ? test.skip : test);
+// export const describeIf = (condition: boolean) => (condition ? describe : describe.skip);
+// export const skipDescribeIf = (condition: boolean) => (condition ? describe.skip : describe);
+export const expectPass = () => expect(true).toBe(true);
+
+export const describeIf = (condition: boolean, name: string, fn: jest.EmptyFunction ) => {
+  if (condition) {
+    return describe(name, fn);
+  } else {
+    return describe.skip(name, fn);
+  }
+};
+
+export const skipDescribeIf = (condition: boolean, name: string, fn: jest.EmptyFunction ) => {
+  if (condition) {
+    return describe.skip(name, fn);
+  } else {
+    return describe(name, fn);
+  }
+};
+
+export const testIf = (condition: boolean, name: string, fn: jest.EmptyFunction) => {
+  if (condition) {
+    return test(name, fn);
+  } else {
+    return test.skip(name, fn);
+  }
+};
+
+
+export const skipTestIf = (condition: boolean, name: string, fn: jest.EmptyFunction) => {
+  if (condition) {
+    return test.skip(name, fn);
+  } else {
+    return test(name, fn);
+  }
+};
+
+// Alt unused approach
+// export const skipTestIf = (condition: boolean) => (condition ? { test: test.skip } : { test: test });
+
 

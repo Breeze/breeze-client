@@ -546,12 +546,12 @@ describe("Save Basics", () => {
 
     const orderDetail1 = em.createEntity('OrderDetail', {
       order: order, // sets OrderID and pulls it into the order's manager
-      productID: TestFns.wellKnownData.chaiProductID, // wellKnownData.alfredsOrderDetailKey.ProductID
+      productID: TestFns.wellKnownData.chaiProductID, 
       quantity: 5
     });
     const orderDetail2 = em.createEntity('OrderDetail', {
       order: order, // sets OrderID and pulls it into the order's manager
-      productID: TestFns.wellKnownData.alfredsOrderDetailKey.ProductID,
+      productID: TestFns.wellKnownData.alfredsOrderDetailKey.productID,
       quantity: 6
     });
 
