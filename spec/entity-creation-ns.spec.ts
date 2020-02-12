@@ -596,9 +596,9 @@ describe("Entity Creation - no server", () => {
   });
 
   test("new entity type - infer unmapped boolean datatype", () => {
-    const em = TestFns.newEntityManager();
+    const em = TestFns.newEntityManager(MetadataStore.importMetadata(TestFns.sampleMetadata));
     const Customer = function () {
-      // testContext.isBeingEdited = false;
+      this.isBeingEdited = false;
     };
     em.metadataStore.registerEntityTypeCtor("Customer", Customer);
 
