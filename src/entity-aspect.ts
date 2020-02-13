@@ -24,6 +24,7 @@ export interface Entity {
   _$entityType?: EntityType;
 }
 
+
 export interface ComplexObject {
   complexAspect: ComplexAspect;
   complexType: ComplexType;
@@ -34,6 +35,14 @@ export interface ComplexObject {
 }
 
 export type StructuralObject = Entity | ComplexObject;
+
+export function isEntity(obj: StructuralObject): obj is Entity {
+  return (obj as Entity).entityType != null;
+}
+
+export function isComplexObject(obj: StructuralObject): obj is ComplexObject {
+  return (obj as ComplexObject).complexType != null;
+}
 
 export interface PropertyChangedEventArgs {
   entity: Entity;
@@ -153,11 +162,6 @@ export class EntityAspect {
   /** @hidden @internal */
   constructor(entity?: Entity) {
 
-    // if called without new
-    // if (!(this instanceof EntityAspect)) {
-    //   return new EntityAspect(entity);
-    // }
-
     this.entity = entity;
     // TODO: keep public or not?
     this.entityGroup = undefined;
@@ -177,8 +181,10 @@ export class EntityAspect {
 
     if (entity != null) {
       // remove properties that should be on prototype but placed on class by Babel
-      if (!entity.entityType) { delete(entity.entityType); }
-      if (!entity.entityAspect) { delete(entity.entityAspect); }
+      // TODO: was this important???
+      // if (!entity.entityType) { delete(entity.entityType); }
+      // if (!entity.entityAspect) { delete(entity.entityAspect); }
+      
       entity.entityAspect = this;
 
       // entityType should already be on the entity from 'watch'
@@ -199,18 +205,8 @@ export class EntityAspect {
   /** @hidden */
   // type-guard
   static isEntity(obj: StructuralObject): obj is Entity {
-    return (obj as any).entityAspect != null;
+    return (obj as Entity).entityAspect != null;
   }
-
-  // No longer used
-  // static createFrom(entity: Entity): EntityAspect {
-  //   if (entity == null) {
-  //     return EntityAspect._nullInstance;
-  //   } else if (entity.entityAspect) {
-  //     return entity.entityAspect;
-  //   }
-  //   return new EntityAspect(entity);
-  // }
 
   // TODO: refactor this and the instance getPropertyValue method.
   /**
@@ -246,9 +242,7 @@ export class EntityAspect {
     if (forceRefresh || !this._entityKey) {
       let entityType = this.entity!.entityType;
       let keyProps = entityType.keyProperties;
-      let values = keyProps.map(function (p) {
-        return this.entity.getProperty(p.name);
-      }, this);
+      let values = keyProps.map( p => this.entity.getProperty(p.name));
       this._entityKey = new EntityKey(entityType, values);
     }
     return this._entityKey;
@@ -285,9 +279,7 @@ export class EntityAspect {
     let entity = this.entity!;
     let entityManager = this.entityManager!;
     // we do not want PropertyChange or EntityChange events to occur here
-    core.using(entityManager, "isRejectingChanges", true, function () {
-      rejectChangesCore(entity);
-    });
+    core.using(entityManager, "isRejectingChanges", true, () => rejectChangesCore(entity));
     if (this.entityState.isAdded()) {
       // next line is needed because the following line will cause this.entityManager -> null;
       entityManager.detachEntity(entity);
@@ -330,10 +322,9 @@ export class EntityAspect {
   >      order.entityAspect.setUnchanged();
   >      // The 'order' entity will now be in an 'Unchanged' state with any changes committed.
   **/
-  setUnchanged = function () {
+  setUnchanged() {
     return this.setEntityState(EntityState.Unchanged);
-  };
-
+  }
 
   /**
   Sets the entity to an EntityState of 'Modified'.  This can also be achieved by changing the value of any property on an 'Unchanged' entity.
@@ -342,9 +333,9 @@ export class EntityAspect {
   >      order.entityAspect.setModified();
   >      // The 'order' entity will now be in a 'Modified' state.
   **/
-  setModified = function () {
+  setModified() {
     return this.setEntityState(EntityState.Modified);
-  };
+  }
 
   /**
   Sets the entity to an EntityState of 'Deleted'.  This both marks the entity as being scheduled for deletion during the next 'Save' call
@@ -354,9 +345,9 @@ export class EntityAspect {
   >      order.entityAspect.setDeleted();
   >      // The 'order' entity will now be in a 'Deleted' state and it will no longer have any 'related' entities.
   **/
-  setDeleted = function () {
+  setDeleted() {
     return this.setEntityState(EntityState.Deleted);
-  };
+  }
 
   /**
   Sets the entity to an EntityState of 'Detached'.  This removes the entity from all of its related entities, but does NOT change the EntityState of any existing entities.
@@ -365,9 +356,9 @@ export class EntityAspect {
   >      order.entityAspect.setDetached();
   >      // The 'order' entity will now be in a 'Detached' state and it will no longer have any 'related' entities.
   **/
-  setDetached = function () {
+  setDetached() {
     return this.setEntityState(EntityState.Detached);
-  };
+  }
 
   /**
   Sets the entity to the specified EntityState. See also 'setUnchanged', 'setModified', 'setDetached', etc.
@@ -438,22 +429,19 @@ export class EntityAspect {
     - query {EntityQuery} The original query
     - httpResponse {httpResponse} The HttpResponse returned from the server.
   **/
-  loadNavigationProperty(navigationProperty: NavigationProperty | string, callback: QuerySuccessCallback, errorCallback: QueryErrorCallback) {
-    let entity = this.entity!;
+  async loadNavigationProperty(navigationProperty: NavigationProperty | string, callback?: QuerySuccessCallback, errorCallback?: QueryErrorCallback) {
+    let entity = this.entity;
     let navProperty = entity.entityType._checkNavProperty(navigationProperty);
     let query = EntityQuery.fromEntityNavigation(entity, navProperty);
-    // return entity.entityAspect.entityManager.executeQuery(query, callback, errorCallback);
-    let promise = entity.entityAspect.entityManager!.executeQuery(query);
-
-    return promise.then((data) => {
+    
+    try {
+      const data = await entity.entityAspect.entityManager.executeQuery(query);
       this._markAsLoaded(navProperty.name);
       if (callback) callback(data);
-      return Promise.resolve(data);
-    }, (error) => {
+      return data;
+    } catch (error) {
       if (errorCallback) errorCallback(error);
-      return Promise.reject(error);
-    });
-
+    }
   }
 
   /**
@@ -484,12 +472,12 @@ export class EntityAspect {
   @param navigationProperty - The NavigationProperty or name of NavigationProperty to 'load'.
   **/
   isNavigationPropertyLoaded(navigationProperty: NavigationProperty | string) {
-    if (!this.entity) return;
+    if (!this.entity) return false;
     let navProperty = this.entity.entityType._checkNavProperty(navigationProperty);
     if (navProperty.isScalar && this.entity.getProperty(navProperty.name) != null) {
       return true;
     }
-    return this._loadedNps && this._loadedNps.indexOf(navProperty.name) >= 0;
+    return this._loadedNps && this._loadedNps.includes(navProperty.name);
   }
 
   /** @hidden @internal */
@@ -513,7 +501,7 @@ export class EntityAspect {
   **/
   validateEntity() {
     let ok = true;
-    this._processValidationOpAndPublish(function (that: any) {
+    this._processValidationOpAndPublish( (that: any) => {
       ok = validateTarget(that.entity);
     });
     return ok;
@@ -583,8 +571,9 @@ export class EntityAspect {
     let result = core.getOwnPropertyValues(this._validationErrors);
     if (property) {
       let propertyName = typeof (property) === 'string' ? property : property.name;
-      result = result.filter(function (ve: ValidationError) {
-        return ve.property && (ve.property.name === propertyName || (propertyName.indexOf(".") !== -1 && ve.propertyName === propertyName));
+      result = result.filter( (ve: ValidationError) => {
+        return ve.property && (ve.property.name === propertyName || 
+          (propertyName.includes(".")  && ve.propertyName === propertyName));
       });
     }
     return result;
@@ -595,9 +584,7 @@ export class EntityAspect {
   **/
   addValidationError(validationError: ValidationError) {
     assertParam(validationError, "validationError").isInstanceOf(ValidationError).check();
-    this._processValidationOpAndPublish(function (that: any) {
-      that._addValidationError(validationError);
-    });
+    this._processValidationOpAndPublish( (that: any) => that._addValidationError(validationError));
   }
 
   removeValidationError(validationError: ValidationError): void;
@@ -608,11 +595,8 @@ export class EntityAspect {
   **/
   removeValidationError(validationErrorOrKey: ValidationError | string) {
     assertParam(validationErrorOrKey, "validationErrorOrKey").isString().or().isInstanceOf(ValidationError).or().isInstanceOf(Validator).check();
-
     let key = (typeof (validationErrorOrKey) === "string") ? validationErrorOrKey : validationErrorOrKey.key;
-    this._processValidationOpAndPublish(function (that: any) {
-      that._removeValidationError(key);
-    });
+    this._processValidationOpAndPublish((that: any) => that._removeValidationError(key));
   }
 
   /**
@@ -645,10 +629,7 @@ export class EntityAspect {
     // assertParam(navigationProperty, "navigationProperty").isInstanceOf(NavigationProperty).check();
     let fkNames = navigationProperty.foreignKeyNames;
     if (fkNames.length === 0) return null;
-    let that = this;
-    let fkValues = fkNames.map(function (fkn) {
-      return that.entity!.getProperty(fkn);
-    });
+    let fkValues = fkNames.map( fkn => this.entity.getProperty(fkn));
     return new EntityKey(navigationProperty.entityType, fkValues);
   }
 
@@ -756,17 +737,18 @@ export class EntityAspect {
 }
 
 BreezeEvent.bubbleEvent(EntityAspect.prototype, function () {
+  // TODO: what is 'this'??? here.
   return this.entityManager;
 });
 
-function rejectChangesCore(target: any) {
-  let aspect = target.entityAspect || target.complexAspect;
-  let stype = target.entityType || target.complexType;
+function rejectChangesCore(target: StructuralObject) {
+  const { aspect, stype } = decompose(target);
+  
   let originalValues = aspect.originalValues;
   for (let propName in originalValues) {
     target.setProperty(propName, originalValues[propName]);
   }
-  stype.complexProperties.forEach(function (cp: any) {
+  stype.complexProperties.forEach( cp => {
     let cos = target.getProperty(cp.name);
     if (cp.isScalar) {
       rejectChangesCore(cos);
@@ -785,14 +767,14 @@ function removeFromRelations(entity: Entity, entityState: EntityState) {
   if (isDeleted) {
     removeFromRelationsCore(entity);
   } else {
-    core.using(entity.entityAspect.entityManager!, "isLoading", true, function () {
+    core.using(entity.entityAspect.entityManager!, "isLoading", true, () => {
       removeFromRelationsCore(entity);
     });
   }
 }
 
 function removeFromRelationsCore(entity: Entity) {
-  entity.entityType.navigationProperties.forEach(function (np) {
+  entity.entityType.navigationProperties.forEach( np => {
     let inverseNp = np.inverse;
     let npValue = entity.getProperty(np.name);
     if (np.isScalar) {
@@ -842,17 +824,16 @@ function validate(entityAspect: EntityAspect, validator: Validator, value: any, 
 
 // coIndex is only used where target is a complex object that is part of an array of complex objects
 // in which case ctIndex is the index of the target within the array.
-function validateTarget(target: any, coIndex?: number) {
+function validateTarget(target: StructuralObject, coIndex?: number) {
   let ok = true;
-  let stype = target.entityType || target.complexType;
-  let aspect = target.entityAspect || target.complexAspect;
-  let entityAspect = target.entityAspect || target.complexAspect.getEntityAspect();
+  let { aspect, stype, entityAspect } = decompose(target);
+
   let context = <any>{ entity: entityAspect.entity };
   if (coIndex !== undefined) {
     context.index = coIndex;
   }
 
-  stype.getProperties().forEach(function (p: any) {
+  stype.getProperties().forEach( p => {
     let value = target.getProperty(p.name);
     let validators = p.getAllValidators();
     if (validators.length > 0) {
@@ -860,20 +841,18 @@ function validateTarget(target: any, coIndex?: number) {
       context.propertyName = aspect.getPropertyPath(p.name);
       ok = entityAspect._validateProperty(value, context) && ok;
     }
-    if (p.isComplexProperty) {
+    if ((p as DataProperty).isComplexProperty) {
       if (p.isScalar) {
         ok = validateTarget(value) && ok;
       } else {
-        ok = value.reduce(function (pv: any, cv: any, ix: number) {
-          return validateTarget(cv, ix) && pv;
-        }, ok);
+        ok = value.reduce((pv: any, cv: any, ix: number) => 
+          validateTarget(cv, ix) && pv, ok);
       }
     }
   });
 
-
   // then target level
-  stype.getAllValidators().forEach(function (validator: Validator) {
+  stype.getAllValidators().forEach( validator => {
     ok = validate(entityAspect, validator, target) && ok;
   });
   return ok;
@@ -971,11 +950,10 @@ export class ComplexAspect {
 
 }
 
-function clearOriginalValues(target: any) {
-  let aspect = target.entityAspect || target.complexAspect;
+function clearOriginalValues(target: StructuralObject) {
+  const { aspect, stype } = decompose(target);
   aspect.originalValues = {};
-  let stype = target.entityType || target.complexType;
-  stype.complexProperties.forEach(function (cp: any) {
+  stype.complexProperties.forEach( cp => {
     let cos = target.getProperty(cp.name);
     if (cp.isScalar) {
       clearOriginalValues(cos);
@@ -986,4 +964,18 @@ function clearOriginalValues(target: any) {
   });
 }
 
-
+function decompose(target: StructuralObject) {
+  let aspect: EntityAspect | ComplexAspect;
+  let stype: EntityType | ComplexType;
+  let entityAspect: EntityAspect;
+  if (isEntity(target)) {
+    aspect = target.entityAspect;
+    stype = target.entityType;
+    entityAspect = aspect;
+  } else {
+    aspect = target.complexAspect;
+    stype =  target.complexType;
+    entityAspect = aspect.getEntityAspect();
+  }
+  return { stype: stype, aspect: aspect, entityAspect: entityAspect };
+}
