@@ -135,7 +135,7 @@ export class DataType extends BreezeEnum {
     isDate: true,
     parse: coerceToDate,
     parseRawValue: parseRawDate,
-    normalize: function (value: any) { return value && value.getTime && value.getTime(); }, // dates don't perform equality comparisons properly
+    normalize: (value: any) => value && value.getTime && value.getTime(), // dates don't perform equality comparisons properly
     fmtOData: fmtDateTime,
     getNext: getNextDateTime,
     getConcurrencyValue: getConcurrencyDateTime
@@ -146,7 +146,7 @@ export class DataType extends BreezeEnum {
     isDate: true,
     parse: coerceToDate,
     parseRawValue: parseRawDate,
-    normalize: function (value: any) { return value && value.getTime && value.getTime(); }, // dates don't perform equality comparisons properly
+    normalize: (value: any) => value && value.getTime && value.getTime(), // dates don't perform equality comparisons properly
     fmtOData: fmtDateTimeOffset,
     getNext: getNextDateTime,
     getConcurrencyValue: getConcurrencyDateTime
@@ -169,7 +169,7 @@ export class DataType extends BreezeEnum {
     parse: coerceToGuid,
     fmtOData: fmtGuid,
     getNext: getNextGuid,
-    parseRawValue: function (val: string) { return val.toLowerCase(); },
+    parseRawValue: (val: string) => val.toLowerCase(),
     getConcurrencyValue: core.getUuid
   });
 
@@ -189,14 +189,10 @@ export class DataType extends BreezeEnum {
       return dataType.normalize;
     } else if (dataType === DataType.Time) {
       // durations must be converted to compare them
-      return function (value: any) {
-        return value && core.durationToSeconds(value);
-      };
+      return  (value: any) => value && core.durationToSeconds(value);
     } else {
       // TODO: __identity
-      return function (value: any) {
-        return value;
-      };
+      return (value: any) => value;
     }
   }
 
