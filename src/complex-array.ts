@@ -1,5 +1,5 @@
 import { core  } from './core';
-import { ObservableArray, observableArrayFns } from './observable-array';
+import { ObservableArray  } from './observable-array';
 import { BreezeEvent } from './event';
 import { ComplexObject, StructuralObject } from './entity-aspect';
 import { DataProperty } from './entity-metadata';
@@ -58,7 +58,7 @@ export class ComplexArray extends ObservableArray<ComplexObject> {
   }
 
   _beforeChange() {
-    observableArrayFns.updateEntityState(this);
+    this.updateEntityState();
   }
 
   _processAdds(adds: ComplexObject[]) {
@@ -138,7 +138,7 @@ function setAspect(co: ComplexObject, arr: ComplexArray) {
 */
 export function makeComplexArray(arr: ComplexObject[], parent: StructuralObject, parentProperty: DataProperty) {
   let complexArray = new ComplexArray(...arr);
-  observableArrayFns.initializeParent(complexArray, parent, parentProperty);
+  complexArray.initializeParent( parent, parentProperty);
   complexArray.arrayChanged = new BreezeEvent("arrayChanged", complexArray);
   return complexArray;
 }

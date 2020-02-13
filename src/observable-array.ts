@@ -27,11 +27,15 @@ export abstract class ObservableArray<T> extends Array<T> {
     return Array;
   }
 
+  initializeParent(parent: StructuralObject, parentProperty: DataProperty) {
+    this.parent = parent;
+    this.parentProperty = parentProperty;
+  }
+
   push(...args: T[]) {
     if (this._inProgress) {
       return -1;
     }
-
     let goodAdds = this._getGoodAdds(args);
     if (!goodAdds.length) {
       return this.length;
@@ -39,8 +43,7 @@ export abstract class ObservableArray<T> extends Array<T> {
     this._beforeChange();
     
     const result = Array.prototype.push.apply(this, goodAdds);
-    
-    processAdds(this, goodAdds);
+    this.processAdds(goodAdds);
     return result;
   }
 
@@ -52,8 +55,7 @@ export abstract class ObservableArray<T> extends Array<T> {
     this._beforeChange();
    
     const result = Array.prototype.push.apply(this, goodAdds);
-    
-    processAdds(this, goodAdds);
+    this.processAdds(goodAdds);
     return result;
   }
 
@@ -65,8 +67,7 @@ export abstract class ObservableArray<T> extends Array<T> {
     this._beforeChange();
     
     const result = Array.prototype.unshift.apply(this, goodAdds);
-    
-    processAdds(this, goodAdds);
+    this.processAdds(goodAdds);
     return result;
   }
 
@@ -74,8 +75,7 @@ export abstract class ObservableArray<T> extends Array<T> {
     this._beforeChange();
     
     const result = Array.prototype.pop.apply(this);
-    
-    processRemoves(this, [result]);
+    this.processRemoves([result]);
     return result;
   }
 
@@ -83,7 +83,7 @@ export abstract class ObservableArray<T> extends Array<T> {
     this._beforeChange();
     
     const result = Array.prototype.shift.apply(this);
-    processRemoves(this, [result]);
+    this.processRemoves([result]);
     return result;
   }
 
@@ -93,11 +93,10 @@ export abstract class ObservableArray<T> extends Array<T> {
     this._beforeChange();
     
     const result = Array.prototype.splice.apply(this, newArgs);
-    
-    processRemoves(this, result);
+    this.processRemoves(result);
 
     if (goodAdds.length) {
-      processAdds(this, goodAdds);
+      this.processAdds(goodAdds);
     }
     return result;
   }
@@ -119,6 +118,47 @@ export abstract class ObservableArray<T> extends Array<T> {
     // default is to do nothing
   }
 
+  processAdds(adds: T[]) {
+    this._processAdds(adds);
+    // this is referencing the name of the method on the complexArray not the name of the event
+    //var args = { added: adds };
+    //args[obsArray._typeName] = obsArray;
+    this.publish( "arrayChanged", { array: this, added: adds });
+  }
+  
+  processRemoves(removes: T[]) {
+    this._processRemoves(removes);
+    // this is referencing the name of the method on the array not the name of the event
+    this.publish( "arrayChanged", { array: this, removed: removes });
+  }
+
+  publish(eventName: string, eventArgs: any) {
+    let pendingPubs = this._getPendingPubs();
+    if (pendingPubs) {
+      if (!this._pendingArgs) {
+        this._pendingArgs = eventArgs;
+        pendingPubs.push( () => {
+          this[eventName].publish(this._pendingArgs);
+          this._pendingArgs = null;
+        });
+      } else {
+        combineArgs(this._pendingArgs, eventArgs);
+      }
+    } else {
+      this[eventName].publish(eventArgs);
+    }
+  }
+
+  updateEntityState() {
+    let entityAspect = this.getEntityAspect();
+    if (entityAspect.entityState.isUnchanged()) {
+      entityAspect.setModified();
+    }
+    if (entityAspect.entityState.isModified() && !this._origValues) {
+      this._origValues = this.slice(0);
+    }
+  }
+
   
 }
 
@@ -128,53 +168,6 @@ export interface ArrayChangedArgs {
   removed?: any[];
 }
 
-
-
-function updateEntityState<T>(obsArray: ObservableArray<T>) {
-  let entityAspect = obsArray.getEntityAspect();
-  if (entityAspect.entityState.isUnchanged()) {
-    entityAspect.setModified();
-  }
-  if (entityAspect.entityState.isModified() && !obsArray._origValues) {
-    obsArray._origValues = obsArray.slice(0);
-  }
-}
-
-function publish<T>(publisher: ObservableArray<T>, eventName: string, eventArgs: any) {
-  let pendingPubs = publisher._getPendingPubs();
-  if (pendingPubs) {
-    if (!publisher._pendingArgs) {
-      publisher._pendingArgs = eventArgs;
-      pendingPubs.push(function () {
-        publisher[eventName].publish(publisher._pendingArgs);
-        publisher._pendingArgs = null;
-      });
-    } else {
-      combineArgs(publisher._pendingArgs, eventArgs);
-    }
-  } else {
-    publisher[eventName].publish(eventArgs);
-  }
-}
-
-function initializeParent(obsArray: any, parent: Object, parentProperty: DataProperty) {
-  obsArray.parent = parent;
-  obsArray.parentProperty = parentProperty;
-}
-
-function processAdds<T>(obsArray: ObservableArray<T>, adds: T[]) {
-  obsArray._processAdds(adds);
-  // this is referencing the name of the method on the complexArray not the name of the event
-  //var args = { added: adds };
-  //args[obsArray._typeName] = obsArray;
-  publish(obsArray, "arrayChanged", { array: obsArray, added: adds });
-}
-
-function processRemoves<T>(obsArray: ObservableArray<T>, removes: T[]) {
-  obsArray._processRemoves(removes);
-  // this is referencing the name of the method on the array not the name of the event
-  publish(obsArray, "arrayChanged", { array: obsArray, removed: removes });
-}
 
 // TODO: see if this function already exists in core and can be imported.
 function combineArgs(target: Object, source: Object) {
@@ -193,9 +186,4 @@ function combineArgs(target: Object, source: Object) {
     }
   }
 }
-/** @hidden @internal */
-export const observableArrayFns = {
-  updateEntityState: updateEntityState,
-  publish: publish,
-  initializeParent: initializeParent
-};
+

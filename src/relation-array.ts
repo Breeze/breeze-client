@@ -5,8 +5,7 @@ import { DataProperty, NavigationProperty } from './entity-metadata';
 import { EntityQuery } from './entity-query';
 import { EntityState } from './entity-state';
 import { BreezeEvent } from './event';
-import { ObservableArray, observableArrayFns } from './observable-array';
-
+import { ObservableArray  } from './observable-array';
 
   /**
   Relation arrays are not actually classes, they are objects that mimic arrays. A relation array is collection of

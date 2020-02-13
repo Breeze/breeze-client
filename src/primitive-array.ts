@@ -1,5 +1,5 @@
 import { core  } from './core';
-import { observableArrayFns, ObservableArray } from './observable-array';
+import { ObservableArray } from './observable-array';
 import { BreezeEvent } from './event';
 import { StructuralObject } from './entity-aspect';
 import { DataProperty } from './entity-metadata';
@@ -103,7 +103,7 @@ import { DataProperty } from './entity-metadata';
 */
 export function makePrimitiveArray(arr: any[], parent: StructuralObject, parentProperty: DataProperty) {
   let primitiveArray = new PrimitiveArray(...arr);
-  observableArrayFns.initializeParent(primitiveArray, parent, parentProperty);
+  primitiveArray.initializeParent( parent, parentProperty);
   primitiveArray.arrayChanged = new BreezeEvent("arrayChanged", primitiveArray);
   return primitiveArray;
 }
