@@ -1,6 +1,7 @@
 import { EntityManager, NamingConvention, MetadataStore, DataType, breeze, core, Entity, config } from 'breeze-client';
 import { ModelLibraryBackingStoreAdapter } from 'breeze-client/adapter-model-library-backing-store';
 import { UriBuilderJsonAdapter } from 'breeze-client/adapter-uri-builder-json';
+import { UriBuilderODataAdapter } from 'breeze-client/adapter-uri-builder-odata';
 import { AjaxFetchAdapter } from 'breeze-client/adapter-ajax-fetch';
 import { DataServiceWebApiAdapter } from 'breeze-client/adapter-data-service-webapi';
 import { UtilFns } from './util-fns';
@@ -9,8 +10,9 @@ const northwindIBMetadata = require('./support/NorthwindIBMetadata.json');
 
 export class TestFns extends UtilFns {
   // Uncomment just one
-  // static defaultServerEnvName = "ASPCORE";
-  static defaultServerEnvName = "SEQUELIZE";
+  static defaultServerEnvName = "ASPCORE";
+  // static defaultServerEnvName = "ASPWEBAPI";
+  // static defaultServerEnvName = "SEQUELIZE";
   // static defaultServerEnvName = "HIBERNATE";
 
   static serverEnvName: string;
@@ -72,7 +74,11 @@ export class TestFns extends UtilFns {
       TestFns.defaultServiceName = 'http://localhost:61552/breeze/NorthwindIBModel';
     } else if (TestFns.isSequelizeServer) {
       TestFns.defaultServiceName = 'http://localhost:3000/breeze/NorthwindIBModel';
+    } else if (TestFns.isAspWebApiServer) {
+      TestFns.defaultServiceName = 'http://localhost:7149/breeze/NorthwindIBModel';
+      
     }
+
   }
 
   private static calcServerTypes(serverEnvName: string) {
@@ -91,7 +97,13 @@ export class TestFns extends UtilFns {
 
   private static initAdapters() {
     ModelLibraryBackingStoreAdapter.register();
-    UriBuilderJsonAdapter.register();
+
+    if (TestFns.isAspCoreServer || TestFns.isSequelizeServer || TestFns.isHibernateServer) {
+      UriBuilderJsonAdapter.register();
+    } else if (TestFns.isAspWebApiServer || TestFns.isNHibernateServer) {
+      UriBuilderODataAdapter.register();
+    }
+
     AjaxFetchAdapter.register();
     DataServiceWebApiAdapter.register();
     
