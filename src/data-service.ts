@@ -123,9 +123,7 @@ export class DataService {
       adapterName: null,
       uriBuilderName: null,
       hasServerMetadata: null,
-      jsonResultsAdapter: function (v: any) {
-        return v && v.name;
-      },
+      jsonResultsAdapter: (v: any) => v && v.name,
       useJsonp: null
     });
   }
@@ -147,13 +145,14 @@ export class DataService {
       return suffix;
     }
     let url = this.serviceName;
+    if (url == null) return url;
     // remove any trailing "/"
-    if (core.stringEndsWith(url, "/")) {
+    if (url.endsWith("/")) {
       url = url.substr(0, url.length - 1);
     }
     // ensure that it ends with "/" + suffix
     suffix = "/" + suffix;
-    if (!core.stringEndsWith(url, suffix)) {
+    if (!url.endsWith(suffix)) {
       url = url + suffix;
     }
     return url;
