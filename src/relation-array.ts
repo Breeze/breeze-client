@@ -68,6 +68,8 @@ export class RelationArray extends ObservableArray<Entity> {
     return em.executeQuery(query, callback, errorCallback);
   }
 
+  // Impl of abstract methods
+
   _getEventParent() {
     return this.parentEntity.entityAspect;
   }
@@ -102,7 +104,7 @@ export class RelationArray extends ObservableArray<Entity> {
     return goodAdds;
   }
 
-  _processAdds(adds: Entity[]) {
+  _processAddsCore(adds: Entity[]) {
     let parentEntity = this.parentEntity;
     let np = this.navigationProperty;
     let addsInProcess = this._addsInProcess;
@@ -129,13 +131,14 @@ export class RelationArray extends ObservableArray<Entity> {
   
   }
 
-  _processRemoves(removes: Entity[]) {
+  _processRemovesCore(removes: Entity[]) {
     let inp = this.navigationProperty.inverse;
     if (inp) {
       removes.forEach( childEntity => childEntity.setProperty(inp!.name, null));
     }
   }
 
+  // --------------------------------------
   _checkForDups(adds: Entity[]) {
     // don't allow dups in this array. - also prevents recursion
     let parentEntity = this.parentEntity;
@@ -171,10 +174,6 @@ export class RelationArray extends ObservableArray<Entity> {
   }
 
 }
-
-
-
-
 
 /** For use by breeze plugin authors only. The class is for use in building a [[IModelLibraryAdapter]] implementation. 
 @adapter (see [[IModelLibraryAdapter]])    

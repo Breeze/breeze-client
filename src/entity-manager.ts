@@ -1560,7 +1560,7 @@ export class EntityManager {
                 let currentChildren = entity.getProperty(parentToChildNp.name);
                 unattachedChildren.forEach(function (child) {
                   // we know if can't already be there.
-                  currentChildren._push(child);
+                  currentChildren._pushUnsafe(child);
                 });
               }
             }
@@ -1611,7 +1611,7 @@ export class EntityManager {
             parent.setProperty(invNp.name, entity);
           } else {
             if (em.isLoading) {
-              parent.getProperty(invNp.name)._push(entity);
+              parent.getProperty(invNp.name)._pushUnsafe(entity);
             } else {
               parent.getProperty(invNp.name).push(entity);
             }

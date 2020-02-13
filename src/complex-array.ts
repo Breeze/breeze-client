@@ -1,7 +1,7 @@
 import { core } from './core';
 import { ObservableArray } from './observable-array';
 import { BreezeEvent } from './event';
-import { ComplexObject, StructuralObject } from './entity-aspect';
+import { ComplexObject, StructuralObject, Entity } from './entity-aspect';
 import { DataProperty } from './entity-metadata';
 
 
@@ -40,7 +40,8 @@ collections are collected into a single notification event for each relation arr
 @readOnly
 **/
 export class ComplexArray extends ObservableArray<ComplexObject> {
-
+  parent: StructuralObject;
+  parentProperty: DataProperty;
 
   constructor(...args: ComplexObject[]) {
     super(...args);
@@ -52,7 +53,21 @@ export class ComplexArray extends ObservableArray<ComplexObject> {
     return Array;
   }
 
-  // virtual impls
+  getEntityAspect() {
+    return (this.parent as Entity).entityAspect || (this.parent as ComplexObject).complexAspect.getEntityAspect();
+  }
+
+  // impl abstract methods
+
+  _getEventParent() {
+    return this.getEntityAspect();
+  }
+
+  _getPendingPubs() {
+    let em = this.getEntityAspect().entityManager;
+    return em && em._pendingPubs;
+  }
+
   _getGoodAdds(adds: ComplexObject[]) {
     // remove any that are already added here
     return adds.filter(a => {
@@ -62,10 +77,10 @@ export class ComplexArray extends ObservableArray<ComplexObject> {
   }
 
   _beforeChange() {
-    this.updateEntityState();
+    this._updateEntityState();
   }
 
-  _processAdds(adds: ComplexObject[]) {
+  _processAddsCore(adds: ComplexObject[]) {
     adds.forEach(a => {
       if (a.complexAspect && a.complexAspect.parent != null) {
         throw new Error("The complexObject is already attached. Either clone it or remove it from its current owner");
@@ -74,8 +89,21 @@ export class ComplexArray extends ObservableArray<ComplexObject> {
     });
   }
 
-  _processRemoves(removes: ComplexObject[]) {
+  _processRemovesCore(removes: ComplexObject[]) {
     removes.forEach(a => this._clearAspect(a));
+  }
+
+
+  // ----------------------
+
+  _updateEntityState() {
+    let entityAspect = this.getEntityAspect();
+    if (entityAspect.entityState.isUnchanged()) {
+      entityAspect.setModified();
+    }
+    if (entityAspect.entityState.isModified() && !this._origValues) {
+      this._origValues = this.slice(0);
+    }
   }
 
   _rejectChanges() {
@@ -118,7 +146,8 @@ export class ComplexArray extends ObservableArray<ComplexObject> {
 */
 export function makeComplexArray(arr: ComplexObject[], parent: StructuralObject, parentProperty: DataProperty) {
   let complexArray = new ComplexArray(...arr);
-  complexArray.initializeParent(parent, parentProperty);
+  complexArray.parent = parent;
+  complexArray.parentProperty = parentProperty;
   return complexArray;
 }
 

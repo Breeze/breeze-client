@@ -12,15 +12,15 @@ export interface ArrayChangedArgs {
 /** @hidden */
 export abstract class ObservableArray<T> extends Array<T> {
   arrayChanged: BreezeEvent<ArrayChangedArgs>;
-  parent?: StructuralObject;
-  parentProperty?: DataProperty;
   _origValues: T[];
   _pendingArgs: any;
   _inProgress: boolean;
 
+  abstract _getEventParent(): Object;
+  abstract _getPendingPubs(): Object[];
   abstract _getGoodAdds(adds: T[]): Array<T>;
-  abstract _processAdds(items: T[]): void;
-  abstract _processRemoves(items: T[]): void;
+  abstract _processAddsCore(items: T[]): void;
+  abstract _processRemovesCore(items: T[]): void;
 
   constructor(...args: T[]) { 
     super(...args); 
@@ -31,11 +31,6 @@ export abstract class ObservableArray<T> extends Array<T> {
   // built-in methods will use this as the constructor
   static get [Symbol.species]() {
     return Array;
-  }
-
-  initializeParent(parent: StructuralObject, parentProperty: DataProperty) {
-    this.parent = parent;
-    this.parentProperty = parentProperty;
   }
 
   push(...args: T[]) {
@@ -49,19 +44,18 @@ export abstract class ObservableArray<T> extends Array<T> {
     this._beforeChange();
     
     const result = Array.prototype.push.apply(this, goodAdds);
-    this.processAdds(goodAdds);
+    this._processAdds(goodAdds);
     return result;
   }
 
-  _push(...args: any[]) {
+  _pushUnsafe(...goodAdds: T[]) {
     if (this._inProgress) {
       return -1;
     }
-    let goodAdds = args;
     this._beforeChange();
    
     const result = Array.prototype.push.apply(this, goodAdds);
-    this.processAdds(goodAdds);
+    this._processAdds(goodAdds);
     return result;
   }
 
@@ -73,7 +67,7 @@ export abstract class ObservableArray<T> extends Array<T> {
     this._beforeChange();
     
     const result = Array.prototype.unshift.apply(this, goodAdds);
-    this.processAdds(goodAdds);
+    this._processAdds(goodAdds);
     return result;
   }
 
@@ -81,7 +75,7 @@ export abstract class ObservableArray<T> extends Array<T> {
     this._beforeChange();
     
     const result = Array.prototype.pop.apply(this);
-    this.processRemoves([result]);
+    this._processRemoves([result]);
     return result;
   }
 
@@ -89,7 +83,7 @@ export abstract class ObservableArray<T> extends Array<T> {
     this._beforeChange();
     
     const result = Array.prototype.shift.apply(this);
-    this.processRemoves([result]);
+    this._processRemoves([result]);
     return result;
   }
 
@@ -99,56 +93,31 @@ export abstract class ObservableArray<T> extends Array<T> {
     this._beforeChange();
     
     const result = Array.prototype.splice.apply(this, newArgs);
-    this.processRemoves(result);
+    this._processRemoves(result);
 
     if (goodAdds.length) {
-      this.processAdds(goodAdds);
+      this._processAdds(goodAdds);
     }
     return result;
-  }
-
-  getEntityAspect() {
-    return (this.parent as Entity).entityAspect || (this.parent as ComplexObject).complexAspect.getEntityAspect();
-  }
-
-  _getEventParent() {
-    return this.getEntityAspect();
-  }
-
-  _getPendingPubs() {
-    let em = this.getEntityAspect().entityManager;
-    return em && em._pendingPubs;
   }
 
   _beforeChange () {
     // default is to do nothing
   }
 
-  processAdds(adds: T[]) {
-    this._processAdds(adds);
-    // this is referencing the name of the method on the complexArray not the name of the event
-    //var args = { added: adds };
-    //args[obsArray._typeName] = obsArray;
-    this.publish( "arrayChanged", { array: this, added: adds });
+  private _processAdds(adds: T[]) {
+    this._processAddsCore(adds);
+    this._publish( "arrayChanged", { array: this, added: adds });
   }
   
-  processRemoves(removes: T[]) {
-    this._processRemoves(removes);
-    // this is referencing the name of the method on the array not the name of the event
-    this.publish( "arrayChanged", { array: this, removed: removes });
+  private _processRemoves(removes: T[]) {
+    this._processRemovesCore(removes);
+    this._publish( "arrayChanged", { array: this, removed: removes });
   }
 
-  updateEntityState() {
-    let entityAspect = this.getEntityAspect();
-    if (entityAspect.entityState.isUnchanged()) {
-      entityAspect.setModified();
-    }
-    if (entityAspect.entityState.isModified() && !this._origValues) {
-      this._origValues = this.slice(0);
-    }
-  }
+  // ------------------------
 
-  publish(eventName: string, eventArgs: any) {
+  private _publish(eventName: string, eventArgs: any) {
     let pendingPubs = this._getPendingPubs();
     if (pendingPubs) {
       if (!this._pendingArgs) {

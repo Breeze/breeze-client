@@ -1,7 +1,7 @@
-import { core  } from './core';
+import { core } from './core';
 import { ObservableArray } from './observable-array';
 import { BreezeEvent } from './event';
-import { StructuralObject } from './entity-aspect';
+import { StructuralObject, Entity, ComplexObject } from './entity-aspect';
 import { DataProperty } from './entity-metadata';
 
 // TODO: mixin impl is not very typesafe
@@ -14,89 +14,106 @@ import { DataProperty } from './entity-metadata';
 // }
 
 
-  // complexArray will have the following props
-  //    parent
-  //    propertyPath
-  //    parentProperty
-  //    addedItems  - only if modified
-  //    removedItems  - only if modified
-  //  each complexAspect of any entity within a complexArray
-  //  will have its own _complexState = "A/M";
+// complexArray will have the following props
+//    parent
+//    propertyPath
+//    parentProperty
+//    addedItems  - only if modified
+//    removedItems  - only if modified
+//  each complexAspect of any entity within a complexArray
+//  will have its own _complexState = "A/M";
 
-  /**
-  Primitive arrays are not actually classes, they are objects that mimic arrays. A primitive array is collection of
-  primitive types associated with a data property on a single entity or complex object. i.e. customer.invoiceNumbers.
-  This collection looks like an array in that the basic methods on arrays such as 'push', 'pop', 'shift', 'unshift', 'splice'
-  are all provided as well as several special purpose methods.
-  @class {PrimitiveArray}
-  **/
+/**
+Primitive arrays are not actually classes, they are objects that mimic arrays. A primitive array is collection of
+primitive types associated with a data property on a single entity or complex object. i.e. customer.invoiceNumbers.
+This collection looks like an array in that the basic methods on arrays such as 'push', 'pop', 'shift', 'unshift', 'splice'
+are all provided as well as several special purpose methods.
+@class {PrimitiveArray}
+**/
 
-  /**
-  An [[Event]] that fires whenever the contents of this array changed.  This event
-  is fired any time a new entity is attached or added to the EntityManager and happens to belong to this collection.
-  Adds that occur as a result of query or import operations are batched so that all of the adds or removes to any individual
-  collections are collected into a single notification event for each relation array.
-  @example
-      // assume order is an order entity attached to an EntityManager.
-      orders.arrayChanged.subscribe(
-      function (arrayChangedArgs) {
-          let addedEntities = arrayChangedArgs.added;
-          let removedEntities = arrayChanged.removed;
-      });
-  @event arrayChanged
-  @param added {Array of Primitives} An array of all of the items added to this collection.
-  @param removed {Array of Primitives} An array of all of the items removed from this collection.
-  @readOnly
-  **/
+/**
+An [[Event]] that fires whenever the contents of this array changed.  This event
+is fired any time a new entity is attached or added to the EntityManager and happens to belong to this collection.
+Adds that occur as a result of query or import operations are batched so that all of the adds or removes to any individual
+collections are collected into a single notification event for each relation array.
+@example
+    // assume order is an order entity attached to an EntityManager.
+    orders.arrayChanged.subscribe(
+    function (arrayChangedArgs) {
+        let addedEntities = arrayChangedArgs.added;
+        let removedEntities = arrayChanged.removed;
+    });
+@event arrayChanged
+@param added {Array of Primitives} An array of all of the items added to this collection.
+@param removed {Array of Primitives} An array of all of the items removed from this collection.
+@readOnly
+**/
 
-  export class PrimitiveArray extends ObservableArray<any> {
+export class PrimitiveArray extends ObservableArray<any> {
+  parent: StructuralObject;
+  parentProperty: DataProperty;
 
-    constructor(...args: any[]) { 
-      super(...args); 
-      Object.setPrototypeOf(this, PrimitiveArray.prototype);
-      
+  constructor(...args: any[]) {
+    super(...args);
+    Object.setPrototypeOf(this, PrimitiveArray.prototype);
+
+  }
+
+  // built-in methods will use this as the constructor
+  static get [Symbol.species]() {
+    return Array;
+  }
+
+  getEntityAspect() {
+    return (this.parent as Entity).entityAspect || (this.parent as ComplexObject).complexAspect.getEntityAspect();
+  }
+
+  // impl abstract methods
+
+  _getEventParent() {
+    return this.getEntityAspect();
+  }
+
+  _getPendingPubs() {
+    let em = this.getEntityAspect().entityManager;
+    return em && em._pendingPubs;
+  }
+
+  _getGoodAdds(adds: any[]) {
+    return adds;
+  }
+
+  _beforeChange() {
+    let entityAspect = this.getEntityAspect();
+    if (entityAspect.entityState.isUnchanged()) {
+      entityAspect.setModified();
     }
-  
-    // built-in methods will use this as the constructor
-    static get [Symbol.species]() {
-      return Array;
-    }
-
-    // virtual impls
-    _getGoodAdds(adds: any[]) {
-      return adds;
-    }
-
-    _beforeChange() {
-      let entityAspect = this.getEntityAspect();
-      if (entityAspect.entityState.isUnchanged()) {
-        entityAspect.setModified();
-      }
-      if (entityAspect.entityState.isModified() && !this._origValues) {
-        this._origValues = this.slice(0);
-      }
-    }
-
-    _processAdds(adds: any[]) {
-      // nothing needed
-    }
-
-    _processRemoves(removes: any[]) {
-      // nothing needed;
-    }
-
-
-    _rejectChanges() {
-      if (!this._origValues) return;
-      this.length = 0;
-      Array.prototype.push.apply(this, this._origValues);
-    }
-
-    _acceptChanges() {
-      this._origValues = null;
+    if (entityAspect.entityState.isModified() && !this._origValues) {
+      this._origValues = this.slice(0);
     }
   }
+
+  _processAddsCore(adds: any[]) {
+    // nothing needed
+  }
+
+  _processRemovesCore(removes: any[]) {
+    // nothing needed;
+  }
+
+  // --------
   
+  _rejectChanges() {
+    if (!this._origValues) return;
+    this.length = 0;
+    Array.prototype.push.apply(this, this._origValues);
+  }
+
+  _acceptChanges() {
+    this._origValues = null;
+  }
+}
+
 
 /** For use by breeze plugin authors only. The class is for use in building a [[IModelLibraryAdapter]] implementation. 
 @adapter (see [[IModelLibraryAdapter]])    
@@ -104,7 +121,8 @@ import { DataProperty } from './entity-metadata';
 */
 export function makePrimitiveArray(arr: any[], parent: StructuralObject, parentProperty: DataProperty) {
   let primitiveArray = new PrimitiveArray(...arr);
-  primitiveArray.initializeParent( parent, parentProperty);
+  primitiveArray.parent = parent;
+  primitiveArray.parentProperty = parentProperty;
   return primitiveArray;
 }
 
