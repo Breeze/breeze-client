@@ -16,9 +16,7 @@ export function defaultPropertyInterceptor(this: StructuralObject, property: Ent
   if (dataType && dataType.parse) {
     // attempts to coerce a value to the correct type - if this fails return the value unchanged
     if (Array.isArray(newValue) && !property.isScalar) {
-      newValue = newValue.map(function (nv) {
-        return dataType.parse(nv, typeof nv);
-      });
+      newValue = newValue.map( nv => dataType.parse(nv, typeof nv));
     } else {
       newValue = dataType.parse(newValue, typeof newValue);
     }
@@ -122,13 +120,7 @@ function setDpValueSimple(context: IContext, rawAccessorFn: any) {
     // fn when the property is part of the key
     let entityType = (parent as Entity).entityType;
     let keyProps = entityType.keyProperties;
-    let values = keyProps.map(function (p) {
-      if (p === property) {
-        return newValue;
-      } else {
-        return parent.getProperty(p.name);
-      }
-    });
+    let values = keyProps.map( p => (p === property) ? newValue : parent.getProperty(p.name));
     let newKey = new EntityKey(entityType, values);
     if (entityManager.findEntityByKey(newKey)) {
       throw new Error("An entity with this key is already in the cache: " + newKey.toString());
@@ -216,7 +208,6 @@ function setDpValueSimple(context: IContext, rawAccessorFn: any) {
         entityManager._unattachedChildrenMap.addChild(key, invNavProp, parent as Entity);
       }
     }
-
   }
 
   rawAccessorFn(newValue);
@@ -231,7 +222,7 @@ function setDpValueSimple(context: IContext, rawAccessorFn: any) {
     // this part handles order.orderId => orderDetail.orderId
     // but won't handle product.productId => orderDetail.productId because product
     // doesn't have an orderDetails property.
-    entityType.navigationProperties.forEach(function (np) {
+    entityType.navigationProperties.forEach( np => {
       let inverseNp = np.inverse;
       let fkNames = inverseNp ? inverseNp.foreignKeyNames : np.invForeignKeyNames;
 
@@ -242,9 +233,7 @@ function setDpValueSimple(context: IContext, rawAccessorFn: any) {
       if (np.isScalar) {
         npValue.setProperty(fkName, newValue);
       } else {
-        npValue.slice(0).forEach(function (iv: any) {
-          iv.setProperty(fkName, newValue);
-        });
+        npValue.slice(0).forEach( (iv: Entity) => iv.setProperty(fkName, newValue));
       }
     });
     // this handles unidirectional problems not covered above.
@@ -280,26 +269,26 @@ function setDpValueComplex(context: IContext, rawAccessorFn: Function) {
   let dataType = property.dataType as ComplexType;
   if (property.isScalar) {
     if (!newValue) {
-      throw new Error(core.formatString("You cannot set the '%1' property to null because it's datatype is the ComplexType: '%2'", property.name, property.dataType.name));
+      throw new Error(`"You cannot set the '${property.name}' property to null ` + 
+        `because it's datatype is the ComplexType: '${property.dataType.name}'`);
     }
 
     if (!oldValue) {
-      let ctor = dataType.getCtor();
+      const ctor = dataType.getCtor();
       oldValue = new ctor();
       rawAccessorFn(oldValue);
     }
-    dataType.dataProperties.forEach(function (dp) {
-      let pn = dp.name;
-      let nv = newValue.getProperty(pn);
+    dataType.dataProperties.forEach( dp => {
+      const pn = dp.name;
+      const nv = newValue.getProperty(pn);
       oldValue.setProperty(pn, nv);
     });
   } else {
-    throw new Error(core.formatString("You cannot set the non-scalar complex property: '%1' on the type: '%2'." +
-            "Instead get the property and use array functions like 'push' or 'splice' to change its contents.",
-        property.name, property.parentType.name));
+    throw new Error(`You cannot set the non-scalar complex property: '${property.name}' on the type: ` +
+      `'${property.parentType.name}'. Instead get the property and use array functions like 'push' ` + 
+      ` or 'splice' to change its contents.`);
   }
 }
-
 
 function setNpValue(context: IContext, rawAccessorFn: Function) {
 
@@ -419,7 +408,7 @@ function setNpValue(context: IContext, rawAccessorFn: Function) {
     if (newValue == null && (entityState.isDetached() || oldValue.entityAspect.entityState.isDetached())) return;
     if (entityState.isDeleted()) return;
     let inverseKeyProps = property.entityType.keyProperties;
-    inverseKeyProps.forEach(function (keyProp, i) {
+    inverseKeyProps.forEach( (keyProp, i) => {
       let relatedDataProp = property.relatedDataProperties[i];
       // Do not trash related property if it is part of that entity's key
       if (newValue || !relatedDataProp.isPartOfKey) {
