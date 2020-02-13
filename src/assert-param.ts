@@ -1,4 +1,5 @@
-﻿import { BreezeEnum } from './enum';
+﻿// Converted v1
+import { BreezeEnum } from './enum';
 import { core  } from './core';
 
 /** @hidden @internal */
@@ -170,10 +171,9 @@ export class Param {
     }
 
     getMessage() {
-        let that = this;
-        let message = this._contexts.map(function (context) {
-            return getMessage(context, that.v);
-        }).join(", or it ");
+        let message = this._contexts
+          .map( context => getMessage(context, this.v))
+          .join(", or it ");
         return core.formatString(this.MESSAGE_PREFIX, this.name) + " " + message;
     }
 
@@ -191,7 +191,7 @@ export class Param {
         let allowUnknownProperty = (parentTypeName && this.parent.config._$typeName === parentTypeName);
 
         let clone = core.extend({}, this.parent.config);
-        this.parent.params.forEach(function (p) {
+        this.parent.params.forEach( p => {
             if (!allowUnknownProperty) delete clone[p.name];
             try {
                 p.check();
@@ -350,7 +350,7 @@ function exec(self: Param) {
     if (contexts.length === 0) {
         return undefined;
     }
-    return contexts.some(function (context: IParamContext) {
+    return contexts.some( (context: IParamContext) => {
         return context.fn ? context.fn(context, self.v) : false;
     });
 }

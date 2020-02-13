@@ -5,21 +5,8 @@ import { DataProperty, NavigationProperty } from './entity-metadata';
 import { EntityQuery } from './entity-query';
 import { EntityState } from './entity-state';
 import { BreezeEvent } from './event';
-import { ObservableArray, observableArray } from './observable-array';
+import { ObservableArray, observableArrayFns } from './observable-array';
 
-// TODO: mixin impl is not very typesafe
-
-export interface RelationArray extends ObservableArray {
-  [index: number]: Entity;
-  parentEntity: Entity;
-  parentProperty?: DataProperty;
-  navigationProperty: NavigationProperty;
-  _inProgress?: boolean;
-  _addsInProcess: Entity[];
-  load(querySuccessCallback?: QuerySuccessCallback, queryErrorCallback?: QueryErrorCallback): Promise<QueryResult>; 
-}
-
-let relationArrayMixin = {
 
   /**
   Relation arrays are not actually classes, they are objects that mimic arrays. A relation array is collection of
@@ -48,6 +35,22 @@ let relationArrayMixin = {
   **/
 
 
+export class RelationArray extends ObservableArray<Entity> {
+  parentEntity: Entity;
+  navigationProperty: NavigationProperty;
+  // array of pushes currently in process on this relation array - used to prevent recursion.
+  _addsInProcess: Entity[];
+
+  constructor(...args: Entity[]) { 
+    super(...args); 
+    Object.setPrototypeOf(this, RelationArray.prototype);
+  }
+
+  // built-in methods will use this as the constructor
+  static get [Symbol.species]() {
+    return Array;
+  }
+
   /**
   Performs an asynchronous load of all other the entities associated with this relationArray.
   @example
@@ -59,36 +62,36 @@ let relationArrayMixin = {
   @param [errorCallback] {Function}
   @return {Promise}
   **/
-  load: function(callback?: QuerySuccessCallback, errorCallback?: QueryErrorCallback): Promise<QueryResult> {
+  load(callback?: QuerySuccessCallback, errorCallback?: QueryErrorCallback): Promise<QueryResult> {
     let parent = this.parentEntity;
     let query = EntityQuery.fromEntityNavigation(this.parentEntity, this.navigationProperty);
     let em = parent.entityAspect.entityManager;
     return em.executeQuery(query, callback, errorCallback);
-  },
+  }
 
-  _getEventParent: function() {
+  _getEventParent() {
     return this.parentEntity.entityAspect;
-  },
+  }
 
-  _getPendingPubs: function() {
+  _getPendingPubs() {
     let em = this.parentEntity.entityAspect.entityManager;
     return em && em._pendingPubs;
-  },
+  }
 
   // virtual impls
-  _getGoodAdds: function(adds: Entity[]) {
+  _getGoodAdds(adds: Entity[]) {
     return getGoodAdds(this, adds);
-  },
+  }
 
-  _processAdds: function(adds: Entity[]) {
+  _processAdds(adds: Entity[]) {
     processAdds(this, adds);
-  },
+  }
 
-  _processRemoves: function(removes: Entity[]) {
+  _processRemoves(removes: Entity[]) {
     processRemoves(this, removes);
   }
 
-};
+}
 
 function getGoodAdds(relationArray: RelationArray, adds: Entity[]) {
   let goodAdds = checkForDups(relationArray, adds);
@@ -188,14 +191,11 @@ function checkForDups(relationArray: RelationArray, adds: Entity[]) {
 @adapter (see [[IModelLibraryAdapter]])    
 @hidden 
 */
-export function makeRelationArray(arr: any[], parentEntity: Entity, navigationProperty: NavigationProperty): RelationArray {
-  let arrX = arr as any;
-  arrX.parentEntity = parentEntity;
-  arrX.navigationProperty = navigationProperty;
-  arrX.arrayChanged = new BreezeEvent("arrayChanged", arrX);
-  // array of pushes currently in process on this relation array - used to prevent recursion.
-  arrX._addsInProcess = [];
-  // need to use mixins here instead of inheritance because we are starting from an existing array object.
-  core.extend(arrX, observableArray.mixin);
-  return core.extend(arrX, relationArrayMixin) as RelationArray;
+export function makeRelationArray(arr: Entity[], parentEntity: Entity, navigationProperty: NavigationProperty): RelationArray {
+  let relationArray = new RelationArray(...arr);
+  relationArray.parentEntity = parentEntity;
+  relationArray.navigationProperty = navigationProperty;
+  relationArray.arrayChanged = new BreezeEvent("arrayChanged", relationArray);
+  relationArray._addsInProcess = [];
+  return relationArray;
 }

@@ -1,20 +1,11 @@
 import { core  } from './core';
-import { ObservableArray, observableArray } from './observable-array';
+import { ObservableArray, observableArrayFns } from './observable-array';
 import { BreezeEvent } from './event';
 import { ComplexObject, StructuralObject } from './entity-aspect';
 import { DataProperty } from './entity-metadata';
 
-// TODO: mixin impl is not very typesafe
 
-export interface ComplexArray extends ObservableArray {
-  [index: number]: ComplexObject;
-  parent?: StructuralObject;
-  parentProperty?: DataProperty;
-}
-
-let complexArrayMixin = {
-
-  // complexArray will have the following props
+  // ComplexArray will have the following props
   //    parent
   //    propertyPath
   //    parentProperty
@@ -48,25 +39,37 @@ let complexArrayMixin = {
   @param removed {Array of Entity} An array of all of the removed from this collection.
   @readOnly
   **/
+export class ComplexArray extends ObservableArray<ComplexObject> {
+  
+
+  constructor(...args: ComplexObject[]) { 
+    super(...args); 
+    Object.setPrototypeOf(this, ComplexArray.prototype);
+  }
+
+  // built-in methods will use this as the constructor
+  static get [Symbol.species]() {
+    return Array;
+  }
 
     // virtual impls
-  _getGoodAdds: function(adds: any[]) {
+  _getGoodAdds(adds: ComplexObject[]) {
     return getGoodAdds(this, adds);
-  },
+  }
 
-  _beforeChange: function() {
-    observableArray.updateEntityState(this);
-  },
+  _beforeChange() {
+    observableArrayFns.updateEntityState(this);
+  }
 
-  _processAdds: function(adds: any[]) {
+  _processAdds(adds: ComplexObject[]) {
     processAdds(this, adds);
-  },
+  }
 
-  _processRemoves: function(removes: any[]) {
+  _processRemoves(removes: ComplexObject[]) {
     processRemoves(this, removes);
-  },
+  }
 
-  _rejectChanges: function() {
+  _rejectChanges() {
     if (!this._origValues) return;
     let that = this;
     this.forEach(function (co: ComplexObject) {
@@ -76,26 +79,26 @@ let complexArrayMixin = {
     this._origValues.forEach(function (co: ComplexObject) {
       that.push(co);
     });
-  },
+  }
 
-  _acceptChanges: function() {
+  _acceptChanges() {
     this._origValues = null;
   }
-};
+}
 
 // local functions
 
 
 function getGoodAdds(complexArray: ComplexArray, adds: ComplexObject[]) {
   // remove any that are already added here
-  return adds.filter(function (a) {
+  return adds.filter( a => {
     // return a.parent !== complexArray.parent;  // TODO: check if this is actually a bug in original breezejs ???
     return a.complexAspect == null || a.complexAspect.parent !== complexArray.parent;
   });
 }
 
 function processAdds(complexArray: ComplexArray, adds: ComplexObject[]) {
-  adds.forEach(function (a) {
+  adds.forEach( a => {
     // if (a.parent != null) { // TODO: check if this is actually a bug in original breezejs ???
     if (a.complexAspect && a.complexAspect.parent != null) {
       throw new Error("The complexObject is already attached. Either clone it or remove it from its current owner");
@@ -105,9 +108,7 @@ function processAdds(complexArray: ComplexArray, adds: ComplexObject[]) {
 }
 
 function processRemoves(complexArray: ComplexArray, removes: ComplexObject[]) {
-  removes.forEach(function (a) {
-    clearAspect(a, complexArray);
-  });
+  removes.forEach( a => clearAspect(a, complexArray));
 }
 
 function clearAspect(co: ComplexObject, arr: ComplexArray) {
@@ -135,11 +136,10 @@ function setAspect(co: ComplexObject, arr: ComplexArray) {
 @adapter (see [[IModelLibraryAdapter]])    
 @hidden 
 */
-export function makeComplexArray(arr: any[], parent: StructuralObject, parentProperty: DataProperty) {
-  let arrX = arr as any;
-  observableArray.initializeParent(arrX, parent, parentProperty);
-  arrX.arrayChanged = new BreezeEvent("arrayChanged", arrX);
-  core.extend(arrX, observableArray.mixin);
-  return core.extend(arrX, complexArrayMixin) as ComplexArray;
+export function makeComplexArray(arr: ComplexObject[], parent: StructuralObject, parentProperty: DataProperty) {
+  let complexArray = new ComplexArray(...arr);
+  observableArrayFns.initializeParent(complexArray, parent, parentProperty);
+  complexArray.arrayChanged = new BreezeEvent("arrayChanged", complexArray);
+  return complexArray;
 }
 

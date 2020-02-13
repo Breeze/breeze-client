@@ -1,5 +1,5 @@
 import { core  } from './core';
-import { observableArray } from './observable-array';
+import { observableArrayFns, ObservableArray } from './observable-array';
 import { BreezeEvent } from './event';
 import { StructuralObject } from './entity-aspect';
 import { DataProperty } from './entity-metadata';
@@ -13,7 +13,6 @@ import { DataProperty } from './entity-metadata';
 //   parentProperty?: DataProperty;
 // }
 
-let primitiveArrayMixin = {
 
   // complexArray will have the following props
   //    parent
@@ -29,7 +28,7 @@ let primitiveArrayMixin = {
   primitive types associated with a data property on a single entity or complex object. i.e. customer.invoiceNumbers.
   This collection looks like an array in that the basic methods on arrays such as 'push', 'pop', 'shift', 'unshift', 'splice'
   are all provided as well as several special purpose methods.
-  @class {primitiveArray}
+  @class {PrimitiveArray}
   **/
 
   /**
@@ -50,52 +49,63 @@ let primitiveArrayMixin = {
   @readOnly
   **/
 
+  export class PrimitiveArray extends ObservableArray<any> {
+
+    constructor(...args: any[]) { 
+      super(...args); 
+      Object.setPrototypeOf(this, PrimitiveArray.prototype);
+    }
+  
+    // built-in methods will use this as the constructor
+    static get [Symbol.species]() {
+      return Array;
+    }
+
     // virtual impls
-  _getGoodAdds:  function(adds: any[]) {
-    return adds;
-  },
-
-  _beforeChange: function() {
-    let entityAspect = this.getEntityAspect();
-    if (entityAspect.entityState.isUnchanged()) {
-      entityAspect.setModified();
+    _getGoodAdds(adds: any[]) {
+      return adds;
     }
-    if (entityAspect.entityState.isModified() && !this._origValues) {
-      this._origValues = this.slice(0);
+
+    _beforeChange() {
+      let entityAspect = this.getEntityAspect();
+      if (entityAspect.entityState.isUnchanged()) {
+        entityAspect.setModified();
+      }
+      if (entityAspect.entityState.isModified() && !this._origValues) {
+        this._origValues = this.slice(0);
+      }
     }
-  },
 
-  _processAdds: function(adds: any[]) {
-    // nothing needed
-  },
+    _processAdds(adds: any[]) {
+      // nothing needed
+    }
 
-  _processRemoves: function(removes: any[]) {
-    // nothing needed;
-  },
+    _processRemoves(removes: any[]) {
+      // nothing needed;
+    }
 
 
-  _rejectChanges: function() {
-    if (!this._origValues) return;
-    this.length = 0;
-    Array.prototype.push.apply(this, this._origValues);
-  },
+    _rejectChanges() {
+      if (!this._origValues) return;
+      this.length = 0;
+      Array.prototype.push.apply(this, this._origValues);
+    }
 
-  _acceptChanges: function() {
-    this._origValues = null;
+    _acceptChanges() {
+      this._origValues = null;
+    }
   }
-};
-  // local functions
+  
 
 /** For use by breeze plugin authors only. The class is for use in building a [[IModelLibraryAdapter]] implementation. 
 @adapter (see [[IModelLibraryAdapter]])    
 @hidden 
 */
 export function makePrimitiveArray(arr: any[], parent: StructuralObject, parentProperty: DataProperty) {
-  let arrX = arr as any;
-  observableArray.initializeParent(arrX, parent, parentProperty);
-  arrX.arrayChanged = new BreezeEvent("arrayChanged", arrX);
-  core.extend(arrX, observableArray.mixin);
-  return core.extend(arrX, primitiveArrayMixin);
+  let primitiveArray = new PrimitiveArray(...arr);
+  observableArrayFns.initializeParent(primitiveArray, parent, parentProperty);
+  primitiveArray.arrayChanged = new BreezeEvent("arrayChanged", primitiveArray);
+  return primitiveArray;
 }
 
 
