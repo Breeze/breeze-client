@@ -54,6 +54,7 @@ import { DataProperty } from './entity-metadata';
     constructor(...args: any[]) { 
       super(...args); 
       Object.setPrototypeOf(this, PrimitiveArray.prototype);
+      
     }
   
     // built-in methods will use this as the constructor
@@ -104,7 +105,6 @@ import { DataProperty } from './entity-metadata';
 export function makePrimitiveArray(arr: any[], parent: StructuralObject, parentProperty: DataProperty) {
   let primitiveArray = new PrimitiveArray(...arr);
   primitiveArray.initializeParent( parent, parentProperty);
-  primitiveArray.arrayChanged = new BreezeEvent("arrayChanged", primitiveArray);
   return primitiveArray;
 }
 

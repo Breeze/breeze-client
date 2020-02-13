@@ -38,7 +38,7 @@ export class RelationArray extends ObservableArray<Entity> {
   parentEntity: Entity;
   navigationProperty: NavigationProperty;
   // array of pushes currently in process on this relation array - used to prevent recursion.
-  _addsInProcess: Entity[];
+  _addsInProcess: Entity[] = [];
 
   constructor(...args: Entity[]) { 
     super(...args); 
@@ -79,112 +79,102 @@ export class RelationArray extends ObservableArray<Entity> {
 
   // virtual impls
   _getGoodAdds(adds: Entity[]) {
-    return getGoodAdds(this, adds);
+    let goodAdds = this._checkForDups(adds);
+    if (!goodAdds.length) {
+      return goodAdds;
+    }
+    let parentEntity = this.parentEntity;
+    let entityManager = parentEntity.entityAspect.entityManager;
+    // we do not want to attach an entity during loading
+    // because these will all be 'attached' at a later step.
+    if (entityManager && !entityManager.isLoading) {
+      goodAdds.forEach( add => {
+        if (add.entityAspect.entityState.isDetached()) {
+          this._inProgress = true;
+          try {
+            entityManager!.attachEntity(add, EntityState.Added);
+          } finally {
+            this._inProgress = false;
+          }
+        }
+      });
+    }
+    return goodAdds;
   }
 
   _processAdds(adds: Entity[]) {
-    processAdds(this, adds);
+    let parentEntity = this.parentEntity;
+    let np = this.navigationProperty;
+    let addsInProcess = this._addsInProcess;
+  
+    let invNp = np.inverse;
+    let startIx = addsInProcess.length;
+    try {
+      adds.forEach( (childEntity) => {
+        addsInProcess.push(childEntity);
+        if (invNp) {
+          childEntity.setProperty(invNp.name, parentEntity);
+        } else {
+          // This occurs with a unidirectional 1-n navigation - in this case
+          // we need to update the fks instead of the navProp
+          let pks = parentEntity.entityType.keyProperties;
+          np.invForeignKeyNames.forEach( (fk, i) => {
+            childEntity.setProperty(fk, parentEntity.getProperty(pks[i].name));
+          });
+        }
+      });
+    } finally {
+      addsInProcess.splice(startIx, adds.length);
+    }
+  
   }
 
   _processRemoves(removes: Entity[]) {
-    processRemoves(this, removes);
+    let inp = this.navigationProperty.inverse;
+    if (inp) {
+      removes.forEach( childEntity => childEntity.setProperty(inp!.name, null));
+    }
   }
 
-}
-
-function getGoodAdds(relationArray: RelationArray, adds: Entity[]) {
-  let goodAdds = checkForDups(relationArray, adds);
-  if (!goodAdds.length) {
+  _checkForDups(adds: Entity[]) {
+    // don't allow dups in this array. - also prevents recursion
+    let parentEntity = this.parentEntity;
+    let navProp = this.navigationProperty;
+    let inverseProp = navProp.inverse;
+    let goodAdds: Entity[];
+    if (inverseProp) {
+      goodAdds = adds.filter( a => {
+        if (this._addsInProcess.indexOf(a) >= 0) {
+          return false;
+        }
+        let inverseValue = a.getProperty(inverseProp!.name);
+        return inverseValue !== parentEntity;
+      });
+    } else {
+      // This occurs with a unidirectional 1->N relation ( where there is no n -> 1)
+      // in this case we compare fks.
+      let fkPropNames = navProp.invForeignKeyNames;
+      let keyProps = parentEntity.entityType.keyProperties;
+      goodAdds = adds.filter( a => {
+        if (this._addsInProcess.indexOf(a) >= 0) {
+          return false;
+        }
+        return fkPropNames.some( (fk, i) => {
+          let keyProp = keyProps[i].name;
+          let keyVal = parentEntity.getProperty(keyProp);
+          let fkVal = a.getProperty(fk);
+          return keyVal !== fkVal;
+        });
+      });
+    }
     return goodAdds;
   }
-  let parentEntity = relationArray.parentEntity;
-  let entityManager = parentEntity.entityAspect.entityManager;
-  // we do not want to attach an entity during loading
-  // because these will all be 'attached' at a later step.
-  if (entityManager && !entityManager.isLoading) {
-    goodAdds.forEach(function (add) {
-      if (add.entityAspect.entityState.isDetached()) {
-        relationArray._inProgress = true;
-        try {
-          entityManager!.attachEntity(add, EntityState.Added);
-        } finally {
-          relationArray._inProgress = false;
-        }
-      }
-    });
-  }
-  return goodAdds;
-}
-
-function processAdds(relationArray: RelationArray, adds: Entity[]) {
-  let parentEntity = relationArray.parentEntity;
-  let np = relationArray.navigationProperty;
-  let addsInProcess = relationArray._addsInProcess;
-
-  let invNp = np.inverse;
-  let startIx = addsInProcess.length;
-  try {
-    adds.forEach(function (childEntity) {
-      addsInProcess.push(childEntity);
-      if (invNp) {
-        childEntity.setProperty(invNp.name, parentEntity);
-      } else {
-        // This occurs with a unidirectional 1-n navigation - in this case
-        // we need to update the fks instead of the navProp
-        let pks = parentEntity.entityType.keyProperties;
-        np.invForeignKeyNames.forEach(function (fk, i) {
-          childEntity.setProperty(fk, parentEntity.getProperty(pks[i].name));
-        });
-      }
-    });
-  } finally {
-    addsInProcess.splice(startIx, adds.length);
-  }
 
 }
 
-function processRemoves(relationArray: RelationArray, removes: Entity[]) {
-  let inp = relationArray.navigationProperty.inverse;
-  if (inp) {
-    removes.forEach(function (childEntity) {
-      childEntity.setProperty(inp!.name, null);
-    });
-  }
-}
 
-function checkForDups(relationArray: RelationArray, adds: Entity[]) {
-  // don't allow dups in this array. - also prevents recursion
-  let parentEntity = relationArray.parentEntity;
-  let navProp = relationArray.navigationProperty;
-  let inverseProp = navProp.inverse;
-  let goodAdds: Entity[];
-  if (inverseProp) {
-    goodAdds = adds.filter(function (a) {
-      if (relationArray._addsInProcess.indexOf(a) >= 0) {
-        return false;
-      }
-      let inverseValue = a.getProperty(inverseProp!.name);
-      return inverseValue !== parentEntity;
-    });
-  } else {
-    // This occurs with a unidirectional 1->N relation ( where there is no n -> 1)
-    // in this case we compare fks.
-    let fkPropNames = navProp.invForeignKeyNames;
-    let keyProps = parentEntity.entityType.keyProperties;
-    goodAdds = adds.filter(function (a) {
-      if (relationArray._addsInProcess.indexOf(a) >= 0) {
-        return false;
-      }
-      return fkPropNames.some(function (fk, i) {
-        let keyProp = keyProps[i].name;
-        let keyVal = parentEntity.getProperty(keyProp);
-        let fkVal = a.getProperty(fk);
-        return keyVal !== fkVal;
-      });
-    });
-  }
-  return goodAdds;
-}
+
+
 
 /** For use by breeze plugin authors only. The class is for use in building a [[IModelLibraryAdapter]] implementation. 
 @adapter (see [[IModelLibraryAdapter]])    
@@ -194,7 +184,5 @@ export function makeRelationArray(arr: Entity[], parentEntity: Entity, navigatio
   let relationArray = new RelationArray(...arr);
   relationArray.parentEntity = parentEntity;
   relationArray.navigationProperty = navigationProperty;
-  relationArray.arrayChanged = new BreezeEvent("arrayChanged", relationArray);
-  relationArray._addsInProcess = [];
   return relationArray;
 }

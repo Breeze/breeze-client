@@ -3,6 +3,11 @@ import { BreezeEvent } from './event';
 import { EntityAspect, StructuralObject, Entity, ComplexObject } from './entity-aspect';
 import { DataProperty } from './entity-metadata';
 
+export interface ArrayChangedArgs {
+  array: any[];
+  added?: any[]; 
+  removed?: any[];
+}
 
 /** @hidden */
 export abstract class ObservableArray<T> extends Array<T> {
@@ -20,6 +25,7 @@ export abstract class ObservableArray<T> extends Array<T> {
   constructor(...args: T[]) { 
     super(...args); 
     Object.setPrototypeOf(this, ObservableArray.prototype);
+    this.arrayChanged = new BreezeEvent("arrayChanged", this);
   }
 
   // built-in methods will use this as the constructor
@@ -132,6 +138,16 @@ export abstract class ObservableArray<T> extends Array<T> {
     this.publish( "arrayChanged", { array: this, removed: removes });
   }
 
+  updateEntityState() {
+    let entityAspect = this.getEntityAspect();
+    if (entityAspect.entityState.isUnchanged()) {
+      entityAspect.setModified();
+    }
+    if (entityAspect.entityState.isModified() && !this._origValues) {
+      this._origValues = this.slice(0);
+    }
+  }
+
   publish(eventName: string, eventArgs: any) {
     let pendingPubs = this._getPendingPubs();
     if (pendingPubs) {
@@ -148,26 +164,8 @@ export abstract class ObservableArray<T> extends Array<T> {
       this[eventName].publish(eventArgs);
     }
   }
-
-  updateEntityState() {
-    let entityAspect = this.getEntityAspect();
-    if (entityAspect.entityState.isUnchanged()) {
-      entityAspect.setModified();
-    }
-    if (entityAspect.entityState.isModified() && !this._origValues) {
-      this._origValues = this.slice(0);
-    }
-  }
-
   
 }
-
-export interface ArrayChangedArgs {
-  array: any[];
-  added?: any[]; 
-  removed?: any[];
-}
-
 
 // TODO: see if this function already exists in core and can be imported.
 function combineArgs(target: Object, source: Object) {
