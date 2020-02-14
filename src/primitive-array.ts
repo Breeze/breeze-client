@@ -1,10 +1,8 @@
-import { core } from './core';
+// Converted to ES6
+
 import { ObservableArray } from './observable-array';
-import { BreezeEvent } from './event';
 import { StructuralObject, Entity, ComplexObject } from './entity-aspect';
 import { DataProperty } from './entity-metadata';
-
-// TODO: mixin impl is not very typesafe
 
 // Not needed
 // interface IPrimitiveArray extends IObservableArray {

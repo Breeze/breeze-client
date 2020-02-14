@@ -1,10 +1,10 @@
-import { core } from './core';
+// Converted to ES6
+
 import { Entity } from './entity-aspect';
 import { QueryErrorCallback, QueryResult, QuerySuccessCallback } from './entity-manager';
-import { DataProperty, NavigationProperty } from './entity-metadata';
+import { NavigationProperty } from './entity-metadata';
 import { EntityQuery } from './entity-query';
 import { EntityState } from './entity-state';
-import { BreezeEvent } from './event';
 import { ObservableArray  } from './observable-array';
 
   /**

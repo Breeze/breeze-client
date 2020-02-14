@@ -24,6 +24,7 @@ describe("Save exception handling", () => {
 
   test("should throw when delete saved added entity (store-gen key) before server save response", async function (done) {
     expect.assertions(7);
+    
     // Fails D#2649 "Internal Error in key fixup - unable to locate entity"
     const em = TestFns.newEntityManager();
     // Surround target emp (emp2) with other adds to see the effect on the cached adds
@@ -94,6 +95,8 @@ describe("Save exception handling", () => {
     const emp2 = em.createEntity("Employee", { firstName: 'Test fn2', lastName: 'Test fn2' });
     const emp3 = em.createEntity("Employee", { firstName: 'Test fn3', lastName: 'Test fn3' });
 
+    // deliberately left as a promise impl
+    // We expect the saveChanges to succeed AND for the code in the try block to fail
     em.saveChanges().then(function (sr) {
       expect(emp1.getProperty("employeeID")).toBeGreaterThan(-1);
       expect(emp1.entityAspect.entityState.isUnchanged()).toBe(true);
@@ -104,7 +107,6 @@ describe("Save exception handling", () => {
     }).catch(function (e) {
       throw new Error('should not get here');
     }).finally(done);
-
 
     // try to rejectChanges for the added entity before save can return;
     try {

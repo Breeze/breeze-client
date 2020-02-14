@@ -1,7 +1,7 @@
-﻿import { core } from './core';
+﻿// Converted to ES6
+
+import { core } from './core';
 import { BreezeEvent } from './event';
-import { EntityAspect, StructuralObject, Entity, ComplexObject } from './entity-aspect';
-import { DataProperty } from './entity-metadata';
 
 export interface ArrayChangedArgs {
   array: any[];

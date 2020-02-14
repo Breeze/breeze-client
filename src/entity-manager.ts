@@ -704,7 +704,7 @@ export class EntityManager {
     core.objectMap(this._entityGroupMap, function (key: string, entityGroup: EntityGroup) {
       return entityGroup._checkOperation('clear');
     }).forEach((entityGroup: EntityGroup) => {
-      entityGroup._clear();
+      entityGroup._clearUnsafe();
     });
 
     this._entityGroupMap = {};

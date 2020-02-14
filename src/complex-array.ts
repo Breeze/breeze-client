@@ -1,9 +1,8 @@
-import { core } from './core';
+// Converted to ES6
+
 import { ObservableArray } from './observable-array';
-import { BreezeEvent } from './event';
 import { ComplexObject, StructuralObject, Entity } from './entity-aspect';
 import { DataProperty } from './entity-metadata';
-
 
 // ComplexArray will have the following props
 //    parent

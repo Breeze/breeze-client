@@ -1,4 +1,6 @@
-﻿import { core } from './core';
+﻿// Converted to ES6
+
+import { core } from './core';
 import { config } from './config';
 import { BreezeEvent } from './event';
 import { assertParam } from './assert-param';
@@ -603,8 +605,8 @@ export class EntityAspect {
   Removes all of the validation errors for a specified entity
   **/
   clearValidationErrors() {
-    this._processValidationOpAndPublish(function (that: any) {
-      core.objectForEach(that._validationErrors, function (key: string, valError: ValidationError) {
+    this._processValidationOpAndPublish( (that: any) => {
+      core.objectForEach(that._validationErrors, (key: string, valError: ValidationError) => {
         if (valError) {
           delete that._validationErrors[key];
           that._pendingValidationResult.removed.push(valError);
@@ -687,9 +689,9 @@ export class EntityAspect {
   /** @hidden @internal */
   _validateProperty(value: any, context: any) {
     let ok = true;
-    this._processValidationOpAndPublish(function (that: any) {
-      context.property.getAllValidators().forEach(function (validator: Validator) {
-        ok = validate(that, validator, value, context) && ok;
+    this._processValidationOpAndPublish( (that: any) => {
+      context.property.getAllValidators().forEach( (validator: Validator) => {
+        ok = ok && validate(that, validator, value, context);
       });
     });
     return ok;

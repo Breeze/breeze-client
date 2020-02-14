@@ -1,15 +1,19 @@
-﻿import { Entity } from './entity-aspect';
+﻿// Converted to ES6
+
+import { Entity } from './entity-aspect';
 import { EntityType, DataProperty  } from './entity-metadata';
 import { EntityKey } from './entity-key';
 import { EntityState } from './entity-state';
 import { EntityManager } from './entity-manager';
 import { MergeStrategy } from './query-options';
 
+// do not expose EntityGroup - internal only
+
 /** @hidden @internal */
 export class EntityGroup {
   entityManager: EntityManager;
   entityType: EntityType;
-  _indexMap: { [index: string]: number };
+  _indexMap: Map<string, number>;
   _entities: (Entity | null)[];
   _emptyIndexes: number[];
 
@@ -18,7 +22,8 @@ export class EntityGroup {
     this.entityType = entityType;
     // freeze the entityType after the first instance of this type is either created or queried.
     this.entityType.isFrozen = true;
-    this._indexMap = {};
+    this._indexMap = new Map<string, number>();
+
     this._entities = [];
     this._emptyIndexes = [];
   }
@@ -34,7 +39,7 @@ export class EntityGroup {
     delete aspect._initialized;
 
     let keyInGroup = aspect.getKey()._keyInGroup;
-    let ix = this._indexMap[keyInGroup];
+    let ix = this._indexMap.get(keyInGroup);
     if (ix >= 0) {
       // safecast because key was found not ix will not return a null
       let targetEntity = this._entities[ix] as Entity;
@@ -59,7 +64,7 @@ export class EntityGroup {
         ix = this._emptyIndexes.pop();
         this._entities[ix] = entity;
       }
-      this._indexMap[keyInGroup] = ix;
+      this._indexMap.set(keyInGroup, ix);
       aspect.entityState = entityState;
       aspect.entityGroup = this;
       aspect.entityManager = this.entityManager;
@@ -72,12 +77,12 @@ export class EntityGroup {
     // belongs to this group.
     let aspect = entity.entityAspect;
     let keyInGroup = aspect.getKey()._keyInGroup;
-    let ix = this._indexMap[keyInGroup];
+    let ix = this._indexMap.get(keyInGroup);
     if (ix === undefined) {
       // shouldn't happen.
       throw new Error("internal error - entity cannot be found in group");
     }
-    delete this._indexMap[keyInGroup];
+    this._indexMap.delete(keyInGroup);
     this._emptyIndexes.push(ix);
     this._entities[ix] = null;
     return entity;
@@ -92,9 +97,9 @@ export class EntityGroup {
     } else {
       keyInGroup = EntityKey.createKeyString(entityKey);
     }
-    let ix = this._indexMap[keyInGroup];
+    const ix = this._indexMap.get(keyInGroup);
     // can't use just (ix) below because 0 is valid
-    let r = (ix !== undefined) ? this._entities[ix] : undefined;
+    const r = (ix !== undefined) ? this._entities[ix] : undefined;
     // coerce null to undefined
     return r == null ? undefined : r;
   }
@@ -130,7 +135,7 @@ export class EntityGroup {
   }
 
   _checkOperation(operationName: string) {
-    this._entities.forEach(function (entity) {
+    this._entities.forEach( entity => {
       entity && entity.entityAspect._checkOperation(operationName);
     });
     // for chaining;
@@ -141,8 +146,8 @@ export class EntityGroup {
   // just for the entityManager clear method - the entityGroup will be in an inconsistent state
   // after this op, which is ok because it will be thrown away.
   // TODO: rename this to be clear that it is UNSAFE...
-  _clear() {
-    this._entities.forEach(function (entity) {
+  _clearUnsafe() {
+    this._entities.forEach( entity => {
       if (entity != null) {
         entity.entityAspect._detach();
       }
@@ -154,7 +159,7 @@ export class EntityGroup {
 
   _updateFkVal(fkProp: DataProperty, oldValue: any, newValue: any) {
     let fkPropName = fkProp.name;
-    this._entities.forEach(function (entity) {
+    this._entities.forEach( entity => {
       if (entity != null) {
         if (entity.getProperty(fkPropName) === oldValue) {
           entity.setProperty(fkPropName, newValue);
@@ -165,45 +170,39 @@ export class EntityGroup {
 
   _fixupKey(tempValue: any, realValue: any) {
     // single part keys appear directly in map
-    let ix = this._indexMap[tempValue];
+    const tempKey = tempValue.toString();
+    const ix = this._indexMap.get(tempKey);
     if (ix === undefined) {
       throw new Error("Internal Error in key fixup - unable to locate entity");
     }
-    let entity = this._entities[ix] as Entity;
-    let keyPropName = entity.entityType.keyProperties[0].name;
+    const entity = this._entities[ix];
+    const keyPropName = entity.entityType.keyProperties[0].name;
     // fks on related entities will automatically get updated by this as well
     entity.setProperty(keyPropName, realValue);
     delete entity.entityAspect.hasTempKey;
-    delete this._indexMap[tempValue];
-    this._indexMap[realValue] = ix;
+    this._indexMap.delete(tempKey);
+    this._indexMap.set(realValue.toString(), ix);
   }
 
   _replaceKey(oldKey: EntityKey, newKey: EntityKey) {
-    let ix = this._indexMap[oldKey._keyInGroup];
-    delete this._indexMap[oldKey._keyInGroup];
-    this._indexMap[newKey._keyInGroup] = ix;
+    let ix = this._indexMap.get(oldKey._keyInGroup);
+    this._indexMap.delete(oldKey._keyInGroup);
+    this._indexMap.set(newKey._keyInGroup, ix);
   }
 
 }
 
 function getFilter(entityStates: EntityState[]) {
   if (entityStates.length === 0) {
-    return function (e: Entity) {
-      return !!e;
-    };
+    return  (e: Entity)  => !!e;
   } else if (entityStates.length === 1) {
-    let entityState = entityStates[0];
-    return function (e: Entity) {
-      return !!e && e.entityAspect.entityState === entityState;
-    };
+    return (e: Entity) => !! (e && e.entityAspect.entityState === entityStates[0]);
   } else {
-    return function (e: Entity) {
-      return !!e && -1 !== entityStates.indexOf(e.entityAspect.entityState);
-    };
+    return (e: Entity) => !! (e && entityStates.includes(e.entityAspect.entityState));
   }
 }
 
 
-// do not expose EntityGroup - internal only
+
 
 

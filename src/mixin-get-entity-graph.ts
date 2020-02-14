@@ -25,7 +25,7 @@ import { Entity, EntityManager, EntityQuery, EntityState, EntityType, ExpandClau
 
 interface EntityGroup {
   _entities: (Entity | null)[];
-  _indexMap: { [index: string]: number };
+  _indexMap: Map<string, number>;
 }
 
 // module augmentation failed to build with ng-packagr, so we have a separate interface
@@ -263,7 +263,7 @@ function getEntityGraphCore(root: Entity | Array<Entity>, expand: string | Array
           try {
             let keyValue = entity.getProperty(fkName);
             for (let i = 0; i < grpCount; i += 1) {
-              val = grps[i]._entities[grps[i]._indexMap[keyValue]];
+              val = grps[i]._entities[grps[i]._indexMap.get(keyValue)];
               if (val) { break; }
             }
           } catch (e) { rethrow(e); }
