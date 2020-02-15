@@ -1,0 +1,1 @@
+{"__symbolic":"module","version":4,"metadata":{"AjaxFetchAdapter":{"__symbolic":"class","members":{"__ctor__":[{"__symbolic":"constructor"}],"initialize":[{"__symbolic":"method"}],"ajax":[{"__symbolic":"method"}]},"statics":{"adapterName":"fetch"}}},"origins":{"AjaxFetchAdapter":"./adapter-ajax-fetch"},"importAs":"breeze-client/adapter-ajax-fetch"}

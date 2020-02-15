@@ -1,0 +1,1 @@
+{"__symbolic":"module","version":4,"metadata":{"AjaxJQueryAdapter":{"__symbolic":"class","members":{"__ctor__":[{"__symbolic":"constructor"}],"initialize":[{"__symbolic":"method"}],"ajax":[{"__symbolic":"method"}]}}},"origins":{"AjaxJQueryAdapter":"./adapter-ajax-jquery"},"importAs":"breeze-client/adapter-ajax-jquery"}

@@ -1,0 +1,8 @@
+{
+  "name": "adapter-ajax-angularjs",
+  "ngPackage": {
+    "lib": {
+        "entryFile": "../adapter-ajax-angularjs.ts"
+      }
+  }
+}

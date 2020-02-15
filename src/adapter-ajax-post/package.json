@@ -1,0 +1,8 @@
+{
+  "name": "adapter-ajax-post",
+  "ngPackage": {
+    "lib": {
+        "entryFile": "../adapter-ajax-post.ts"
+      }
+  }
+}

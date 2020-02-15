@@ -1,0 +1,1 @@
+{"__symbolic":"module","version":4,"metadata":{"AjaxAngularjsAdapter":{"__symbolic":"class","members":{"__ctor__":[{"__symbolic":"constructor"}],"initialize":[{"__symbolic":"method"}],"setHttp":[{"__symbolic":"method"}],"ajax":[{"__symbolic":"method"}]}}},"origins":{"AjaxAngularjsAdapter":"./adapter-ajax-angularjs"},"importAs":"breeze-client/adapter-ajax-angularjs"}

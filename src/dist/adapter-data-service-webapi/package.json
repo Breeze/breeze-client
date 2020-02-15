@@ -1,0 +1,13 @@
+{
+  "name": "breeze-client/adapter-data-service-webapi",
+  "main": "../bundles/breeze-client-adapter-data-service-webapi.umd.js",
+  "module": "../fesm5/breeze-client-adapter-data-service-webapi.js",
+  "es2015": "../fesm2015/breeze-client-adapter-data-service-webapi.js",
+  "esm5": "../esm5/adapter-data-service-webapi/breeze-client-adapter-data-service-webapi.js",
+  "esm2015": "../esm2015/adapter-data-service-webapi/breeze-client-adapter-data-service-webapi.js",
+  "fesm5": "../fesm5/breeze-client-adapter-data-service-webapi.js",
+  "fesm2015": "../fesm2015/breeze-client-adapter-data-service-webapi.js",
+  "typings": "breeze-client-adapter-data-service-webapi.d.ts",
+  "metadata": "breeze-client-adapter-data-service-webapi.metadata.json",
+  "sideEffects": false
+}

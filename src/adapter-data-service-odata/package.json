@@ -1,0 +1,8 @@
+{
+  "name": "adapter-data-service-odata",
+  "ngPackage": {
+    "lib": {
+        "entryFile": "../adapter-data-service-odata.ts"
+      }
+  }
+}

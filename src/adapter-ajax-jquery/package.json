@@ -1,0 +1,8 @@
+{
+  "name": "adapter-ajax-jquery",
+  "ngPackage": {
+    "lib": {
+        "entryFile": "../adapter-ajax-jquery.ts"
+      }
+  }
+}

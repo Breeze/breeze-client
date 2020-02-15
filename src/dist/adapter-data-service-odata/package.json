@@ -1,0 +1,13 @@
+{
+  "name": "breeze-client/adapter-data-service-odata",
+  "main": "../bundles/breeze-client-adapter-data-service-odata.umd.js",
+  "module": "../fesm5/breeze-client-adapter-data-service-odata.js",
+  "es2015": "../fesm2015/breeze-client-adapter-data-service-odata.js",
+  "esm5": "../esm5/adapter-data-service-odata/breeze-client-adapter-data-service-odata.js",
+  "esm2015": "../esm2015/adapter-data-service-odata/breeze-client-adapter-data-service-odata.js",
+  "fesm5": "../fesm5/breeze-client-adapter-data-service-odata.js",
+  "fesm2015": "../fesm2015/breeze-client-adapter-data-service-odata.js",
+  "typings": "breeze-client-adapter-data-service-odata.d.ts",
+  "metadata": "breeze-client-adapter-data-service-odata.metadata.json",
+  "sideEffects": false
+}

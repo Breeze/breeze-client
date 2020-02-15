@@ -1,0 +1,13 @@
+{
+  "name": "breeze-client/mixin-get-entity-graph",
+  "main": "../bundles/breeze-client-mixin-get-entity-graph.umd.js",
+  "module": "../fesm5/breeze-client-mixin-get-entity-graph.js",
+  "es2015": "../fesm2015/breeze-client-mixin-get-entity-graph.js",
+  "esm5": "../esm5/mixin-get-entity-graph/breeze-client-mixin-get-entity-graph.js",
+  "esm2015": "../esm2015/mixin-get-entity-graph/breeze-client-mixin-get-entity-graph.js",
+  "fesm5": "../fesm5/breeze-client-mixin-get-entity-graph.js",
+  "fesm2015": "../fesm2015/breeze-client-mixin-get-entity-graph.js",
+  "typings": "breeze-client-mixin-get-entity-graph.d.ts",
+  "metadata": "breeze-client-mixin-get-entity-graph.metadata.json",
+  "sideEffects": false
+}

@@ -1,0 +1,8 @@
+{
+  "name": "mixin-save-queuing",
+  "ngPackage": {
+    "lib": {
+        "entryFile": "../mixin-save-queuing.ts"
+      }
+  }
+}

@@ -1,8 +1,0 @@
-{
-  "name": "mixin-get-entity-graph",
-  "ngPackage": {
-    "lib": {
-        "entryFile": "../src/mixin-get-entity-graph.ts"
-      }
-  }
-}

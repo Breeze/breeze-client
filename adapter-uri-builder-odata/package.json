@@ -1,8 +1,0 @@
-{
-  "name": "adapter-uri-builder-odata",
-  "ngPackage": {
-    "lib": {
-        "entryFile": "../src/adapter-uri-builder-odata.ts"
-      }
-  }
-}

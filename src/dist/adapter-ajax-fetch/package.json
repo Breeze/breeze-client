@@ -1,0 +1,13 @@
+{
+  "name": "breeze-client/adapter-ajax-fetch",
+  "main": "../bundles/breeze-client-adapter-ajax-fetch.umd.js",
+  "module": "../fesm5/breeze-client-adapter-ajax-fetch.js",
+  "es2015": "../fesm2015/breeze-client-adapter-ajax-fetch.js",
+  "esm5": "../esm5/adapter-ajax-fetch/breeze-client-adapter-ajax-fetch.js",
+  "esm2015": "../esm2015/adapter-ajax-fetch/breeze-client-adapter-ajax-fetch.js",
+  "fesm5": "../fesm5/breeze-client-adapter-ajax-fetch.js",
+  "fesm2015": "../fesm2015/breeze-client-adapter-ajax-fetch.js",
+  "typings": "breeze-client-adapter-ajax-fetch.d.ts",
+  "metadata": "breeze-client-adapter-ajax-fetch.metadata.json",
+  "sideEffects": false
+}

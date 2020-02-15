@@ -1,0 +1,13 @@
+{
+  "name": "breeze-client/mixin-save-queuing",
+  "main": "../bundles/breeze-client-mixin-save-queuing.umd.js",
+  "module": "../fesm5/breeze-client-mixin-save-queuing.js",
+  "es2015": "../fesm2015/breeze-client-mixin-save-queuing.js",
+  "esm5": "../esm5/mixin-save-queuing/breeze-client-mixin-save-queuing.js",
+  "esm2015": "../esm2015/mixin-save-queuing/breeze-client-mixin-save-queuing.js",
+  "fesm5": "../fesm5/breeze-client-mixin-save-queuing.js",
+  "fesm2015": "../fesm2015/breeze-client-mixin-save-queuing.js",
+  "typings": "breeze-client-mixin-save-queuing.d.ts",
+  "metadata": "breeze-client-mixin-save-queuing.metadata.json",
+  "sideEffects": false
+}

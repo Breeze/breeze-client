@@ -1,0 +1,47 @@
+{
+    "compileOnSave": true,
+    "compilerOptions": {
+        "declaration": true,
+        "target": "es6",
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "stripInternal": true,
+        "baseUrl": ".",
+        "paths": {
+            "breeze-client": ["./breeze"]
+        },
+        "sourceMap": true,
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
+        "removeComments": false,
+        // "strict": true,  // getting to here...
+        "strictNullChecks": false,
+        "noImplicitAny": true,
+        "noImplicitThis": false,
+        "alwaysStrict": true,
+        "strictFunctionTypes": true,
+        "strictPropertyInitialization": false,
+        "suppressImplicitAnyIndexErrors": true,
+        "noUnusedLocals": false,
+        "typeRoots": [
+            "./node_modules/@types"
+        ],
+        "downlevelIteration": true,
+        "importHelpers": true,
+        "lib": [
+          "dom",
+          "es5",
+          "es2015.collection",
+          "es2015.iterable",
+          "es2017"
+        ]
+        
+        
+    },
+    "exclude": [
+        "node_modules",
+        "dist",
+        "temp"
+    ]
+
+}

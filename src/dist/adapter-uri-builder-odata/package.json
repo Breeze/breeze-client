@@ -1,0 +1,13 @@
+{
+  "name": "breeze-client/adapter-uri-builder-odata",
+  "main": "../bundles/breeze-client-adapter-uri-builder-odata.umd.js",
+  "module": "../fesm5/breeze-client-adapter-uri-builder-odata.js",
+  "es2015": "../fesm2015/breeze-client-adapter-uri-builder-odata.js",
+  "esm5": "../esm5/adapter-uri-builder-odata/breeze-client-adapter-uri-builder-odata.js",
+  "esm2015": "../esm2015/adapter-uri-builder-odata/breeze-client-adapter-uri-builder-odata.js",
+  "fesm5": "../fesm5/breeze-client-adapter-uri-builder-odata.js",
+  "fesm2015": "../fesm2015/breeze-client-adapter-uri-builder-odata.js",
+  "typings": "breeze-client-adapter-uri-builder-odata.d.ts",
+  "metadata": "breeze-client-adapter-uri-builder-odata.metadata.json",
+  "sideEffects": false
+}

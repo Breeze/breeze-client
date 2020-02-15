@@ -1,0 +1,13 @@
+{
+  "name": "breeze-client/adapter-ajax-jquery",
+  "main": "../bundles/breeze-client-adapter-ajax-jquery.umd.js",
+  "module": "../fesm5/breeze-client-adapter-ajax-jquery.js",
+  "es2015": "../fesm2015/breeze-client-adapter-ajax-jquery.js",
+  "esm5": "../esm5/adapter-ajax-jquery/breeze-client-adapter-ajax-jquery.js",
+  "esm2015": "../esm2015/adapter-ajax-jquery/breeze-client-adapter-ajax-jquery.js",
+  "fesm5": "../fesm5/breeze-client-adapter-ajax-jquery.js",
+  "fesm2015": "../fesm2015/breeze-client-adapter-ajax-jquery.js",
+  "typings": "breeze-client-adapter-ajax-jquery.d.ts",
+  "metadata": "breeze-client-adapter-ajax-jquery.metadata.json",
+  "sideEffects": false
+}

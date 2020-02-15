@@ -1,8 +1,0 @@
-{
-  "name": "adapter-uri-builder-json",
-  "ngPackage": {
-    "lib": {
-        "entryFile": "../src/adapter-uri-builder-json.ts"
-      }
-  }
-}

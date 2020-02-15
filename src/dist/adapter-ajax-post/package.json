@@ -1,0 +1,13 @@
+{
+  "name": "breeze-client/adapter-ajax-post",
+  "main": "../bundles/breeze-client-adapter-ajax-post.umd.js",
+  "module": "../fesm5/breeze-client-adapter-ajax-post.js",
+  "es2015": "../fesm2015/breeze-client-adapter-ajax-post.js",
+  "esm5": "../esm5/adapter-ajax-post/breeze-client-adapter-ajax-post.js",
+  "esm2015": "../esm2015/adapter-ajax-post/breeze-client-adapter-ajax-post.js",
+  "fesm5": "../fesm5/breeze-client-adapter-ajax-post.js",
+  "fesm2015": "../fesm2015/breeze-client-adapter-ajax-post.js",
+  "typings": "breeze-client-adapter-ajax-post.d.ts",
+  "metadata": "breeze-client-adapter-ajax-post.metadata.json",
+  "sideEffects": false
+}

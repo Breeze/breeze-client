@@ -1,0 +1,8 @@
+{
+  "name": "adapter-ajax-fetch",
+  "ngPackage": {
+    "lib": {
+        "entryFile": "../adapter-ajax-fetch.ts"
+      }
+  }
+}

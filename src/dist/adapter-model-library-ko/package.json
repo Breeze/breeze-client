@@ -1,0 +1,13 @@
+{
+  "name": "breeze-client/adapter-model-library-ko",
+  "main": "../bundles/breeze-client-adapter-model-library-ko.umd.js",
+  "module": "../fesm5/breeze-client-adapter-model-library-ko.js",
+  "es2015": "../fesm2015/breeze-client-adapter-model-library-ko.js",
+  "esm5": "../esm5/adapter-model-library-ko/breeze-client-adapter-model-library-ko.js",
+  "esm2015": "../esm2015/adapter-model-library-ko/breeze-client-adapter-model-library-ko.js",
+  "fesm5": "../fesm5/breeze-client-adapter-model-library-ko.js",
+  "fesm2015": "../fesm2015/breeze-client-adapter-model-library-ko.js",
+  "typings": "breeze-client-adapter-model-library-ko.d.ts",
+  "metadata": "breeze-client-adapter-model-library-ko.metadata.json",
+  "sideEffects": false
+}

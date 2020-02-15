@@ -1,0 +1,8 @@
+{
+  "name": "adapter-model-library-ko",
+  "ngPackage": {
+    "lib": {
+        "entryFile": "../adapter-model-library-ko.ts"
+      }
+  }
+}

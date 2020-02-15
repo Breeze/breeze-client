@@ -1,0 +1,17 @@
+{
+  "name": "breeze-client/adapter-ajax-httpclient",
+  "peerDependencies": {
+    "@angular/common": "^8.2.1",
+    "rxjs": "^6.5.3"
+  },
+  "main": "../bundles/breeze-client-adapter-ajax-httpclient.umd.js",
+  "module": "../fesm5/breeze-client-adapter-ajax-httpclient.js",
+  "es2015": "../fesm2015/breeze-client-adapter-ajax-httpclient.js",
+  "esm5": "../esm5/adapter-ajax-httpclient/breeze-client-adapter-ajax-httpclient.js",
+  "esm2015": "../esm2015/adapter-ajax-httpclient/breeze-client-adapter-ajax-httpclient.js",
+  "fesm5": "../fesm5/breeze-client-adapter-ajax-httpclient.js",
+  "fesm2015": "../fesm2015/breeze-client-adapter-ajax-httpclient.js",
+  "typings": "breeze-client-adapter-ajax-httpclient.d.ts",
+  "metadata": "breeze-client-adapter-ajax-httpclient.metadata.json",
+  "sideEffects": false
+}

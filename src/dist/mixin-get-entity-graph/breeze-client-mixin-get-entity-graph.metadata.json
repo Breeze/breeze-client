@@ -1,0 +1,1 @@
+{"__symbolic":"module","version":4,"metadata":{"HasEntityGraph":{"__symbolic":"interface"},"mixinEntityGraph":{"__symbolic":"function"}},"origins":{"HasEntityGraph":"./mixin-get-entity-graph","mixinEntityGraph":"./mixin-get-entity-graph"},"importAs":"breeze-client/mixin-get-entity-graph"}

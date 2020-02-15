@@ -1,0 +1,12 @@
+{
+  "name": "adapter-ajax-httpclient",
+  "peerDependencies": {
+    "@angular/common": "^8.2.1",
+    "rxjs": "^6.5.3"
+  },
+  "ngPackage": {
+    "lib": {
+        "entryFile": "../adapter-ajax-httpclient.ts"
+      }
+  }
+}
