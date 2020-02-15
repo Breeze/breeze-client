@@ -27,24 +27,6 @@ export interface Entity {
   _$entityType?: EntityType;
 }
 
-class NullEntity {
-  static __instance: NullEntity;
-  static instance() {
-    if (!NullEntity.__instance) {
-      NullEntity.__instance = new NullEntity();
-    }
-    return <Entity> <any> NullEntity.__instance;
-  }
-  entityType: EntityType;
-  entityAspect: EntityAspect;
-  constructor() {
-    this.entityType = new EntityType(new MetadataStore());
-  }
-  getProperty: (p: any) => undefined;
-  setProperty: (p: any, v: any) => {} ;
-}
-
-
 export interface ComplexObject {
   complexAspect: ComplexAspect;
   complexType: ComplexType;
@@ -94,6 +76,7 @@ a query, import or [[EntityManager.createEntity]] call.
 
 **/
 export class EntityAspect {
+
   /** The Entity that this aspect is associated with. __Read Only__  **/
   entity: Entity;
   /** The [[EntityManager]] that contains this entity. __Read Only__ **/
@@ -177,11 +160,20 @@ export class EntityAspect {
   _inProcess: any[] = []; // used in defaultPropertyInterceptor for temp storage.
   /** @hidden @internal */
   _inProcessEntity?: Entity; // used in EntityManager
+
   /** @hidden @internal */
-  constructor(entity?: Entity) {
-    
-    this.entity = entity || NullEntity.instance();
+  static nullInstance() {
+    if ( nullEntityAspect == null ) {
+      nullEntityAspect = new EntityAspect(<any>new NullEntity());
+    }
+    return nullEntityAspect;
+  }
+
+  /** @hidden @internal */
+  constructor(entity: Entity) {
+    this.entity = entity;
     this.entity.entityAspect = this;
+
     // TODO: keep public or not?
     this.entityGroup = undefined;
     this.entityManager = undefined;
@@ -196,27 +188,29 @@ export class EntityAspect {
 
     this.validationErrorsChanged = new BreezeEvent("validationErrorsChanged", this);
     this.propertyChanged = new BreezeEvent("propertyChanged", this);
+    
     // in case this is the NULL entityAspect. - used with ComplexAspects that have no parent.
-
-    if (entity != null) {
-      // remove properties that should be on prototype but placed on class by Babel
-      // TODO: was this important???
-      // if (!entity.entityType) { delete(entity.entityType); }
-      // if (!entity.entityAspect) { delete(entity.entityAspect); }
-      
-      // entityType should already be on the entity from 'watch'
-      let entityType = entity.entityType || entity._$entityType;
-      if (!entityType) {
-        let typeName = entity.prototype._$typeName;
-        if (!typeName) {
-          throw new Error("This entity is not registered as a valid EntityType");
-        } else {
-          throw new Error("Metadata for this entityType has not yet been resolved: " + typeName);
-        }
-      }
-      let entityCtor = entityType.getEntityCtor();
-      config.interfaceRegistry.modelLibrary.getDefaultInstance().startTracking(entity, entityCtor.prototype);
+    if (entity.entityType.isAnonymous) {
+      return;
     }
+    // remove properties that should be on prototype but placed on class by Babel
+    // TODO: was this important???
+    // if (!entity.entityType) { delete(entity.entityType); }
+    // if (!entity.entityAspect) { delete(entity.entityAspect); }
+    
+    // entityType should already be on the entity from 'watch'
+    let entityType = entity.entityType || entity._$entityType;
+    if (!entityType) {
+      let typeName = entity.prototype._$typeName;
+      if (!typeName) {
+        throw new Error("This entity is not registered as a valid EntityType");
+      } else {
+        throw new Error("Metadata for this entityType has not yet been resolved: " + typeName);
+      }
+    }
+    let entityCtor = entityType.getEntityCtor();
+    config.interfaceRegistry.modelLibrary.getDefaultInstance().startTracking(entity, entityCtor.prototype);
+    
   }
 
   /** @hidden */
@@ -947,11 +941,11 @@ export class ComplexAspect {
   **/
   getEntityAspect() {
     let parent = this.parent;
-    if (!parent) return new EntityAspect();
+    if (!parent) return EntityAspect.nullInstance();
     while ( isComplexObject(parent!)) {
       parent = parent.complexAspect.parent;    
     }
-    return parent ? parent.entityAspect : new EntityAspect();
+    return parent ? parent.entityAspect : EntityAspect.nullInstance();
   }
 
   // OLD Code
@@ -1005,4 +999,16 @@ function decompose(target: StructuralObject) {
     entityAspect = aspect.getEntityAspect();
   }
   return { stype: stype, aspect: aspect, entityAspect: entityAspect };
+}
+
+let nullEntityAspect: EntityAspect = null;
+
+class NullEntity {
+  entityType: EntityType;
+  entityAspect: EntityAspect;
+  constructor() {
+    this.entityType = new EntityType(new MetadataStore());
+  }
+  getProperty: (p: any) => undefined;
+  setProperty: (p: any, v: any) => {};
 }
