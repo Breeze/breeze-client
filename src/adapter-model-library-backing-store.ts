@@ -2,6 +2,10 @@
 
 let core = breeze.core;
 
+type OpenObj = {
+  [key: string]: any;
+};
+
 export class ModelLibraryBackingStoreAdapter implements breeze.ModelLibraryAdapter {
   name: string;
 
@@ -23,7 +27,7 @@ export class ModelLibraryBackingStoreAdapter implements breeze.ModelLibraryAdapt
     for (let p in entity) {
       if (p === "entityAspect" || p === "entityType") continue;
       if (p === "_$typeName" || p === "_pendingSets" || p === "_backingStore") continue;
-      let val = entity[p];
+      let val = (entity as OpenObj)[p];
       if (!core.isFunction(val)) {
         names.push(p);
       }
@@ -63,7 +67,7 @@ export class ModelLibraryBackingStoreAdapter implements breeze.ModelLibraryAdapt
     stype.getProperties().forEach(function (prop) {
 
       let propName = prop.name;
-      let val = entity[propName];
+      let val = (entity as OpenObj)[propName];
 
       if (prop instanceof breeze.DataProperty) {
         if (prop.isComplexProperty) {
@@ -171,11 +175,11 @@ function makePropDescription(proto: any, property: breeze.EntityProperty) {
     proto._pendingBackingStores = pendingStores;
   }
   let descr = {
-    get: function () {
+    get: function (this: any) {
       let bs = this._backingStore || getBackingStore(this);
       return bs[propName];
     },
-    set: function (value: any) {
+    set: function (this: any, value: any) {
       // IE9 cannot touch instance._backingStore here
       let bs = this._backingStore || getPendingBackingStore(this);
       let accessorFn = getAccessorFn(bs, propName);
@@ -194,7 +198,7 @@ function makePropDescription(proto: any, property: breeze.EntityProperty) {
 
 }
 
-function getAccessorFn(bs: {}, propName: string): any {
+function getAccessorFn(bs: OpenObj, propName: string): any {
   return function () {
     if (arguments.length === 0) {
       return bs[propName];
@@ -239,7 +243,7 @@ function wrapPropDescription(proto: any, property: breeze.EntityProperty): any {
       if (!propDescr) return undefined;
       return propDescr.get!.bind(this)();
     },
-    set: function (value: any) {
+    set: function (this: any, value: any) {
       this._$interceptor(property, value, localAccessorFn(this));
     },
     enumerable: propDescr.enumerable,

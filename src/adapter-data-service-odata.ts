@@ -1,11 +1,17 @@
 ﻿import * as breeze from 'breeze-client';
 
+
 let core = breeze.core;
 
 declare var window: any;
 declare var document: any;
 declare var url: any; // needed to access node's url.parse
 declare var OData: any;
+
+type OpenObj = {
+  [key: string]: any;
+};
+
 
 interface ODataSaveContext extends breeze.SaveContext {
   tempKeys: breeze.EntityKey[];
@@ -318,7 +324,7 @@ export class DataServiceODataAdapter extends breeze.AbstractDataServiceAdapter {
 }
 
 // crude serializer.  Doesn't recurse
-function toQueryString(obj: Object) {
+function toQueryString(obj: OpenObj) {
   let parts: string[] = [];
   for (let i in obj) {
     if (obj.hasOwnProperty(i)) {
@@ -480,7 +486,7 @@ function getMessage(body: any) {
 breeze.config.registerAdapter("dataService", DataServiceODataAdapter);
 
 
-let webApiODataCtor = function () {
+let webApiODataCtor = function (this: any) {
   this.name = "webApiOData";
 };
 
@@ -488,7 +494,7 @@ breeze.core.extend(webApiODataCtor.prototype, DataServiceODataAdapter.prototype)
 
 breeze.config.registerAdapter("dataService", webApiODataCtor as any);
 // OData 4 adapter
-let webApiOData4Ctor = function () {
+let webApiOData4Ctor = function (this: any) {
   this.name = "webApiOData4";
 };
 breeze.core.extend(webApiOData4Ctor.prototype, webApiODataCtor.prototype);

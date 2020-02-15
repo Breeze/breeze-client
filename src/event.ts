@@ -164,7 +164,7 @@ export class BreezeEvent<T> {
   @return Whether unsubscription occured. This will return false if already unsubscribed or if the key simply
   cannot be found.
   **/
-  unsubscribe = function (unsubKey: number) {
+  unsubscribe = function (this: any, unsubKey: number) {
     if (!this._subscribers) return false;
     let subs = this._subscribers;
     let ix = core.arrayIndexOf(subs, function (s) {
@@ -251,7 +251,7 @@ export class BreezeEvent<T> {
   }
 
   /** @hidden @internal */
-  static _isEnabled = function (eventName: string, obj: Object) {
+  static _isEnabled(eventName: string, obj: Object): boolean {
     let isEnabled: any = null;
     let ob = <any>obj;
     let eventMap = ob._$eventMap;
@@ -273,7 +273,7 @@ export class BreezeEvent<T> {
         return true;
       }
     }
-  };
+  }
 
 
 }

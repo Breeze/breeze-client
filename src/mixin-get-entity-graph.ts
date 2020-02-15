@@ -70,7 +70,7 @@ export function mixinEntityGraph(emclass: { new(): EntityManager }) {
 mixinEntityGraph(EntityManager);
 
 
-function getEntityGraph(roots: Entity | Array<Entity> | EntityQuery, expand: string | Array<string> | ExpandClause) {
+function getEntityGraph(this: any, roots: Entity | Array<Entity> | EntityQuery, expand: string | Array<string> | ExpandClause) {
   if (roots instanceof EntityQuery) {
     let newRoots = this.executeQueryLocally(roots);
     return getEntityGraphCore(newRoots, expand || roots.expandClause!);

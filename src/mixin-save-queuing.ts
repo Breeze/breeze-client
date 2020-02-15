@@ -82,7 +82,7 @@ export function enableSaveQueuing(em: EntityManager, enable: boolean = true) {
  * Replacement for EntityManager.saveChanges
  * This version queues saveChanges calls while a real save is in progress
  **/
-function saveChangesWithQueuing(entities: Entity[] | null, saveOptions: any) {
+function saveChangesWithQueuing(this: any, entities: Entity[] | null, saveOptions: any) {
   try {
     // `this` is an EntityManager
     let saveQueuing = this._saveQueuing;
@@ -248,7 +248,7 @@ class Deferred<T> {
   reject: (err: any) => void;
   promise: Promise<T>;
   constructor() {
-    this.promise = new Promise<T>(function (resolve: (val: any) => void, reject: (err: any) => void) {
+    this.promise = new Promise<T>(function (this: any, resolve: (val: any) => void, reject: (err: any) => void) {
       this.resolve = resolve;
       this.reject = reject;
     }.bind(this));

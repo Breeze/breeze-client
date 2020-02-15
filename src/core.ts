@@ -508,7 +508,7 @@ function wrapExecution(startFn: () => any, endFn: (state: any) => any | void, fn
 
 /** Remember & return the value of fn() when it was called with its current args */
 function memoize(fn: any): any {
-    return function () {
+    return function (this: any) {
         let args = arraySlice(<any>arguments),
             hash = "",
             i = args.length,

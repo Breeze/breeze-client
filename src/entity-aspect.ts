@@ -752,7 +752,7 @@ export class EntityAspect {
 
 }
 
-BreezeEvent.bubbleEvent(EntityAspect.prototype, function () {
+BreezeEvent.bubbleEvent(EntityAspect.prototype, function (this: any) {
   // TODO: what is 'this'??? here.
   return this.entityManager;
 });

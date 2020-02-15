@@ -1,5 +1,9 @@
 ﻿import * as breeze from 'breeze-client';
 
+type OpenObj = {
+  [key: string]: any;
+};
+
 export class UriBuilderODataAdapter implements breeze.UriBuilderAdapter {
 
   name: string;
@@ -24,7 +28,7 @@ export class UriBuilderODataAdapter implements breeze.UriBuilderAdapter {
       entityType = new breeze.EntityType(metadataStore);
     }
 
-    let queryOptions = {};
+    let queryOptions: OpenObj = {};
     queryOptions["$filter"] = toWhereODataFragment(entityQuery.wherePredicate);
     queryOptions["$orderby"] = toOrderByODataFragment(entityQuery.orderByClause!);
 
@@ -88,7 +92,7 @@ export class UriBuilderODataAdapter implements breeze.UriBuilderAdapter {
     function toQueryOptionsString(queryOptions: breeze.QueryOptions) {
       let qoStrings: string[] = [];
       for (let qoName in queryOptions) {
-        let qoValue = queryOptions[qoName];
+        let qoValue = (queryOptions as OpenObj)[qoName];
         if (qoValue !== undefined) {
           if (qoValue instanceof Array) {
             qoValue.forEach(function (qov) {
@@ -117,7 +121,7 @@ export class UriBuilderODataAdapter implements breeze.UriBuilderAdapter {
 
 let toODataFragmentVisitor = {
 
-  passthruPredicate: function () {
+  passthruPredicate: function (this: any) {
     return this.value;
   },
 
@@ -180,9 +184,9 @@ let toODataFragmentVisitor = {
     return exprVal + "/" + odataOpFrom(this) + "(" + prefix + ": " + newPredVal + ")";
   },
 
-  litExpr: function () {
+  litExpr: function (this: any) {
     if (Array.isArray(this.value)) {
-      return this.value.map(function (v: any) { return this.dataType.fmtOData(v); }, this);
+      return this.value.map( (v: any) => this.dataType.fmtOData(v));
     } else {
       return this.dataType.fmtOData(this.value);
     }
@@ -202,7 +206,7 @@ let toODataFragmentVisitor = {
   }
 };
 
-let _operatorMap = {
+let _operatorMap: OpenObj = {
   'contains': 'substringof'
 };
 

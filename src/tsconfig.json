@@ -18,7 +18,7 @@
         // "strict": true,  // getting to here... same as next 4 being set to true.
         "strictNullChecks": true,
         "noImplicitAny": true,
-        "noImplicitThis": false,
+        "noImplicitThis": true,
         "alwaysStrict": true,
 
         "noUnusedLocals": false,
