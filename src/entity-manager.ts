@@ -1,5 +1,5 @@
 ﻿import { DataServiceAdapter } from './interface-registry';
-import { core, Callback, ErrorCallback } from './core';
+import { core, Callback, ErrorCallback, ObjMap } from './core';
 import { assertParam, assertConfig } from './assert-param';
 import { config } from './config';
 import { BreezeEvent } from './event';
@@ -1831,7 +1831,7 @@ function markIsBeingSaved(entities: Entity[], flag: boolean) {
 }
 
 function exportEntityGroups(em: EntityManager, entitiesOrEntityTypes?: Entity[] | EntityType[] | string[]) {
-  let entityGroupMap: { [index: string]: EntityGroup };
+  let entityGroupMap: ObjMap<EntityGroup>;
   let first = entitiesOrEntityTypes && entitiesOrEntityTypes[0];
   // check if array
   if (first) {
@@ -1874,7 +1874,7 @@ function exportEntityGroups(em: EntityManager, entitiesOrEntityTypes?: Entity[] 
   }
 
   let tempKeys: ITempKey[] = [];
-  let newGroupMap = {};
+  let newGroupMap: ObjMap<any> = {};
   core.objectForEach(entityGroupMap, (entityTypeName, entityGroup) => {
     newGroupMap[entityTypeName] = exportEntityGroup(entityGroup, tempKeys);
   });
@@ -1900,7 +1900,7 @@ function exportEntityGroup(entityGroup: EntityGroup, tempKeys: ITempKey[]) {
 
 function structuralObjectToJson(so: StructuralObject, dps: DataProperty[], serializerFn?: (dp: DataProperty, value: any) => any, tempKeys?: ITempKey[]) {
 
-  let result = {};
+  let result: ObjMap<any> = {};
   dps.forEach(function (dp) {
     let dpName = dp.name;
     let value = so.getProperty(dpName);
@@ -2219,7 +2219,7 @@ function executeQueryCore(em: EntityManager, query: EntityQuery | string, queryO
         if (state.error) {
           return Promise.reject(state.error);
         }
-
+        return;
       }, function () {
         let nodes = dataService.jsonResultsAdapter.extractResults(data);
         nodes = core.toArray(nodes);
@@ -2343,7 +2343,7 @@ function unwrapInstance(structObj: StructuralObject, transformFn?: (dp: DataProp
   let rawObject: any = {};
   let stype = EntityAspect.isEntity(structObj) ? structObj.entityType : structObj.complexType;
   let serializerFn = getSerializerFn(stype);
-  let unmapped = {};
+  let unmapped: ObjMap<any> = {};
   stype.dataProperties.forEach(function (dp) {
     if (dp.isComplexProperty) {
       rawObject[dp.nameOnServer] = core.map(structObj.getProperty(dp.name), function (co) {
@@ -2375,7 +2375,7 @@ function unwrapOriginalValues(target: StructuralObject, metadataStore: MetadataS
   let stype = EntityAspect.isEntity(target) ? target.entityType : target.complexType;
   let aspect = EntityAspect.isEntity(target) ? target.entityAspect : target.complexAspect;
   let fn = metadataStore.namingConvention.clientPropertyNameToServer;
-  let result = {};
+  let result: ObjMap<any> = {};
   core.objectForEach(aspect.originalValues, function (propName, val) {
     let prop = stype.getProperty(propName) as DataProperty;
     val = transformFn ? transformFn(prop, val) : val;
@@ -2404,7 +2404,7 @@ function unwrapChangedValues(entity: Entity, metadataStore: MetadataStore, trans
   let stype = entity.entityType;
   let serializerFn = getSerializerFn(stype);
   let fn = metadataStore.namingConvention.clientPropertyNameToServer;
-  let result = {};
+  let result: ObjMap<any> = {};
   core.objectForEach(entity.entityAspect.originalValues, function (propName, value) {
     let prop = stype.getProperty(propName) as DataProperty;
     let val = entity.getProperty(propName);

@@ -14,15 +14,20 @@
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true,
         "removeComments": false,
-        // "strict": true,  // getting to here...
+        
+        // "strict": true,  // getting to here... same as next 4 being set to true.
         "strictNullChecks": true,
         "noImplicitAny": true,
         "noImplicitThis": false,
         "alwaysStrict": true,
+
+        "noUnusedLocals": false,
+        "noImplicitReturns": true,
         "strictFunctionTypes": true,
         "strictPropertyInitialization": false,
+
         "suppressImplicitAnyIndexErrors": true,
-        "noUnusedLocals": false,
+        
         "typeRoots": [
             "./node_modules/@types"
         ],

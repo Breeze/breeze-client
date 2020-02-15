@@ -1,4 +1,5 @@
-﻿/*
+﻿type OpenObj = { [key: string]: any; };
+/*
  * Copyright 2012-2019 IdeaBlade, Inc.  All Rights Reserved.  
  * Use, reproduction, distribution, and modification of this code is subject to the terms and 
  * conditions of the IdeaBlade Breeze license, available at http://www.breezejs.com/license
@@ -44,10 +45,12 @@ Unlike enums in some other environments, each 'symbol' can have both methods and
 >         expect(DayOfWeek.Friday.toString()).toBe("Friday");
 >       });
 >   });
-Note that we have Error['x'] = ... in some places in the code to prevent Terser from optimizing out some important calls.
+Note that we have BreezeEnum._dump =  ... in some places in the code to prevent Terser from optimizing out some important calls.
 @dynamic
 */
-export class BreezeEnum {
+export class BreezeEnum implements OpenObj {
+
+  [key: string]: any;
   // // TODO: think about CompositeEnum (flags impl).
   /** The name of this symbol */
   name: string;
@@ -57,7 +60,7 @@ export class BreezeEnum {
   static _resolvedNamesAndSymbols: { name: string, symbol: BreezeEnum }[];
 
   /**  */
-  constructor(propertiesObj?: Object) {
+  constructor(propertiesObj?: OpenObj) {
     if (propertiesObj) {
       Object.keys(propertiesObj).forEach((key) => this[key] = propertiesObj[key]);
     }
@@ -89,7 +92,7 @@ export class BreezeEnum {
   @return The symbol that matches the name or 'undefined' if not found.
   **/
   static fromName(name: string) {
-    return this[name];
+    return (this as OpenObj)[name];
   }
 
   /**
@@ -103,10 +106,10 @@ export class BreezeEnum {
 
     for (let key in this) {
       if (this.hasOwnProperty(key)) {
-        let symb = this[key];
+        let symb = (this as OpenObj)[key];
         if (symb instanceof BreezeEnum) {
           result.push( { name: key, symbol: symb });
-          this[key] = symb;
+          (this as OpenObj)[key] = symb;
           symb.name = key;
         }
       }
@@ -129,7 +132,7 @@ export class BreezeEnum {
       return false;
     }
 
-    return this[sym.name] != null;
+    return (this as OpenObj)[sym.name] != null;
   }
 
 
@@ -156,6 +159,9 @@ export class BreezeEnum {
       name: this.name
     };
   }
+
+  // Note that we have BreezeEnum._dump =  ... in some places in the code to prevent Terser from optimizing out some important calls.
+  static _dump: any = 'anything at all';
 
 }
 

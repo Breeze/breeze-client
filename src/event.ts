@@ -1,9 +1,9 @@
-﻿import { core } from './core';
+﻿import { core, ObjMap } from './core';
 import { assertParam } from './assert-param';
 
 function publishCore<T>(that: BreezeEvent<T>, data: T, errorCallback?: (e: Error) => any) {
   let subscribers = that._subscribers;
-  if (!subscribers) return true;
+  if (!subscribers) return;
   // subscribers from outer scope.
   subscribers.forEach(function (s) {
     try {
@@ -39,7 +39,7 @@ Class to support basic event publication and subscription semantics.
 **/
 export class BreezeEvent<T> {
   /** @hidden @internal */
-  static __eventNameMap = {};
+  static __eventNameMap: ObjMap<boolean> = {};
   /** @hidden @internal */
   static __nextUnsubKey = 1;
   /** The name of this Event */

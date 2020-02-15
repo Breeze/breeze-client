@@ -20,11 +20,13 @@ export class TestFns extends UtilFns {
   
   static metadataStoreIsBeingFetched: boolean;
 
+  // For use when we don't want to go to the server
   static sampleMetadata: string;
   static sampleMetadataStore = TestFns.initSampleMetadataStore();  
 
+  // For use when we don't want to refetch Metadata on each new MetadataStore.
   static defaultMetadata: string;
-  static defaultMetadataStore: MetadataStore;
+  private static _defaultMetadataStore: MetadataStore;
   
   static isODataServer: boolean;
   static isMongoServer: boolean;
@@ -123,13 +125,13 @@ export class TestFns extends UtilFns {
   }
 
   static async initDefaultMetadataStore() {
-    if (TestFns.defaultMetadataStore == null) {
+    if (TestFns._defaultMetadataStore == null) {
       const ms = new MetadataStore();
       await ms.fetchMetadata(TestFns.defaultServiceName);
       TestFns.defaultMetadata = ms.exportMetadata();
-      TestFns.defaultMetadataStore = ms;  
+      TestFns._defaultMetadataStore = ms;  
     }
-    return TestFns.defaultMetadataStore;
+    return TestFns._defaultMetadataStore;
   }
 
   static initSampleMetadataStore(): MetadataStore {
@@ -148,8 +150,8 @@ export class TestFns extends UtilFns {
     let em: EntityManager;
     if (metadataStore) {
       em = new EntityManager({ serviceName: TestFns.defaultServiceName, metadataStore: metadataStore });
-    } else if (TestFns.defaultMetadataStore) {
-      em = new EntityManager({ serviceName: TestFns.defaultServiceName, metadataStore: TestFns.defaultMetadataStore });
+    } else if (TestFns._defaultMetadataStore) {
+      em = new EntityManager({ serviceName: TestFns.defaultServiceName, metadataStore: TestFns._defaultMetadataStore });
     } else if (TestFns.sampleMetadataStore) {
       em = new EntityManager({ serviceName: TestFns.defaultServiceName, metadataStore: TestFns.sampleMetadataStore });
     } else {
@@ -175,7 +177,7 @@ export class TestFns extends UtilFns {
     return ctor;
   }
 
-  static createES5Props(target: any) {
+  private static createES5Props(target: any) {
     Object.defineProperty(target, "companyName", {
       get: function () {
         return this["_companyName"] || null;

@@ -1,4 +1,4 @@
-﻿import { core, Callback, ErrorCallback } from './core';
+﻿import { core, Callback, ErrorCallback, ObjMap } from './core';
 import { assertParam } from './assert-param';
 import { DataType } from './data-type';
 import { EntityAspect, Entity } from './entity-aspect';
@@ -661,7 +661,7 @@ export class EntityQuery {
 
   // protected methods
   /** @hidden @internal */
-  _getFromEntityType(metadataStore: MetadataStore, throwErrorIfNotFound?: boolean) {
+  _getFromEntityType(metadataStore: MetadataStore, throwErrorIfNotFound?: boolean): EntityType | undefined {
     // Uncomment next two lines if we make this method public.
     // assertParam(metadataStore, "metadataStore").isInstanceOf(MetadataStore).check();
     // assertParam(throwErrorIfNotFound, "throwErrorIfNotFound").isBoolean().isOptional().check();
@@ -705,7 +705,7 @@ export class EntityQuery {
   }
 
   /** @hidden @internal */
-  _getToEntityType(metadataStore: MetadataStore, skipFromCheck?: boolean): EntityType | undefined {
+  _getToEntityType(metadataStore: MetadataStore, skipFromCheck?: boolean) {
     // skipFromCheck is to avoid recursion if called from _getFromEntityType;
     if (this.resultEntityType instanceof EntityType) {
       return this.resultEntityType;
@@ -721,7 +721,7 @@ export class EntityQuery {
       if (skipFromCheck || this.selectClause) {
         return undefined;
       } else {
-        this._getFromEntityType(metadataStore, false);
+        return this._getFromEntityType(metadataStore, false);
       }
 
     }
@@ -773,7 +773,7 @@ function fromJSON(eq: EntityQuery, json: Object) {
 function clone(eq: EntityQuery, propName?: string, value?: any) {
   // immutable queries mean that we don't need to clone if no change in value.
   if (propName) {
-    if (eq[propName] === value) return eq;
+    if ((eq as ObjMap<any>)[propName] === value) return eq;
   }
   // copying QueryOptions is safe because they are are immutable;
   let copy = core.extend(new EntityQuery(), eq, [
@@ -792,15 +792,15 @@ function clone(eq: EntityQuery, propName?: string, value?: any) {
     "entityManager",
     "dataService",
     "resultEntityType"
-  ]) as EntityQuery;
+  ]) as ObjMap<any>;
   copy.parameters = core.extend({}, eq.parameters);
   if (propName) {
     copy[propName] = value;
   }
-  return copy;
+  return copy as EntityQuery;
 }
 
-function processUsing(eq: EntityQuery, map: Object, value: any, propertyName?: string) {
+function processUsing(eq: EntityQuery, map: ObjMap<any>, value: any, propertyName?: string) {
   let typeName = value._$typeName || ((value instanceof BreezeEnum) && (value.constructor as any).name);
   let key = typeName && typeName.substr(0, 1).toLowerCase() + typeName.substr(1);
   if (propertyName && key !== propertyName) {
@@ -811,7 +811,7 @@ function processUsing(eq: EntityQuery, map: Object, value: any, propertyName?: s
     if (fn === undefined) {
       throw new Error("Invalid config property: " + key);
     } else if (fn === null) {
-      eq[key] = value;
+      (eq as ObjMap<any>)[key] = value;
     } else {
       fn(eq, value);
     }
@@ -916,7 +916,7 @@ export class FilterQueryOp extends BreezeEnum implements QueryOp {
   static IsTypeOf = new FilterQueryOp({ operator: "isof" });
 }
 FilterQueryOp.prototype._$typeName = "FilterQueryOp";
-Error['x'] = FilterQueryOp.resolveSymbols();
+BreezeEnum._dump =  FilterQueryOp.resolveSymbols();
 
 
 /**
@@ -933,7 +933,7 @@ export class BooleanQueryOp extends BreezeEnum implements QueryOp {
 
 }
 BooleanQueryOp.prototype._$typeName = "BooleanQueryOp";
-Error['x'] = BooleanQueryOp.resolveSymbols();
+BreezeEnum._dump =  BooleanQueryOp.resolveSymbols();
 
 
 /** For use by breeze plugin authors only.  The class is used in most [[IUriBuilderAdapter]] implementations
@@ -1110,7 +1110,7 @@ export class SelectClause {
   toFunction(/* config */) {
     let that = this;
     return function (entity: Entity) {
-      let result = {};
+      let result: ObjMap<any> = {};
       that.propertyPaths.forEach(function (path, i) {
         result[that._pathNames[i]] = EntityAspect.getPropertyPathValue(entity, path);
       });

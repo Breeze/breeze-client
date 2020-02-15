@@ -11,6 +11,11 @@ export interface Callback {
     (data: any): void;
 }
 
+export type ObjMap<TValue> = {
+  [key: string]: TValue;
+};
+
+
 // type Predicate = (i: any) => boolean;
 type Predicate<T> = (i: T) => boolean;
 
@@ -25,7 +30,7 @@ let isES5Supported: boolean = function () {
 } ();
 
 // iterate over object
-function objectForEach(obj: Object, kvFn: (key: string, val: any) => any) {
+function objectForEach(obj: ObjMap<any>, kvFn: (key: string, val: any) => any) {
     for (let key in obj) {
         if (hasOwnProperty(obj, key)) {
             kvFn(key, obj[key]);
@@ -33,7 +38,7 @@ function objectForEach(obj: Object, kvFn: (key: string, val: any) => any) {
     }
 }
 
-function objectMap(obj: Object, kvFn?: (key: string, val: any) => any): any[] {
+function objectMap(obj: ObjMap<any>, kvFn?: (key: string, val: any) => any): any[] {
     let results: any[] = [];
     for (let key in obj) {
         if (hasOwnProperty(obj, key)) {
@@ -46,7 +51,7 @@ function objectMap(obj: Object, kvFn?: (key: string, val: any) => any): any[] {
     return results;
 }
 
-function objectFirst(obj: Object, kvPredicate: (key: string, val: any) => boolean): { key: string, value: any } | null {
+function objectFirst(obj: ObjMap<any>, kvPredicate: (key: string, val: any) => boolean): { key: string, value: any } | null {
     for (let key in obj) {
         if (hasOwnProperty(obj, key)) {
             let value = obj[key];
@@ -106,7 +111,7 @@ function pluck(propertyName: any): (obj: Object) => any {
 // end functional extensions
 
 /** Return an array of property values from source */
-function getOwnPropertyValues(source: Object): any[] {
+function getOwnPropertyValues(source: ObjMap<any>): any[] {
     let result: any[] = [];
     for (let name in source) {
         if (hasOwnProperty(source, name)) {
@@ -117,7 +122,7 @@ function getOwnPropertyValues(source: Object): any[] {
 }
 
 /** Copy properties from source to target. Returns target. */
-function extend(target: Object, source?: Object, propNames?: string[]): Object {
+function extend(target: ObjMap<any>, source?: ObjMap<any>, propNames?: string[]): Object {
     if (!source) return target;
     if (propNames) {
         propNames.forEach(function (propName) {
@@ -134,7 +139,7 @@ function extend(target: Object, source?: Object, propNames?: string[]): Object {
 }
 
 /** Copy properties from defaults iff undefined on target.  Returns target. */
-function updateWithDefaults(target: Object, defaults: Object): any {
+function updateWithDefaults(target: ObjMap<any>, defaults: ObjMap<any>): any {
     for (let name in defaults) {
         if (target[name] === undefined) {
             target[name] = defaults[name];
@@ -172,7 +177,7 @@ function setAsDefault(target: Object, ctor: { new (...args: any[]): any, default
        - if it does not exist then a new object will be created as filled.
     'target is returned.
 */
-function toJson(source: Object, template: Object, target: Object = {}): Object {
+function toJson(source: ObjMap<any>, template: ObjMap<any>, target: ObjMap<any> = {}): Object {
 
     for (let key in template) {
         let aliases = key.split(",");
@@ -249,8 +254,8 @@ function toJSONSafe(obj: any, replacer?: (prop: string, value: any) => any): any
 }
 
 /** Resolves the values of a list of properties by checking each property in multiple sources until a value is found. */
-function resolveProperties(sources: Object[], propertyNames: string[]): any {
-    let r = {};
+function resolveProperties(sources: ObjMap<any>[], propertyNames: string[]): any {
+    let r: ObjMap<any> = {};
     let length = sources.length;
     propertyNames.forEach(function (pn) {
         for (let i = 0; i < length; i++) {
@@ -410,7 +415,7 @@ function arrayEquals(a1: any[], a2: any[], equalsFn?: (x1: any, x2: any) => bool
 // end of array functions
 
 /** Returns an array for a source and a prop, and creates the prop if needed. */
-function getArray(source: Object, propName: string): any[] {
+function getArray(source: ObjMap<any>, propName: string): any[] {
     let arr = source[propName];
     if (!arr) {
         arr = [];
@@ -468,7 +473,7 @@ function requireLibCore(libName: string) {
 }
 
 /** Execute fn while obj has tempValue for property */
-function using(obj: Object, property: string, tempValue: any, fn: () => any) {
+function using(obj: ObjMap<any>, property: string, tempValue: any, fn: () => any) {
     let originalValue = obj[property];
     if (tempValue === originalValue) {
         return fn();
@@ -486,7 +491,7 @@ function using(obj: Object, property: string, tempValue: any, fn: () => any) {
 }
 
 /** Call state = startFn(), call fn(), call endFn(state) */
-function wrapExecution(startFn: () => any, endFn: (state: any) => any, fn: () => any) {
+function wrapExecution(startFn: () => any, endFn: (state: any) => any | void, fn: () => any | void) {
     let state: any;
     try {
         state = startFn();
@@ -682,6 +687,8 @@ if (!Object.create) {
     };
 }
 
+let dump: any = 'anything';
+
 // // not all methods above are exported
 export const core = {
     isES5Supported: isES5Supported,
@@ -739,6 +746,7 @@ export const core = {
     toJson: toJson,
     toJSONSafe: toJSONSafe,
     toJSONSafeReplacer: toJSONSafeReplacer,
+    dump: dump
 };
 
 export interface ErrorCallback {

@@ -295,9 +295,10 @@ export class DataType extends BreezeEnum {
   //};
 }
 DataType.prototype._$typeName = "DataType";
-Error['x'] = DataType._resetConstants();
-Error['x'] = DataType.resolveSymbols();
-Error['x'] = DataType.getSymbols().forEach((sym: DataType) => sym.validatorCtor = getValidatorCtor(sym));
+BreezeEnum._dump = DataType._resetConstants();
+BreezeEnum._dump = DataType.resolveSymbols();
+BreezeEnum._dump = DataType.getSymbols().forEach((sym: DataType) => sym.validatorCtor = getValidatorCtor(sym));
+
 
 // private functions;
 
@@ -335,6 +336,8 @@ function getValidatorCtor(dataType: DataType) {
       return Validator.duration;
     case DataType.Undefined:
       return Validator.none;
+    default:
+      return Validator.none;  
   }
 }
 
@@ -451,7 +454,7 @@ function fmtDateTime(val: Date) {
   try {
     return "datetime'" + val.toISOString() + "'";
   } catch (e) {
-    throwError("'%1' is not a valid dateTime", val);
+    throw fmtError("'%1' is not a valid dateTime", val);
   }
 }
 
@@ -460,14 +463,14 @@ function fmtDateTimeOffset(val: Date) {
   try {
     return "datetimeoffset'" + val.toISOString() + "'";
   } catch (e) {
-    throwError("'%1' is not a valid dateTime", val);
+    throw fmtError("'%1' is not a valid dateTime", val);
   }
 }
 
 function fmtTime(val: any) {
   if (val == null) return null;
   if (!core.isDuration(val)) {
-    throwError("'%1' is not a valid ISO 8601 duration", val);
+    throw fmtError("'%1' is not a valid ISO 8601 duration", val);
   }
   return "time'" + val + "'";
 }
@@ -475,7 +478,7 @@ function fmtTime(val: any) {
 function fmtGuid(val: any) {
   if (val == null) return null;
   if (!core.isGuid(val)) {
-    throwError("'%1' is not a valid guid", val);
+    throw fmtError("'%1' is not a valid guid", val);
   }
   return "guid'" + val + "'";
 }
@@ -499,9 +502,9 @@ function fmtUndefined(val: any) {
   return val;
 }
 
-function throwError(msg: string, val: any) {
+function fmtError(msg: string, val: any) {
   msg = core.formatString(msg, val);
-  throw new Error(msg);
+  return new Error(msg);
 }
 
 function parseRawDate(val: any) {
