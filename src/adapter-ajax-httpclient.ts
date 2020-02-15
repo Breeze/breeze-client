@@ -6,7 +6,7 @@ export class AjaxHttpClientAdapter {
   static adapterName = 'httpclient';
   name = AjaxHttpClientAdapter.adapterName;
   defaultSettings = {};
-  requestInterceptor: (info: {}) => {};
+  requestInterceptor?: (info: {}) => {};
 
   constructor(public http: HttpClient) { }
 
@@ -63,10 +63,10 @@ export class AjaxHttpClientAdapter {
       error: errorFn      // adapter's error callback
     };
 
-    if (core.isFunction(this.requestInterceptor)) {
+    if (this.requestInterceptor && core.isFunction(this.requestInterceptor)) {
       this.requestInterceptor(requestInfo);
       if (this.requestInterceptor['oneTime']) {
-        this.requestInterceptor = null;
+        this.requestInterceptor = undefined;
       }
     }
 
@@ -153,8 +153,9 @@ export class AjaxHttpClientAdapter {
 
 ///// Helpers ////
 
-function encodeParams(obj: {}) {
+function encodeParams(obj?: Object) {
   let query = '';
+  if (!obj) return query;
   let subValue: any, innerObj: any, fullSubName: any;
 
   for (let name in obj) {
@@ -193,5 +194,8 @@ function encodeParams(obj: {}) {
 }
 
 function makeGetHeaders(headers: HttpHeaders) {
-  return function getHeaders(headerName?: string) { return headers.getAll(headerName).join('\r\n'); };
+  return function getHeaders(headerName?: string) { 
+    const hdrs = headers.getAll(headerName || '');
+    return (hdrs || []).join('\r\n'); 
+  };
 }

@@ -67,7 +67,7 @@ export class AjaxFetchAdapter implements breeze.AjaxAdapter {
       init = core.extend(compositeConfig, init) as any;
       // extend is shallow; extend headers separately
       let headers = core.extend({}, this.defaultSettings.headers); // copy default headers 1st
-      init.headers = core.extend(headers, init.headers) as any;
+      init.headers = core.extend(headers, init.headers as Object) as any;
     }
 
     let requestInfo = {
@@ -98,11 +98,11 @@ export class AjaxFetchAdapter implements breeze.AjaxAdapter {
           });
         }
       }).catch(err => {
-        requestInfo.error(0, err && err.message || err, null, null, err);
+        requestInfo.error(0, err && err.message || err, '', undefined, err);
       });
     }
 
-    function encodeParams(obj: {}) {
+    function encodeParams(obj: any) {
       let query = '';
       let subValue: any, innerObj: any, fullSubName: any;
     
@@ -152,7 +152,7 @@ export class AjaxFetchAdapter implements breeze.AjaxAdapter {
       config.success(httpResponse);
     }
 
-    function errorFn(status: number, statusText: string, body: string, response: Response, errorThrown: any) {
+    function errorFn(status: number, statusText: string, body: string, response: Response | undefined, errorThrown: any) {
       let httpResponse = {
         config: config,
         data: body,
@@ -168,7 +168,7 @@ export class AjaxFetchAdapter implements breeze.AjaxAdapter {
 
 breeze.config.registerAdapter("ajax", AjaxFetchAdapter);
 
-function getHeadersFn(response: Response): any {
+function getHeadersFn(response?: Response): any {
   if (!response || response.status === 0) { // timeout or abort; no headers
     return function (headerName: string) {
       return (headerName && headerName.length > 0) ? "" : {};

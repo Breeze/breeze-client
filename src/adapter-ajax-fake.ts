@@ -67,7 +67,7 @@ export class AjaxFakeAdapter implements breeze.AjaxAdapter {
           data = [];
         }
       }
-      successFn(data, "OK", null);
+      successFn(data, "OK", null as unknown as XMLHttpRequest);
     }
 
     function successFn(data: any, statusText: string, xhr: XMLHttpRequest) {

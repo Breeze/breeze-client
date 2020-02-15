@@ -24,7 +24,7 @@
 import { Entity, EntityManager, EntityQuery, EntityState, EntityType, ExpandClause } from 'breeze-client';
 
 interface EntityGroup {
-  _entities: (Entity | null)[];
+  _entities: (Entity | undefined)[];
   _indexMap: Map<string, number>;
 }
 
@@ -73,7 +73,7 @@ mixinEntityGraph(EntityManager);
 function getEntityGraph(roots: Entity | Array<Entity> | EntityQuery, expand: string | Array<string> | ExpandClause) {
   if (roots instanceof EntityQuery) {
     let newRoots = this.executeQueryLocally(roots);
-    return getEntityGraphCore(newRoots, expand || roots.expandClause);
+    return getEntityGraphCore(newRoots, expand || roots.expandClause!);
   } else {
     return getEntityGraphCore(roots, expand);
   }
@@ -102,7 +102,7 @@ function getEntityGraphCore(root: Entity | Array<Entity>, expand: string | Array
   }
 
   function getRootInfo() {
-    let compatTypes: Array<EntityType>;
+    let compatTypes: Array<EntityType> | undefined;
 
     roots.forEach(function (root, ix) {
       let aspect;
@@ -113,13 +113,13 @@ function getEntityGraphCore(root: Entity | Array<Entity>, expand: string | Array
         throw getRootErr(ix, 'is a detached entity');
       }
 
-      let em = aspect.entityManager;
+      let em = aspect.entityManager!;
       if (entityGroupMap) {
         if (entityGroupMap !== em._entityGroupMap) {
           throw getRootErr(ix, "has a different 'EntityManager' than other roots");
         }
       } else {
-        entityGroupMap = em._entityGroupMap;
+        entityGroupMap = em._entityGroupMap as any;
       }
       getRootType(root, ix);
 
@@ -147,7 +147,7 @@ function getEntityGraphCore(root: Entity | Array<Entity>, expand: string | Array
           return;
         }
         baseType = baseType.baseEntityType;
-        compatTypes = null;
+        compatTypes = undefined;
       } while (baseType);
 
       // does current rootType derives from thisType?
@@ -171,7 +171,7 @@ function getEntityGraphCore(root: Entity | Array<Entity>, expand: string | Array
         expand = [];
       } else if (typeof expand === 'string') {
         // tricky because Breeze expandClause not exposed publically
-        expand = new EntityQuery().expand(expand).expandClause;
+        expand = new EntityQuery().expand(expand).expandClause!;
       }
       if (expand instanceof ExpandClause && expand.propertyPaths) { // expand clause
         expand = expand.propertyPaths;
@@ -205,7 +205,7 @@ function getEntityGraphCore(root: Entity | Array<Entity>, expand: string | Array
     for (let i = 0, slen = segments.length; i < slen; i++) {
       let f = makePathSegmentFn(type, segments[i]);
       type = (f as any).navType;
-      fns.push(f);
+      fns.push(f as any);
     }
 
     return function pathFn(entities: Array<Entity>) {
@@ -263,8 +263,13 @@ function getEntityGraphCore(root: Entity | Array<Entity>, expand: string | Array
           try {
             let keyValue = entity.getProperty(fkName);
             for (let i = 0; i < grpCount; i += 1) {
-              val = grps[i]._entities[grps[i]._indexMap.get(keyValue)];
-              if (val) { break; }
+              
+              const ix = grps[i]._indexMap.get(keyValue);
+              if (ix != undefined) {
+                val = grps[i]._entities[ix];
+                if (val) { break; }
+              }
+              
             }
           } catch (e) { rethrow(e); }
           return val;
@@ -281,7 +286,7 @@ function getEntityGraphCore(root: Entity | Array<Entity>, expand: string | Array
             grps.forEach(function (grp) {
               vals = vals.concat(grp._entities.filter(function (en) {
                 return en && en.getProperty(fkName) === keyValue;
-              }));
+              }) as Entity[]) ;
             });
           } catch (e) { rethrow(e); }
           return vals;

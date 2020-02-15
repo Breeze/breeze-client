@@ -54,7 +54,7 @@ export class SaveOptions {
   }
 
   /** @hidden @internal */
-  private static _updateWithConfig(obj: SaveOptions, config: SaveOptionsConfig) {
+  private static _updateWithConfig(obj: SaveOptions, config?: SaveOptionsConfig) {
     if (config) {
       assertConfig(config)
           .whereParam("resourceName").isOptional().isString()

@@ -44,12 +44,12 @@ export class UriBuilderODataAdapter implements breeze.UriBuilderAdapter {
     }
 
     let qoText = toQueryOptionsString(queryOptions as breeze.QueryOptions);
-    let sep = entityQuery.resourceName.includes("?") ? "&" : "?";
+    let sep = entityQuery.resourceName!.includes("?") ? "&" : "?";
     return entityQuery.resourceName + sep + qoText;
 
     // private methods to this func.
 
-    function toWhereODataFragment(wherePredicate: breeze.Predicate) {
+    function toWhereODataFragment(wherePredicate?: breeze.Predicate) {
       if (!wherePredicate) return undefined;
       // validation occurs inside of the toODataFragment call here.
       let frag = wherePredicate.visit({ entityType: entityType }, toODataFragmentVisitor);

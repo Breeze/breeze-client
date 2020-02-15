@@ -240,7 +240,7 @@ export class DataServiceODataAdapter extends breeze.AbstractDataServiceAdapter {
       if (metadata != null) {
         // TODO: may be able to make this more efficient by caching of the previous value.
         let entityTypeName = breeze.MetadataStore.normalizeTypeName(metadata.type);
-        let et = entityTypeName && mappingContext.entityManager.metadataStore.getEntityType(entityTypeName, true);
+        let et = entityTypeName && mappingContext!.entityManager.metadataStore.getEntityType(entityTypeName, true);
         // OData response doesn't distinguish a projection from a whole entity.
         // We'll assume that whole-entity data would have at least as many properties  (<=)
         // as the EntityType has mapped properties on the basis that
@@ -253,7 +253,7 @@ export class DataServiceODataAdapter extends breeze.AbstractDataServiceAdapter {
           if (uriKey) {
             // Strip baseUri to make uriKey a relative uri
             // Todo: why is this necessary when absolute works for every OData source tested?
-            let re = new RegExp('^' + mappingContext.dataService.serviceName, 'i');
+            let re = new RegExp('^' + mappingContext!.dataService.serviceName, 'i');
             uriKey = uriKey.replace(re, '');
           }
           result.extraMetadata = {
@@ -267,7 +267,7 @@ export class DataServiceODataAdapter extends breeze.AbstractDataServiceAdapter {
         result.node = node.results;
       }
 
-      let propertyName = nodeContext.propertyName;
+      let propertyName = nodeContext!.propertyName;
       result.ignore = node.__deferred != null || propertyName === "__metadata" ||
         // EntityKey properties can be produced by EDMX models
         (propertyName === "EntityKey" && node.$type && core.stringStartsWith(node.$type, "System.Data"));

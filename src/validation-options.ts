@@ -88,7 +88,7 @@ export class ValidationOptions implements ValidationOptionsConfig {
 }
 ValidationOptions.prototype._$typeName = "ValidationOptions";
 
-function updateWithConfig(options: ValidationOptions, config: ValidationOptionsConfig) {
+function updateWithConfig(options: ValidationOptions, config?: ValidationOptionsConfig) {
   if (config) {
     assertConfig(config)
         .whereParam("validateOnAttach").isBoolean().isOptional()

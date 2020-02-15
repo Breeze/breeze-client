@@ -28,7 +28,7 @@ export class InterfaceDef<T extends BaseAdapter> {
   }
 
   /** Return the definition for the given adapterName */
-  getImpl(adapterName: string): IDef<T> {
+  getImpl(adapterName: string) {
     return this._implMap.get(adapterName.toLowerCase());
   }
 
@@ -152,7 +152,7 @@ export class BreezeConfig {
   **/
   getAdapterInstance<T extends BaseAdapter>(interfaceName: AdapterType, adapterName?: string) {
     let idef = this.getInterfaceDef<T>(interfaceName);
-    let impl: IDef<T>;
+    let impl: IDef<T> | undefined;
 
     let isDefault = adapterName == null || adapterName === "";
     if (isDefault) {

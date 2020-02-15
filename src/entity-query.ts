@@ -37,7 +37,7 @@ export class EntityQuery {
   This value may be null if the entityType cannot be associated with a resourceName. __Read Only__ */
   fromEntityType?: EntityType;
   /** The 'where' [[Predicate]] used by this query. __Read Only__ */
-  wherePredicate: Predicate; // TODO
+  wherePredicate?: Predicate; // TODO
   /** The [[OrderByClause]] used by this query. __Read Only__ */
   orderByClause?: OrderByClause;
   /** The [[ExpandClause]] used by this query. __Read Only__ */
@@ -236,7 +236,7 @@ export class EntityQuery {
   Each property path can optionally end with " desc" to force a descending sort order. If 'propertyPaths' is either null or omitted then all ordering is removed.
   @param isDescending - If specified, overrides all of the embedded 'desc' tags in the previously specified property paths.
   **/
-  orderBy(propertyPaths: string | string[], isDescending?: boolean) {
+  orderBy(propertyPaths?: string | string[], isDescending?: boolean) {
     // propertyPaths: can pass in create("A.X,B") or create("A.X desc, B") or create("A.X desc,B", true])
     // isDesc parameter trumps isDesc in propertyName.
     let orderByClause = propertyPaths == null ? null : new OrderByClause(normalizePropertyPaths(propertyPaths), isDescending);

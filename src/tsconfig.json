@@ -15,7 +15,7 @@
         "experimentalDecorators": true,
         "removeComments": false,
         // "strict": true,  // getting to here...
-        "strictNullChecks": false,
+        "strictNullChecks": true,
         "noImplicitAny": true,
         "noImplicitThis": false,
         "alwaysStrict": true,

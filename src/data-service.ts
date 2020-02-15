@@ -211,7 +211,7 @@ export interface JsonResultsAdapterConfig {
   This method has a default implementation which simply returns an empty array. */
   extractDeletedKeys?: (data: {}) => any[]; // TODO: refine
   /** A visitor method that will be called on each node of the returned payload. */
-  visitNode?: (v: any, mc?: MappingContext, nodeContext?: NodeContext) => NodeMeta;
+  visitNode?: (v: any, mc: MappingContext, nodeContext: NodeContext) => NodeMeta;
 
 }
 

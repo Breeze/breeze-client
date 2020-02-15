@@ -106,10 +106,10 @@ class SaveQueuing {
   baseSaveChanges: () => Promise<any>;
   isSaving: boolean;
   _isEnabled: boolean;
-  activeSaveDeferred: Deferred<SaveResult>;
-  nextSaveDeferred: Deferred<SaveResult>;
-  activeSaveMemo: SaveMemo;
-  nextSaveMemo: SaveMemo;
+  activeSaveDeferred: Deferred<SaveResult> | null;
+  nextSaveDeferred: Deferred<SaveResult> | null;
+  activeSaveMemo: SaveMemo | null;
+  nextSaveMemo: SaveMemo | null;
   saveOptions: any;
 
   constructor(entityManager: EntityManager) {
@@ -170,7 +170,7 @@ class SaveQueuing {
       // added entities normally don't have original values but these will now
       let added = entities ?
         entities.filter(function (e) { return e.entityAspect.entityState.isAdded(); }) :
-        self.entityManager.getEntities(null, EntityState.Added);
+        self.entityManager.getEntities(undefined, EntityState.Added);
       added.forEach(entity => {
         let props = entity.entityType.dataProperties;
         let originalValues = entity.entityAspect.originalValues;

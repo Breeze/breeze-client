@@ -117,7 +117,7 @@ function getOwnPropertyValues(source: Object): any[] {
 }
 
 /** Copy properties from source to target. Returns target. */
-function extend(target: Object, source: Object, propNames?: string[]): Object {
+function extend(target: Object, source?: Object, propNames?: string[]): Object {
     if (!source) return target;
     if (propNames) {
         propNames.forEach(function (propName) {
