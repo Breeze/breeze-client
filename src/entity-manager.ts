@@ -204,7 +204,7 @@ Instances of the EntityManager contain and manage collections of entities, eithe
 **/
 export class EntityManager {
   /** @hidden @internal */
-  _$typeName: string; // actually defined on prototype
+  _$typeName!: string; // actually defined on prototype
 
   /** The service name associated with this EntityManager. __Read Only__ **/
   serviceName: string;
@@ -222,8 +222,8 @@ export class EntityManager {
   keyGeneratorCtor: { new (): KeyGenerator }; // TODO: review this
   /** The [[MetadataStore]] associated with this EntityManager. __Read Only__ **/
   metadataStore: MetadataStore;
-  isLoading: boolean;
-  isRejectingChanges: boolean;
+  isLoading: boolean = false;
+  isRejectingChanges: boolean = false;
 
   // events
   /**
@@ -289,7 +289,7 @@ export class EntityManager {
   /** @hidden @internal */
   _pendingPubs?: any[]; // TODO: refine later
   /** @hidden @internal */
-  _hasChangesAction?: (() => boolean); // TODO refine later
+  _hasChangesAction?: (() => void); // TODO refine later
   /** @hidden @internal */
   _hasChanges: boolean;
   /** @hidden @internal */
@@ -1470,10 +1470,10 @@ export class EntityManager {
       // so defer it during a query/import or save and call it once when complete ( if needed).
       if (this._hasChanges) {
         if (this.isLoading) {
-          this._hasChangesAction = this._hasChangesAction || function () {
-            this._setHasChanges(null);
+          this._hasChangesAction = this._hasChangesAction || (() => {
+            this._setHasChanges();
             this.entityChanged.publish(ecArgs);
-          }.bind(this);
+          });
           return;
         } else {
           this._setHasChanges();
@@ -1830,7 +1830,7 @@ function markIsBeingSaved(entities: Entity[], flag: boolean) {
   });
 }
 
-function exportEntityGroups(em: EntityManager, entitiesOrEntityTypes: Entity[] | EntityType[] | string[]) {
+function exportEntityGroups(em: EntityManager, entitiesOrEntityTypes?: Entity[] | EntityType[] | string[]) {
   let entityGroupMap: { [index: string]: EntityGroup };
   let first = entitiesOrEntityTypes && entitiesOrEntityTypes[0];
   // check if array
@@ -2455,8 +2455,8 @@ function executeQueryLocallyCore(em: EntityManager, query: EntityQuery) {
   let queryOptions = QueryOptions.resolve([query.queryOptions, em.queryOptions, QueryOptions.defaultInstance]);
   let includeDeleted = queryOptions.includeDeleted === true;
 
-  let newFilterFunc = function (entity: Entity) {
-    return entity && (includeDeleted || !entity.entityAspect.entityState.isDeleted()) && (filterFunc ? filterFunc(entity) : true);
+  let newFilterFunc = function (entity: Entity | null) {
+    return  entity && (includeDeleted || !entity.entityAspect.entityState.isDeleted()) && (filterFunc ? filterFunc(entity) : true);
   };
 
   let result: any[] = [];

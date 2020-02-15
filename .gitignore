@@ -75,3 +75,4 @@ jspm_packages
 # compiled output
 /dist
 /.compile
+spec/support/import-export-test-stash

@@ -1062,7 +1062,7 @@ export class EntityType {
   Returns an array containing this type and any/all subtypes of this type down thru the hierarchy.
   **/
   getSelfAndSubtypes() {
-    let result = [this];
+    let result = [ this as EntityType ];
     this.subtypes.forEach(function (st) {
       let subtypes = st.getSelfAndSubtypes();
       result.push.apply(result, subtypes);
@@ -2626,7 +2626,8 @@ export function qualifyTypeName(shortName: string, ns?: string) {
 function addProperties(entityType: StructuralType, propObj: Object | undefined, ctor: any) {
   if (propObj == null) return;
   if (Array.isArray(propObj)) {
-    propObj.forEach(entityType._addPropertyCore.bind(entityType));
+    // propObj.forEach( entityType._addPropertyCore.bind(entityType));
+    propObj.forEach( p => entityType._addPropertyCore(p));
   } else if (typeof (propObj) === 'object') {
     for (let key in propObj) {
       if (core.hasOwnProperty(propObj, key)) {

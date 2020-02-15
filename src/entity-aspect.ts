@@ -6,24 +6,42 @@ import { BreezeEvent } from './event';
 import { assertParam } from './assert-param';
 import { EntityState  } from './entity-state';
 import { EntityAction } from './entity-action';
-import { EntityType, ComplexType, DataProperty, NavigationProperty, EntityProperty } from './entity-metadata';
+import { EntityType, ComplexType, DataProperty, NavigationProperty, EntityProperty, MetadataStore } from './entity-metadata';
 import { EntityKey } from './entity-key';
 import { EntityGroup } from './entity-group';
 import { EntityManager, QueryResult, QueryErrorCallback, QuerySuccessCallback } from './entity-manager';
 import { Validator, ValidationError } from './validate';
 import { EntityQuery } from './entity-query';
 
+
 export interface Entity {
   entityAspect: EntityAspect;
   entityType: EntityType;
   /** @internal */
-  getProperty?(prop: string): any;
+  getProperty(prop: string): any;
   /** @internal */
-  setProperty?(prop: any, value: any): void;
+  setProperty(prop: any, value: any): void;
   /** @hidden @internal */
-  prototype?: { _$typeName: string };
+  prototype: { _$typeName: string };
   /** @hidden @internal */
   _$entityType?: EntityType;
+}
+
+class NullEntity {
+  static __instance: NullEntity;
+  static instance() {
+    if (!NullEntity.__instance) {
+      NullEntity.__instance = new NullEntity();
+    }
+    return <Entity> <any> NullEntity.__instance;
+  }
+  entityType: EntityType;
+  entityAspect: EntityAspect;
+  constructor() {
+    this.entityType = new EntityType(new MetadataStore());
+  }
+  getProperty: (p: any) => undefined;
+  setProperty: (p: any, v: any) => {} ;
 }
 
 
@@ -33,7 +51,7 @@ export interface ComplexObject {
   getProperty(prop: string): any;
   setProperty(prop: any, value: any): void;
   /** @hidden @internal */
-  prototype?: { _$typeName: string };
+  prototype: { _$typeName: string };
 }
 
 export type StructuralObject = Entity | ComplexObject;
@@ -77,7 +95,7 @@ a query, import or [[EntityManager.createEntity]] call.
 **/
 export class EntityAspect {
   /** The Entity that this aspect is associated with. __Read Only__  **/
-  entity?: Entity;
+  entity: Entity;
   /** The [[EntityManager]] that contains this entity. __Read Only__ **/
   entityManager?: EntityManager;
   /**  @hidden @internal */
@@ -92,7 +110,7 @@ export class EntityAspect {
   /**  Whether this entity has any validation errors. __Read Only__ */
   hasValidationErrors: boolean;
   /** Whether this entity has a temporary [[EntityKey]]. */
-  hasTempKey: boolean;
+  hasTempKey: boolean = false;
   /** Whether this entity was created by being loaded from the database */
   wasLoaded?: boolean;
   /** Extra metadata about this entity such as the entity's etag.
@@ -152,19 +170,18 @@ export class EntityAspect {
   /** @hidden @internal */
   _entityKey: EntityKey;
   /** @hidden @internal */
-  _loadedNps: any[];
+  _loadedNps: any[] = [];
   /** @hidden @internal */
   _initialized?: boolean;
   /** @hidden @internal */
-  _inProcess: any[]; // used in defaultPropertyInterceptor for temp storage.
+  _inProcess: any[] = []; // used in defaultPropertyInterceptor for temp storage.
   /** @hidden @internal */
   _inProcessEntity?: Entity; // used in EntityManager
   /** @hidden @internal */
-  static _nullInstance = new EntityAspect(); // TODO: determine if this works
-  /** @hidden @internal */
   constructor(entity?: Entity) {
-
-    this.entity = entity;
+    
+    this.entity = entity || NullEntity.instance();
+    this.entity.entityAspect = this;
     // TODO: keep public or not?
     this.entityGroup = undefined;
     this.entityManager = undefined;
@@ -187,8 +204,6 @@ export class EntityAspect {
       // if (!entity.entityType) { delete(entity.entityType); }
       // if (!entity.entityAspect) { delete(entity.entityAspect); }
       
-      entity.entityAspect = this;
-
       // entityType should already be on the entity from 'watch'
       let entityType = entity.entityType || entity._$entityType;
       if (!entityType) {
@@ -437,7 +452,7 @@ export class EntityAspect {
     let query = EntityQuery.fromEntityNavigation(entity, navProperty);
     
     try {
-      const data = await entity.entityAspect.entityManager.executeQuery(query);
+      const data = await entity.entityAspect.entityManager!.executeQuery(query);
       this._markAsLoaded(navProperty.name);
       if (callback) callback(data);
       return data;
@@ -931,15 +946,25 @@ export class ComplexAspect {
   Returns the EntityAspect for the top level entity that contains this complex object.
   **/
   getEntityAspect() {
-    let parent = <any>this.parent;
+    let parent = this.parent;
     if (!parent) return new EntityAspect();
-    let entityAspect = parent.entityAspect;
-    while (parent && !entityAspect) {
-      parent = parent.complexAspect && parent.complexAspect.parent;
-      entityAspect = parent && parent.entityAspect;
+    while ( isComplexObject(parent!)) {
+      parent = parent.complexAspect.parent;    
     }
-    return entityAspect || new EntityAspect();
+    return parent ? parent.entityAspect : new EntityAspect();
   }
+
+  // OLD Code
+  // getEntityAspect() {
+  //   let parent = this.parent;
+  //   if (!parent) return new EntityAspect();
+  //   let entityAspect = (parent as Entity).entityAspect;
+  //   while (parent && !entityAspect) {
+  //     parent = parent.complexAspect && parent.complexAspect.parent;
+  //     entityAspect = parent && parent.entityAspect;
+  //   }
+  //   return entityAspect || new EntityAspect();
+  // }
 
   /**  @hidden @internal */
   // TODO: rename - and use '_'; used on both EntityAspect and ComplexAspect for polymorphic reasons.

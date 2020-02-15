@@ -10,7 +10,7 @@ An EntityKey is an object that represents the unique identity of an entity.  Ent
 **/
 export class EntityKey {
   /** @hidden @internal */
-  _$typeName: string; // actually placed on prototype
+  _$typeName!: string; // actually placed on prototype
   /** @hidden @internal */
   static ENTITY_KEY_DELIMITER = ":::";
   /**  The 'EntityType' that this is a key for. __Read Only__ */
@@ -44,11 +44,11 @@ export class EntityKey {
   constructor(entityType: EntityType, keyValues: any) {
     assertParam(entityType, "entityType").isInstanceOf(EntityType).check();
     let subtypes = entityType.getSelfAndSubtypes();
-    if (subtypes.length > 1) {
-      this._subtypes = subtypes.filter(function (st) {
-        return st.isAbstract === false;
-      });
-    }
+    
+    this._subtypes = subtypes.filter(function (st) {
+      return st.isAbstract === false;
+    });
+    
 
     if (!Array.isArray(keyValues)) {
       keyValues = [keyValues];
