@@ -14,7 +14,7 @@ export class EntityGroup {
   entityManager: EntityManager;
   entityType: EntityType;
   _indexMap: Map<string, number>;
-  _entities: (Entity | null)[];
+  _entities: (Entity | undefined)[];
   _emptyIndexes: number[];
 
   constructor(entityManager: EntityManager, entityType: EntityType) {
@@ -40,7 +40,7 @@ export class EntityGroup {
 
     let keyInGroup = aspect.getKey()._keyInGroup;
     let ix = this._indexMap.get(keyInGroup);
-    if (ix >= 0) {
+    if (ix != null) {
       // safecast because key was found not ix will not return a null
       let targetEntity = this._entities[ix] as Entity;
       let targetEntityState = targetEntity.entityAspect.entityState;
@@ -58,10 +58,11 @@ export class EntityGroup {
       }
       return targetEntity;
     } else {
+      
       if (this._emptyIndexes.length === 0) {
         ix = this._entities.push(entity) - 1;
       } else {
-        ix = this._emptyIndexes.pop();
+        ix = this._emptyIndexes.pop()!;
         this._entities[ix] = entity;
       }
       this._indexMap.set(keyInGroup, ix);
@@ -84,10 +85,9 @@ export class EntityGroup {
     }
     this._indexMap.delete(keyInGroup);
     this._emptyIndexes.push(ix);
-    this._entities[ix] = null;
+    this._entities[ix] = undefined;
     return entity;
   }
-
 
   // returns entity based on an entity key defined either as an array of key values or an EntityKey
   findEntityByKey(entityKey: EntityKey) {
@@ -105,28 +105,11 @@ export class EntityGroup {
   }
 
   hasChanges() {
-    let entities = this._entities;
-    let unchanged = EntityState.Unchanged;
-    for (let i = 0, len = entities.length; i < len; i++) {
-      let e = entities[i];
-      if (e && e.entityAspect.entityState !== unchanged) {
-        return true;
-      }
-    }
-    return false;
+    return this._entities.some(e => e && e.entityAspect.entityState !== EntityState.Unchanged);
   }
 
-  getChanges() {
-    let entities = this._entities;
-    let unchanged = EntityState.Unchanged;
-    let changes: Entity[] = [];
-    for (let i = 0, len = entities.length; i < len; i++) {
-      let e = entities[i];
-      if (e && e.entityAspect.entityState !== unchanged) {
-        changes.push(e);
-      }
-    }
-    return changes;
+  getChanges()  {
+    return this._entities.filter(e => e && e.entityAspect.entityState !== EntityState.Unchanged) as Entity[];
   }
 
   getEntities(entityStates: EntityState[]) {
@@ -135,9 +118,7 @@ export class EntityGroup {
   }
 
   _checkOperation(operationName: string) {
-    this._entities.forEach( entity => {
-      entity && entity.entityAspect._checkOperation(operationName);
-    });
+    this._entities.forEach( e => e && e.entityAspect._checkOperation(operationName));
     // for chaining;
     return this;
   }
@@ -147,11 +128,7 @@ export class EntityGroup {
   // after this op, which is ok because it will be thrown away.
   // TODO: rename this to be clear that it is UNSAFE...
   _clearUnsafe() {
-    this._entities.forEach( entity => {
-      if (entity != null) {
-        entity.entityAspect._detach();
-      }
-    });
+    this._entities.forEach( e => e && e.entityAspect._detach()); 
     (this as any)._entities = null;
     (this as any)._indexMap = null;
     (this as any)._emptyIndexes = null;
@@ -159,10 +136,10 @@ export class EntityGroup {
 
   _updateFkVal(fkProp: DataProperty, oldValue: any, newValue: any) {
     let fkPropName = fkProp.name;
-    this._entities.forEach( entity => {
-      if (entity != null) {
-        if (entity.getProperty(fkPropName) === oldValue) {
-          entity.setProperty(fkPropName, newValue);
+    this._entities.forEach( e => {
+      if (e != null) {
+        if (e.getProperty(fkPropName) === oldValue) {
+          e.setProperty(fkPropName, newValue);
         }
       }
     });
@@ -175,7 +152,7 @@ export class EntityGroup {
     if (ix === undefined) {
       throw new Error("Internal Error in key fixup - unable to locate entity");
     }
-    const entity = this._entities[ix];
+    const entity = this._entities[ix]!;
     const keyPropName = entity.entityType.keyProperties[0].name;
     // fks on related entities will automatically get updated by this as well
     entity.setProperty(keyPropName, realValue);
@@ -186,6 +163,7 @@ export class EntityGroup {
 
   _replaceKey(oldKey: EntityKey, newKey: EntityKey) {
     let ix = this._indexMap.get(oldKey._keyInGroup);
+    if (ix === undefined) return;
     this._indexMap.delete(oldKey._keyInGroup);
     this._indexMap.set(newKey._keyInGroup, ix);
   }
@@ -194,11 +172,11 @@ export class EntityGroup {
 
 function getFilter(entityStates: EntityState[]) {
   if (entityStates.length === 0) {
-    return  (e: Entity)  => !!e;
+    return  (e?: Entity)  => !!e;
   } else if (entityStates.length === 1) {
-    return (e: Entity) => !! (e && e.entityAspect.entityState === entityStates[0]);
+    return (e?: Entity) => !! (e && e.entityAspect.entityState === entityStates[0]);
   } else {
-    return (e: Entity) => !! (e && entityStates.includes(e.entityAspect.entityState));
+    return (e?: Entity | null) => !! (e && entityStates.includes(e.entityAspect.entityState));
   }
 }
 

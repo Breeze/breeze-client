@@ -1001,7 +1001,7 @@ function decompose(target: StructuralObject) {
   return { stype: stype, aspect: aspect, entityAspect: entityAspect };
 }
 
-let nullEntityAspect: EntityAspect = null;
+let nullEntityAspect: EntityAspect | null = null;
 
 class NullEntity {
   entityType: EntityType;

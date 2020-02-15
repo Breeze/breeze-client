@@ -65,7 +65,7 @@ export class RelationArray extends ObservableArray<Entity> {
     let parent = this.parentEntity;
     let query = EntityQuery.fromEntityNavigation(this.parentEntity, this.navigationProperty);
     let em = parent.entityAspect.entityManager;
-    return em.executeQuery(query, callback, errorCallback);
+    return em!.executeQuery(query, callback, errorCallback);
   }
 
   // Impl of abstract methods

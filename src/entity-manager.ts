@@ -1778,7 +1778,7 @@ function getChangesCore(em: EntityManager, entityTypes?: EntityType | EntityType
 
   // TODO: think about writing a core.mapMany method if we see more of these.
   let selected: Entity[] = [];
-  entityGroups.forEach(function (eg) {
+  entityGroups.forEach( eg => {
     // eg may be undefined or null
     if (!eg) return;
     let entities = eg.getChanges();
@@ -2430,15 +2430,13 @@ function unwrapChangedValues(entity: Entity, metadataStore: MetadataStore, trans
 }
 
 function cpHasOriginalValues(structuralObject: StructuralObject, cp: DataProperty): boolean {
-  let coOrCos = structuralObject.getProperty(cp.name);
+  let coOrCos: ComplexObject | ComplexObject[] = structuralObject.getProperty(cp.name);
   if (cp.isScalar) {
-    return coHasOriginalValues(coOrCos);
+    return coHasOriginalValues(coOrCos as ComplexObject);
   } else {
     // this occurs when a nonscalar co array has had cos added or removed.
-    if (coOrCos._origValues) return true;
-    return coOrCos.some(function (co: ComplexObject) {
-      return coHasOriginalValues(co);
-    });
+    if ((coOrCos as any)._origValues) return true;
+    return (coOrCos as ComplexObject[]).some( co => coHasOriginalValues(co));
   }
 }
 
@@ -2455,7 +2453,7 @@ function executeQueryLocallyCore(em: EntityManager, query: EntityQuery) {
   let queryOptions = QueryOptions.resolve([query.queryOptions, em.queryOptions, QueryOptions.defaultInstance]);
   let includeDeleted = queryOptions.includeDeleted === true;
 
-  let newFilterFunc = function (entity: Entity | null) {
+  let newFilterFunc = function (entity?: Entity) {
     return  entity && (includeDeleted || !entity.entityAspect.entityState.isDeleted()) && (filterFunc ? filterFunc(entity) : true);
   };
 

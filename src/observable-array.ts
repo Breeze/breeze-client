@@ -12,12 +12,12 @@ export interface ArrayChangedArgs {
 /** @hidden */
 export abstract class ObservableArray<T> extends Array<T> {
   arrayChanged: BreezeEvent<ArrayChangedArgs>;
-  _origValues: T[];
+  _origValues: T[] = [];
   _pendingArgs: any;
   _inProgress: boolean;
 
   abstract _getEventParent(): Object;
-  abstract _getPendingPubs(): Object[];
+  abstract _getPendingPubs(): any[] | undefined;
   abstract _getGoodAdds(adds: T[]): Array<T>;
   abstract _processAddsCore(items: T[]): void;
   abstract _processRemovesCore(items: T[]): void;

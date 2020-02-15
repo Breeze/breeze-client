@@ -86,7 +86,7 @@ export class PrimitiveArray extends ObservableArray<any> {
     if (entityAspect.entityState.isUnchanged()) {
       entityAspect.setModified();
     }
-    if (entityAspect.entityState.isModified() && !this._origValues) {
+    if (entityAspect.entityState.isModified()) {
       this._origValues = this.slice(0);
     }
   }
@@ -102,13 +102,13 @@ export class PrimitiveArray extends ObservableArray<any> {
   // --------
   
   _rejectChanges() {
-    if (!this._origValues) return;
+    if (this._origValues.length === 0) return;
     this.length = 0;
     Array.prototype.push.apply(this, this._origValues);
   }
 
   _acceptChanges() {
-    this._origValues = null;
+    this._origValues.length = 0;
   }
 }
 
