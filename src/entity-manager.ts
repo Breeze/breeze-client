@@ -994,15 +994,13 @@ export class EntityManager {
 
     if (entitiesToSave.length === 0) {
       let result = { entities: [], keyMappings: [] } as SaveResult;
-      
-      return Promise.resolve(result);
+      return result;
     }
 
     if (!saveOptions.allowConcurrentSaves) {
       let anyPendingSaves = entitiesToSave.some( entity => entity.entityAspect.isBeingSaved);
       if (anyPendingSaves) {
-        let err = new Error("Concurrent saves not allowed - SaveOptions.allowConcurrentSaves is false");
-        return Promise.reject(err);
+        throw new Error("Concurrent saves not allowed - SaveOptions.allowConcurrentSaves is false");
       }
     }
 
@@ -1010,7 +1008,7 @@ export class EntityManager {
 
     let valError = this.saveChangesValidateOnClient(entitiesToSave);
     if (valError) {
-      return Promise.reject(valError);
+      throw valError;
     }
 
     let dataService = DataService.resolve([saveOptions.dataService, this.dataService]);
@@ -1029,28 +1027,18 @@ export class EntityManager {
 
     try { // Guard against exception thrown in dataservice adapter before it goes async
       updateConcurrencyProperties(entitiesToSave);
-      return dataService.adapterInstance!.saveChanges(saveContext, saveBundle)
-        .then(saveSuccess).then((r) => r, saveFail);
+      const saveResult = await dataService.adapterInstance!.saveChanges(saveContext, saveBundle);
+      markIsBeingSaved(entitiesToSave, false);
+      const savedEntities = saveContext.processSavedEntities(saveResult);
+      saveResult.entities = savedEntities;
+      // update _hasChanges after save.
+      this._setHasChanges();
+      return saveResult;
     } catch (err) {
       // undo the marking by updateConcurrencyProperties
       markIsBeingSaved(entitiesToSave, false);
-      return Promise.reject(err);
-    }
-
-    function saveSuccess(saveResult: SaveResult) {
-      let em = saveContext.entityManager;
-      markIsBeingSaved(entitiesToSave, false);
-      let savedEntities = saveContext.processSavedEntities(saveResult);
-      saveResult.entities = savedEntities;
-
-      // update _hasChanges after save.
-      em._setHasChanges();
-
-      // can't do this anymore because other changes might have been made while saved entities in flight.
-      //      let hasChanges = (isFullSave && haveSameContents(entitiesToSave, savedEntities)) ? false : null;
-      //      em._setHasChanges(hasChanges);
-
-      return Promise.resolve(saveResult);
+      let clientError = processServerErrors(saveContext, err);
+      throw clientError;
     }
 
     function processSavedEntities(saveResult: SaveResult) {
@@ -1092,11 +1080,7 @@ export class EntityManager {
       return savedEntities;
     }
 
-    function saveFail(serverError: SaveErrorFromServer) {
-      markIsBeingSaved(entitiesToSave, false);
-      let clientError = processServerErrors(saveContext, serverError);
-      return Promise.reject(clientError);
-    }
+
   }
 
   /**
