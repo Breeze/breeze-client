@@ -267,7 +267,7 @@ function resolveProperties(sources: any[], propertyNames: string[]): any {
 
 // array functions
 
-function toArray(item: any): any[] {
+function toArray<T>(item: T | T[]): T[] {
   if (item == null) {
     return [];
   } else if (Array.isArray(item)) {
