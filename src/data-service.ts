@@ -2,7 +2,7 @@
 import { DataServiceAdapter, UriBuilderAdapter } from './interface-registry';
 import { KeyMapping } from './entity-manager';
 import { MappingContext } from './mapping-context';
-import { assertConfig } from './assert-param';
+import { assertConfig, Param } from './assert-param';
 import { config } from './config';
 import { core } from './core';
 
@@ -37,23 +37,23 @@ anytime a MetadataStore.fetchMetadata call occurs with a new dataService ( or se
 **/
 export class DataService {
   /** @hidden @internal */
-  _$typeName: string; // actually put on prototype.
+  _$typeName!: string; // actually put on prototype.
   /** The serviceName for this DataService. __Read Only__ **/
-  serviceName: string;
+  serviceName?: string;
   /** The adapter name for the [[IDataServiceAdapter]] to be used with this service. __Read Only__  **/
-  adapterName: string;
+  adapterName?: string;
   /**  The [[IDataServiceAdapter]] implementation instance associated with this EntityManager. __Read Only__  **/
   adapterInstance?: DataServiceAdapter;
   /** The adapter name for the [[IUriBuilderAdapter]] to be used with this service. __Read Only__  **/
-  uriBuilderName: string;
+  uriBuilderName?: string;
   /**  The [[IUriBuilderAdapter]] implementation instance associated with this EntityManager. __Read Only__  **/
   uriBuilder?: UriBuilderAdapter;
   /** Whether the server can provide metadata for this service. __Read Only__   **/
-  hasServerMetadata: boolean;
+  hasServerMetadata?: boolean;
   /** The [[JsonResultsAdapter]] used to process the results of any query against this DataService. __Read Only__ **/
-  jsonResultsAdapter: JsonResultsAdapter;
+  jsonResultsAdapter?: JsonResultsAdapter;
   /** Whether to use JSONP when performing a 'GET' request against this service. __Read Only__  **/
-  useJsonp: boolean;
+  useJsonp?: boolean;
 
   /**   DataService constructor
   >     var dataService = new DataService({
@@ -71,8 +71,9 @@ export class DataService {
   >     });
   @param config - A configuration object.
   **/
-  constructor(config?: DataServiceConfig) {
-    updateWithConfig(this, config);
+  constructor(config: DataServiceConfig) {
+    // updateWithConfig assumes all optional keys.
+    updateWithConfig(this, config, true);
   }
 
 
@@ -81,9 +82,8 @@ export class DataService {
   @param config - The configuration object to apply to create a new DataService.
   **/
   using(config: DataServiceConfig) {
-    if (!config) return this;
     let result = new DataService(this);
-    return updateWithConfig(result, config);
+    return updateWithConfig(result, config, false);
   }
 
   static resolve(dataServices: DataService[]) {
@@ -99,9 +99,18 @@ export class DataService {
     if (!ds.serviceName) {
       throw new Error("Unable to resolve a 'serviceName' for this dataService");
     }
+
     ds.adapterInstance = ds.adapterInstance || config.getAdapterInstance<DataServiceAdapter>("dataService", ds.adapterName);
-    ds.jsonResultsAdapter = ds.jsonResultsAdapter || ds.adapterInstance!.jsonResultsAdapter;
+    if (!ds.adapterInstance) {
+      throw new Error("Unable to resolve a 'DataServiceAdapter' for this dataService");
+    }
+
     ds.uriBuilder = ds.uriBuilder || config.getAdapterInstance<UriBuilderAdapter>("uriBuilder", ds.uriBuilderName);
+    if (!ds.uriBuilder) {
+      throw new Error("Unable to resolve a 'uriBuilder' for this dataService");
+    }
+
+    ds.jsonResultsAdapter = ds.jsonResultsAdapter || ds.adapterInstance.jsonResultsAdapter;
     return ds;
   }
 
@@ -161,18 +170,18 @@ export class DataService {
 }
 DataService.prototype._$typeName = "DataService";
 
-function updateWithConfig(obj: DataService, dsConfig?: DataServiceConfig) {
+function updateWithConfig(obj: DataService, dsConfig: DataServiceConfig, isCtor: boolean) {
   if (dsConfig) {
     assertConfig(dsConfig)
-        .whereParam("serviceName").isOptional()
-        .whereParam("adapterName").isString().isOptional()
-        .whereParam("uriBuilderName").isString().isOptional()
-        .whereParam("hasServerMetadata").isBoolean().isOptional()
-        .whereParam("jsonResultsAdapter").isInstanceOf(JsonResultsAdapter).isOptional()
-        .whereParam("useJsonp").isBoolean().isOptional()
-        .applyAll(obj);
+      .whereParam("serviceName").isOptional()
+      .whereParam("adapterName").isString().isOptional()
+      .whereParam("uriBuilderName").isString().isOptional()
+      .whereParam("hasServerMetadata").isBoolean().isOptional()
+      .whereParam("jsonResultsAdapter").isInstanceOf(JsonResultsAdapter).isOptional()
+      .whereParam("useJsonp").isBoolean().isOptional()
+      .applyAll(obj);
     obj.serviceName = obj.serviceName && DataService._normalizeServiceName(obj.serviceName);
-    obj.adapterInstance = obj.adapterName ?  config.getAdapterInstance<DataServiceAdapter>("dataService", obj.adapterName) : undefined;
+    obj.adapterInstance = obj.adapterName ? config.getAdapterInstance<DataServiceAdapter>("dataService", obj.adapterName) : undefined;
     obj.uriBuilder = obj.uriBuilderName ? config.getAdapterInstance<UriBuilderAdapter>("uriBuilder", obj.uriBuilderName) : undefined;
   }
   return obj;
@@ -221,9 +230,9 @@ This facility makes it possible for breeze to talk to virtually any web service 
 **/
 export class JsonResultsAdapter {
   /** @hidden @internal */
-  _$typeName: string; // actually put on prototype.
+  _$typeName!: string; // actually put on prototype.
   /** The name of this adapter.  This name is used to uniquely identify and locate this instance when an 'exported' JsonResultsAdapter is later imported. */
-  name: string;
+  name!: string;
   /** A Function that is called once per query operation to extract the 'payload' from any json received over the wire. 
   This method has a default implementation which simply returns the "results" property from any json returned as a result of executing the query. */
   extractResults: Function; // TODO - refine
@@ -235,9 +244,9 @@ export class JsonResultsAdapter {
   extractKeyMappings:  (data: {}) => KeyMapping[];
   /** A function that is called once per save operation to extract any deleted keys from any json received over the wire.  Must return an array.
   This method has a default implementation which is to simply returns the "deletedKeys" property from any json returned as a result of executing the save. */
-  extractDeletedKeys?: (data: {}) => any[]; // TODO: refine
+  extractDeletedKeys: (data: {}) => any[]; // TODO: refine
   /** A visitor method that will be called on each node of the returned payload. */
-  visitNode: Function;
+  visitNode!: Function;
 
   /**
   JsonResultsAdapter constructor

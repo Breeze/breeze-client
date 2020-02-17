@@ -151,7 +151,7 @@ export class EntityAspect {
   /** @hidden @internal */
   _pendingValidationResult: any;
   /** @hidden @internal */
-  _entityKey: EntityKey;
+  _entityKey?: EntityKey;
   /** @hidden @internal */
   _loadedNps: any[] = [];
   /** @hidden @internal */
@@ -889,11 +889,11 @@ entity via either a query, import or EntityManager.createEntity call.
 export class ComplexAspect {
 
   /** The complex object that this aspect is associated with. __Read Only__ */
-  complexObject: ComplexObject;
+  complexObject!: ComplexObject;
   /** The 'original values' of this complex object where they are different from the 'current values'.
   This is a map where the key is a property name and the value is the 'original value' of the property.
   __Read Only__ */
-  originalValues: ObjMap<any>;
+  originalValues!: ObjMap<any>;
   /** The parent object that to which this aspect belongs; this will either be an entity or another complex object. __Read Only__ */
   parent?: StructuralObject;
   /** The [[DataProperty]] on the 'parent' that contains this complex object. __Read Only__ */
@@ -1010,10 +1010,10 @@ let nullEntityAspect: EntityAspect | null = null;
 
 class NullEntity {
   entityType: EntityType;
-  entityAspect: EntityAspect;
+  entityAspect!: EntityAspect;
   constructor() {
     this.entityType = new EntityType(new MetadataStore());
   }
-  getProperty: (p: any) => undefined;
-  setProperty: (p: any, v: any) => {};
+  getProperty: (p: any) => undefined = (p) => undefined;
+  setProperty: (p: any, v: any) => void = (p, v) => {};
 }

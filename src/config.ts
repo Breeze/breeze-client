@@ -60,7 +60,7 @@ export class BreezeConfig {
 
   stringifyPad = '';
   /** whether to prohibit eval() and Function() in breeze code */
-  noEval: boolean;
+  noEval?: boolean;
   /** @hidden @internal */
   _interfaceRegistry: any;  // will be set in adapter-interfaces. untyped here to avoid circularity issues.
 

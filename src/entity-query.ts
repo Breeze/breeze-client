@@ -454,6 +454,9 @@ export class EntityQuery {
   using(obj: any) {
     if (!obj) return this;
     let eq = clone(this);
+    // if (obj instanceof EntityManager) {
+    //   return clone(this, "entityManager", obj);
+    // }
     processUsing(eq, {
       "entityManager": null,
       "dataService": null,
@@ -465,7 +468,7 @@ export class EntityQuery {
         eq.queryOptions = (eq.queryOptions || new QueryOptions()).using(val);
       },
       "jsonResultsAdapter": (eq: EntityQuery, val: any) => {
-        eq.dataService = (eq.dataService || new DataService()).using({ jsonResultsAdapter: val });
+        eq.dataService = (eq.dataService || new DataService({})).using({ jsonResultsAdapter: val });
       }
     }, obj);
     return eq;

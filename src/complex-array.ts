@@ -39,8 +39,8 @@ collections are collected into a single notification event for each relation arr
 @readOnly
 **/
 export class ComplexArray extends ObservableArray<ComplexObject> {
-  parent: StructuralObject;
-  parentProperty: DataProperty;
+  parent!: StructuralObject;
+  parentProperty!: DataProperty;
 
   constructor(...args: ComplexObject[]) {
     super(...args);

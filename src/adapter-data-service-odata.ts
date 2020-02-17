@@ -21,7 +21,7 @@ interface ODataSaveContext extends breeze.SaveContext {
 /** @hidden */
 export class DataServiceODataAdapter extends breeze.AbstractDataServiceAdapter {
   name: string;
-  relativeUrl: boolean | ((ds: breeze.DataService, url: string) => string);
+  relativeUrl?: boolean | ((ds: breeze.DataService, url: string) => string);
   // _catchNoConnectionError = abstractDsaProto._catchNoConnectionError;
   // changeRequestInterceptor = abstractDsaProto.changeRequestInterceptor;
   // _createChangeRequestInterceptor = abstractDsaProto._createChangeRequestInterceptor;
@@ -61,13 +61,16 @@ export class DataServiceODataAdapter extends breeze.AbstractDataServiceAdapter {
   fetchMetadata(metadataStore: breeze.MetadataStore, dataService: breeze.DataService) {
     let serviceName = dataService.serviceName;
 
-    let url: string;
+    let url: string | undefined;
     if (this.relativeUrl === true) {
       url = dataService.qualifyUrl('$metadata');
     } else if (core.isFunction(this.relativeUrl)) {
       url = (this.relativeUrl as any)(dataService, '$metadata');
     } else {
       url = this.getAbsoluteUrl(dataService, '$metadata');
+    }
+    if (url == null) {
+      throw new Error('Unable to resolve a valid url');
     }
 
     let mheaders = core.extend({}, this.headers);
@@ -103,7 +106,7 @@ export class DataServiceODataAdapter extends breeze.AbstractDataServiceAdapter {
           return resolve(csdlMetadata);
 
         }, function (error: any) {
-          let err = createError(error, url);
+          let err = createError(error, url!);
           err.message = "Metadata query failed for: " + url + "; " + (err.message || "");
           return reject(err);
         },

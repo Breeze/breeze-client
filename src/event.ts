@@ -48,9 +48,9 @@ export class BreezeEvent<T> {
   publisher: Object;
 
   /** @hidden @internal */
-  _subscribers: Subscription[];
+  _subscribers: Subscription[] = [];
   /** @hidden @internal */
-  _defaultErrorCallback: (e: Error) => any;
+  _defaultErrorCallback?: (e: Error) => any;
 
 
   /**
@@ -142,10 +142,6 @@ export class BreezeEvent<T> {
   @return This is a key for 'unsubscription'.  It can be passed to the 'unsubscribe' method.
   **/
   subscribe(callback: (data: T) => any) {
-    if (!this._subscribers) {
-      this._subscribers = [];
-    }
-
     let unsubKey = BreezeEvent.__nextUnsubKey;
     this._subscribers.push({ unsubKey: unsubKey, callback: callback });
     ++BreezeEvent.__nextUnsubKey;
@@ -164,22 +160,17 @@ export class BreezeEvent<T> {
   @return Whether unsubscription occured. This will return false if already unsubscribed or if the key simply
   cannot be found.
   **/
-  unsubscribe = function (this: any, unsubKey: number) {
-    if (!this._subscribers) return false;
+  unsubscribe(unsubKey: number) {
+    if (this._subscribers.length === 0) return false;
     let subs = this._subscribers;
-    let ix = core.arrayIndexOf(subs, function (s) {
-      return s.unsubKey === unsubKey;
-    });
+    let ix = this._subscribers.findIndex( s => s.unsubKey === unsubKey);
     if (ix !== -1) {
-      subs.splice(ix, 1);
-      if (subs.length === 0) {
-        this._subscribers = null;
-      }
+      this._subscribers.splice(ix, 1);
       return true;
     } else {
       return false;
     }
-  };
+  }
 
   /** remove all subscribers */
   clear() {
