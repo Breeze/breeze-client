@@ -23,6 +23,7 @@
   },
   "scripts": {
     "build": "npm run clean && npm run packagr && npm pack ./dist && npm run install-to-spec",
+    "test": "npm run test --prefix ../spec",
     "clean": "rimraf ../temp && rimraf *.js && rimraf *.d.ts && rimraf ./dist && rimraf node_modules/breeze-client.js",
     "install-to-spec": "cd ../spec && npm install ../src/breeze-client-2.0.7.tgz",
     "publish": "npm publish --tag latest ../dist",

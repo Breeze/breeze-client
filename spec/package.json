@@ -24,6 +24,7 @@
   },
   "scripts": {
     "test": "npm run clean && jest",
+    "build": "npm run build --prefix ../src",
     "clean": "rimraf *.spec.js && rimraf *-fns.js",
     "tsc": "tsc",
     "watch-tsc": "tsc -w",
