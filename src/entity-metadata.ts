@@ -1,4 +1,6 @@
-﻿import { core, ObjMap, ErrorCallback } from './core';
+﻿// Converted to ES6
+
+import { core, ObjMap, ErrorCallback } from './core';
 import { config } from './config';
 import { BreezeEvent } from './event';
 import { assertParam, assertConfig, Param } from './assert-param';
@@ -17,8 +19,6 @@ export type EntityProperty = DataProperty | NavigationProperty;
 export type StructuralType = EntityType | ComplexType;
 
 
-
-// TODO: consider exposing later
 /** @hidden @internal */
 export interface IMetadataJson {
   metadataVersion: string;
@@ -46,8 +46,6 @@ export interface MetadataFetchedEventArgs {
   dataService: DataService | string;
   rawMetadata: any;
 }
-
-
 
 /**
 An instance of the MetadataStore contains all of the metadata about a collection of [[EntityType]]'s.
@@ -220,8 +218,9 @@ export class MetadataStore {
         structuralType._updateFromBase(baseEntityType as EntityType);
       }
       if (structuralType.keyProperties.length === 0 && !structuralType.isAbstract) {
-        throw new Error("Unable to add " + structuralType.name +
-          " to this MetadataStore.  An EntityType must have at least one property designated as a key property - See the 'DataProperty.isPartOfKey' property.");
+        throw new Error(`Unable to add ${structuralType.name} to this MetadataStore. ` 
+           + `An EntityType must have at least one property designated as a key property. ` 
+           + `- See the 'DataProperty.isPartOfKey' property.`);
       }
     }
 
@@ -229,7 +228,7 @@ export class MetadataStore {
     // don't register anon types
     if (!(structuralType as any).isAnonymous) {
       if (this._structuralTypeMap[structuralType.name]) {
-        throw new Error("Type " + structuralType.name + " already exists in this MetadataStore.");
+        throw new Error(`Type ${structuralType.name} already exists in this MetadataStore.`);
       }
 
       this._structuralTypeMap[structuralType.name] = structuralType;
@@ -414,34 +413,37 @@ export class MetadataStore {
   @param errorCallback - Function called on failure.
   @return Promise
   **/
-  fetchMetadata(dataService: string | DataService, callback?: (schema: any) => void, errorCallback?: ErrorCallback) {
-    try {
-      assertParam(dataService, "dataService").isString().or().isInstanceOf(DataService).check();
-      assertParam(callback, "callback").isFunction().isOptional().check();
-      assertParam(errorCallback, "errorCallback").isFunction().isOptional().check();
+  async fetchMetadata(dataService: string | DataService, callback?: (schema: any) => void, errorCallback?: ErrorCallback) {
+    
+    assertParam(dataService, "dataService").isString().or().isInstanceOf(DataService).check();
+    assertParam(callback, "callback").isFunction().isOptional().check();
+    assertParam(errorCallback, "errorCallback").isFunction().isOptional().check();
 
-      if (typeof dataService === "string") {
-        // use the dataService with a matching name or create a new one.
-        dataService = this.getDataService(dataService) || new DataService({ serviceName: dataService });
-      }
-
-      dataService = DataService.resolve([dataService]);
-
-      if (this.hasMetadataFor(dataService.serviceName!)) {
-        throw new Error("Metadata for a specific serviceName may only be fetched once per MetadataStore. ServiceName: " + dataService.serviceName);
-      }
-
-      return dataService.adapterInstance!.fetchMetadata(this, dataService).then((rawMetadata: any) => {
-        this.metadataFetched.publish({ metadataStore: this, dataService: dataService, rawMetadata: rawMetadata });
-        if (callback) callback(rawMetadata);
-        return Promise.resolve(rawMetadata);
-      }, function (error: any) {
-        if (errorCallback) errorCallback(error);
-        return Promise.reject(error);
-      });
-    } catch (e) {
-      return Promise.reject(e);
+    if (typeof dataService === "string") {
+      // use the dataService with a matching name or create a new one.
+      dataService = this.getDataService(dataService) || new DataService({ serviceName: dataService });
     }
+
+    dataService = DataService.resolve([dataService]);
+
+    if (this.hasMetadataFor(dataService.serviceName!)) {
+      throw new Error(`Metadata for a specific serviceName may only be fetched once per MetadataStore. `
+        + `ServiceName: ${dataService.serviceName}`);
+    }
+
+    try {
+      const rawMetadata = await dataService.adapterInstance!.fetchMetadata(this, dataService);
+      this.metadataFetched.publish({ metadataStore: this, dataService: dataService, rawMetadata: rawMetadata });
+      if (callback) callback(rawMetadata);
+      return rawMetadata;
+    } catch (e) {
+      if (errorCallback) {
+        errorCallback(e);
+      } else {
+        throw e;
+      }
+    }
+    
   }
 
 
@@ -539,7 +541,7 @@ export class MetadataStore {
     } else if (okIfNotFound) {
       return null;
     } else {
-      let msg = core.formatString("Unable to locate an 'EntityType' by the name: '%1'. Be sure to execute a query or call fetchMetadata first.", typeName);
+      const msg = `Unable to locate an 'EntityType' by the name: '${typeName}'. Be sure to execute a query or call fetchMetadata first.`;
       throw new Error(msg);
     }
   }
@@ -564,7 +566,7 @@ export class MetadataStore {
   } else if (okIfNotFound) {
     return null;
   } else {
-    let msg = core.formatString("Unable to locate an 'ComplexType' by the name: '%1'. Be sure to execute a query or call fetchMetadata first.", typeName);
+    const msg = `Unable to locate an 'ComplexType' by the name: '${typeName}'. Be sure to execute a query or call fetchMetadata first.`
     throw new Error(msg);
   }
 }
@@ -608,7 +610,7 @@ export class MetadataStore {
     let type = this._structuralTypeMap[qualTypeName];
     if (!type) {
       if (okIfNotFound) return null;
-      let msg = core.formatString("Unable to locate a 'Type' by the name: '%1'. Be sure to execute a query or call fetchMetadata first.", typeName);
+      let msg = `Unable to locate a 'Type' by the name: '${typeName}'. Be sure to execute a query or call fetchMetadata first.`;
       throw new Error(msg);
     }
     return type;
@@ -623,10 +625,9 @@ export class MetadataStore {
     return getTypesFromMap(this._structuralTypeMap);
   }
 
+  /** @hidden @internal */
   getIncompleteNavigationProperties() {
-    return core.objectMap(this._incompleteTypeMap, function (key, value) {
-      return value;
-    });
+    return core.objectMap(this._incompleteTypeMap, (key, value) => value);
   }
 
   /**
@@ -815,15 +816,13 @@ function completeStructuralTypeFromJson(metadataStore: MetadataStore, json: any,
     stype.validators = json.validators.map(Validator.fromJSON);
   }
 
-  json.dataProperties.forEach(function (dp: Object) {
-    stype._addPropertyCore(DataProperty.fromJSON(dp));
-  });
-
+  json.dataProperties.forEach( (dp: any) => stype._addPropertyCore(DataProperty.fromJSON(dp)));
+  
 
   let isEntityType = !json.isComplexType;
   if (isEntityType) {
     //noinspection JSHint
-    json.navigationProperties && json.navigationProperties.forEach(function (np: Object) {
+    json.navigationProperties && json.navigationProperties.forEach( (np: any) => {
       stype._addPropertyCore(NavigationProperty.fromJSON(np));
     });
   }
@@ -833,9 +832,7 @@ function completeStructuralTypeFromJson(metadataStore: MetadataStore, json: any,
   let deferredTypes = metadataStore._deferredTypes;
   let deferrals = deferredTypes[stype.name];
   if (deferrals) {
-    deferrals.forEach(function (d: any) {
-      completeStructuralTypeFromJson(metadataStore, d.json, d.stype);
-    });
+    deferrals.forEach( (d: any) => completeStructuralTypeFromJson(metadataStore, d.json, d.stype));
     delete deferredTypes[stype.name];
   }
 }
@@ -844,7 +841,7 @@ function getQualifiedTypeName(metadataStore: MetadataStore, structTypeName: stri
   if (isQualifiedTypeName(structTypeName)) return structTypeName;
   let result = metadataStore._shortNameMap[structTypeName];
   if (!result && throwIfNotFound) {
-    throw new Error("Unable to locate 'entityTypeName' of: " + structTypeName);
+    throw new Error(`Unable to locate 'entityTypeName' of: ${structTypeName}`);
   }
   return result;
 }
@@ -1089,7 +1086,7 @@ export class EntityType {
 
     if (this.subtypes && this.subtypes.length) {
       let stype = this;
-      stype.getSelfAndSubtypes().forEach(function (st) {
+      stype.getSelfAndSubtypes().forEach( st => {
         if (st !== stype) {
           if (property.isNavigationProperty) {
             st._addPropertyCore(new NavigationProperty(property), true);
@@ -1129,12 +1126,14 @@ export class EntityType {
   /** @hidden @internal */
   _addPropertyCore(property: EntityProperty, shouldResolve: boolean = false) {
     if (this.isFrozen) {
-      throw new Error("The '" + this.name + "' EntityType/ComplexType has been frozen. You can only add properties to an EntityType/ComplexType before any instances of that type have been created and attached to an entityManager.");
+      throw new Error(`The ${this.name} EntityType/ComplexType has been frozen. ` 
+        + `You can only add properties to an EntityType/ComplexType before any instances of that type `
+        + `have been created and attached to an entityManager.`);
     }
     let parentType = property.parentType;
     if (parentType) {
       if (parentType !== this) {
-        throw new Error("This property: " + property.name + " has already been added to " + property.parentType.name);
+        throw new Error(`This property: ${property.name} has already been added to ${property.parentType.name}.`);
       } else {
         // adding the same property more than once to the same entityType is just ignored.
         return;
@@ -1231,13 +1230,11 @@ export class EntityType {
       let fn = (typeof initFn === "string") ? instance[initFn] : initFn;
       fn(instance);
     }
-    this.complexProperties && this.complexProperties.forEach(function (cp) {
+    this.complexProperties && this.complexProperties.forEach( cp => {
       let complexType = cp.dataType as ComplexType;
       let ctInstance = instance.getProperty(cp.name);
       if (Array.isArray(ctInstance)) {
-        ctInstance.forEach((ctInst) => {
-          complexType._initializeInstance(ctInst);
-        });
+        ctInstance.forEach( ctInst => complexType._initializeInstance(ctInst));
       } else {
         complexType._initializeInstance(ctInstance);
       }
@@ -1365,7 +1362,7 @@ export class EntityType {
   >      let arrayOfPropNames = custType.getPropertyNames();
   **/
   getPropertyNames() {
-    return this.getProperties().map(core.pluck('name'));
+    return this.getProperties().map( p => p.name);
   }
 
   /**
@@ -1376,7 +1373,7 @@ export class EntityType {
   @return A DataProperty or null if not found.
   **/
   getDataProperty(propertyName: string) {
-    return core.arrayFirst(this.dataProperties, core.propEq('name', propertyName));
+    return this.dataProperties.find(p => p.name === propertyName);
   }
 
   /**
@@ -1387,7 +1384,7 @@ export class EntityType {
   @return A NavigationProperty or null if not found.
   **/
   getNavigationProperty(propertyName: string) {
-    return core.arrayFirst(this.navigationProperties, core.propEq('name', propertyName));
+    return this.navigationProperties.find(p => p.name === propertyName);
   }
 
   /**
@@ -1444,9 +1441,7 @@ export class EntityType {
     let propNames: string[];
     if (this.isAnonymous) {
       let fn = this.metadataStore.namingConvention.clientPropertyNameToServer;
-      propNames = propertyPath.split(".").map(function (propName) {
-        return fn(propName);
-      });
+      propNames = propertyPath.split(".").map( propName => fn(propName));
     } else {
       let props = this.getPropertiesOnPath(propertyPath, false, true);
       propNames = props!.map((prop: EntityProperty) => prop.nameOnServer);
@@ -1585,8 +1580,7 @@ export class EntityType {
     // if (navigationProperty.isNavigationProperty) {
     if (navigationProperty instanceof NavigationProperty) {
       if (navigationProperty.parentType !== this) {
-        throw new Error(core.formatString("The navigationProperty '%1' is not a property of entity type '%2'",
-          navigationProperty.name, this.name));
+        throw new Error(`The navigationProperty '${navigationProperty.name}' is not a property of entity type '${this.name}'`);
       }
       return navigationProperty;
     }
@@ -1644,9 +1638,7 @@ export class EntityType {
     });
 
     if (this.isComplexType) {
-      (incompleteTypeMap[this.name] || []).forEach(function (cp: DataProperty) {
-        resolveCp(cp, metadataStore);
-      });
+      (incompleteTypeMap[this.name] || []).forEach( cp => resolveCp(cp, metadataStore));
       delete incompleteTypeMap[this.name];
     }
   }
@@ -1661,9 +1653,7 @@ export class EntityType {
     });
     let incompleteTypeMap = metadataStore._incompleteTypeMap;
     // next resolve all navProp that point to this entityType.
-    (incompleteTypeMap[this.name] || []).forEach(function (np: NavigationProperty) {
-      tryResolveNp(np, metadataStore);
-    });
+    (incompleteTypeMap[this.name] || []).forEach( np => tryResolveNp(np, metadataStore));
     // every navProp that pointed to this type should now be resolved
     delete incompleteTypeMap[this.name];
   }
@@ -1681,11 +1671,12 @@ function updateClientServerNames(nc: NamingConvention, parent: any, clientPropNa
   let clientName = parent[clientPropName];
   if (clientName && clientName.length) {
     // if (parent.isUnmapped) return;
-    let serverNames = core.toArray(clientName).map(function (cName) {
+    let serverNames = core.toArray(clientName).map( cName => {
       let sName = nc.clientPropertyNameToServer(cName, parent);
       let testName = nc.serverPropertyNameToClient(sName, parent);
       if (cName !== testName) {
-        throw new Error("NamingConvention for this client property name does not roundtrip properly:" + cName + "-->" + testName);
+        throw new Error(`NamingConvention for this client property name does not roundtrip properly: ` 
+          + `${cName} --> ${testName}`);
       }
       return sName;
     });
@@ -1697,7 +1688,8 @@ function updateClientServerNames(nc: NamingConvention, parent: any, clientPropNa
       let cName = nc.serverPropertyNameToClient(sName, parent);
       let testName = nc.clientPropertyNameToServer(cName, parent);
       if (sName !== testName) {
-        throw new Error("NamingConvention for this server property name does not roundtrip properly:" + sName + "-->" + testName);
+        throw new Error(`NamingConvention for this server property name does not roundtrip properly: ` 
+          + `${sName} --> ${testName}`);
       }
       return cName;
     });
@@ -2387,7 +2379,7 @@ export class NavigationProperty {
   }
 
   /** @hidden @internal */
-  getInverse(): NavigationProperty | undefined {
+  getInverse() {
     let np: NavigationProperty = this;
     while (!np._inverse && np.baseProperty) {
       np = np.baseProperty;
@@ -2469,7 +2461,7 @@ export class NavigationProperty {
   _resolveNp() {
     let np = this;
     let entityType = np.entityType;
-    let invNp = core.arrayFirst(entityType.navigationProperties, (altNp) => {
+    let invNp = entityType.navigationProperties.find( altNp => {
       // Can't do this because of possibility of comparing a base class np with a subclass altNp.
       // return altNp.associationName === np.associationName
       //    && altNp !== np;
@@ -2477,16 +2469,17 @@ export class NavigationProperty {
       return altNp.associationName === np.associationName &&
         (altNp.name !== np.name || altNp.entityTypeName !== np.entityTypeName);
     });
+    
     np._inverse = invNp || undefined;
     //if (invNp && invNp.inverse == null) {
     //    invNp._resolveNp();
     //}
     if (!invNp) {
       // unidirectional 1-n relationship
-      np.invForeignKeyNames.forEach(function (invFkName) {
+      np.invForeignKeyNames.forEach( invFkName => {
         let fkProp = entityType.getDataProperty(invFkName);
         if (fkProp == null) {
-          throw new Error("EntityType '" + np.entityTypeName + "' has no foreign key matching '" + invFkName + "'");
+          throw new Error(`EntityType '${np.entityTypeName}' has no foreign key matching '${invFkName}'.`);
         }
         let invEntityType = np.parentType;
         invNp = core.arrayFirst(invEntityType.navigationProperties, (np2) => {
@@ -2507,11 +2500,6 @@ function throwSetInverseError(np: NavigationProperty, message: string) {
   throw new Error("Cannot set the inverse property for: " + np.formatName() + ". " + message);
 }
 
-// Not current used.
-// function throwCreateInverseError(np: NavigationProperty, message: string) {
-//   throw new Error("Cannot create inverse for: " + np.formatName() + ". The entityType for this navigation property " + message);
-// }
-
 // sets navigation property: relatedDataProperties and dataProperty: relatedNavigationProperty
 function resolveRelated(np: NavigationProperty) {
 
@@ -2519,12 +2507,10 @@ function resolveRelated(np: NavigationProperty) {
   if (fkNames.length === 0) return;
 
   let parentEntityType = np.parentType;
-  let fkProps = fkNames.map(function (fkName) {
-    return parentEntityType.getDataProperty(fkName);
-  });
+  let fkProps = fkNames.map( (fkName) => parentEntityType.getDataProperty(fkName)!);
   let fkPropCollection = parentEntityType.foreignKeyProperties;
 
-  fkProps.forEach((dp: DataProperty) => {
+  fkProps.forEach( dp => {
     core.arrayAddItemUnique(fkPropCollection, dp);
     dp.relatedNavigationProperty = np;
     // now update the inverse
