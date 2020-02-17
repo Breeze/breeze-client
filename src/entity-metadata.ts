@@ -186,7 +186,7 @@ export class MetadataStore {
   addDataService(dataService: DataService, shouldOverwrite?: boolean) {
     assertParam(dataService, "dataService").isInstanceOf(DataService).check();
     assertParam(shouldOverwrite, "shouldOverwrite").isBoolean().isOptional().check();
-    let ix = this._getDataServiceIndex(dataService.serviceName);
+    let ix = this.dataServices.findIndex( ds => ds.serviceName === dataService.serviceName);
     if (ix >= 0) {
       if (!!shouldOverwrite) {
         this.dataServices[ix] = dataService;
@@ -198,12 +198,6 @@ export class MetadataStore {
     }
   }
 
-  /** @hidden @internal */
-  _getDataServiceIndex(serviceName: string) {
-    return core.arrayIndexOf(this.dataServices, function (ds) {
-      return ds.serviceName === serviceName;
-    });
-  }
 
   /**
   Adds an EntityType to this MetadataStore.  No additional properties may be added to the EntityType after its has
@@ -433,7 +427,7 @@ export class MetadataStore {
 
       dataService = DataService.resolve([dataService]);
 
-      if (this.hasMetadataFor(dataService.serviceName)) {
+      if (this.hasMetadataFor(dataService.serviceName!)) {
         throw new Error("Metadata for a specific serviceName may only be fetched once per MetadataStore. ServiceName: " + dataService.serviceName);
       }
 

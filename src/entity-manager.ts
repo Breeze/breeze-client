@@ -207,7 +207,11 @@ export class EntityManager {
   _$typeName!: string; // actually defined on prototype
 
   /** The service name associated with this EntityManager. __Read Only__ **/
-  serviceName: string;
+  // serviceName: string;
+   /** The service name associated with this EntityManager. __Read Only__ **/
+   get serviceName() {
+    return this.dataService.serviceName;
+  }
   /** The DataService associated with this EntityManager. __Read Only__ **/
   dataService: DataService;
   /** The [[QueryOptions]] associated with this EntityManager. __Read Only__ **/
@@ -386,8 +390,10 @@ export class EntityManager {
     let defaultSaveOptions = isCtor ? SaveOptions.defaultInstance : em.saveOptions;
     let defaultValidationOptions = isCtor ? ValidationOptions.defaultInstance : em.validationOptions;
 
-    let configParam = assertConfig(config)
-      .whereParam("serviceName").isOptional().isString()
+    // configParam should not include 'serviceName' because it isn't settable. 
+    const { serviceName, ...applyConfig }  = config;
+    assertParam(serviceName, "serviceName").isOptional().isString().check();
+    let configParam = assertConfig(applyConfig)
       .whereParam("dataService").isOptional().isInstanceOf(DataService)
       .whereParam("queryOptions").isInstanceOf(QueryOptions).isOptional().withDefault(defaultQueryOptions)
       .whereParam("saveOptions").isInstanceOf(SaveOptions).isOptional().withDefault(defaultSaveOptions)
@@ -405,11 +411,14 @@ export class EntityManager {
     core.updateWithDefaults(em.validationOptions, defaultValidationOptions);
 
     if (config.serviceName) {
-      em.dataService = new DataService({
-        serviceName: em.serviceName
-      });
+      if (em.dataService == null) {
+        em.dataService = new DataService({
+          serviceName: config.serviceName
+        });
+      } else {
+        em.dataService = em.dataService.using( { serviceName : config.serviceName });
+      }
     }
-    em.serviceName = em.dataService && em.dataService.serviceName;
 
     em.keyGeneratorCtor = em.keyGeneratorCtor || KeyGenerator;
     if (isCtor || config.keyGeneratorCtor) {
@@ -936,7 +945,7 @@ export class EntityManager {
     let queryOptions = QueryOptions.resolve([(query as any).queryOptions, this.queryOptions, QueryOptions.defaultInstance]);
     let dataService = DataService.resolve([(query as any).dataService!, this.dataService]);
 
-    if ((!dataService.hasServerMetadata) || this.metadataStore.hasMetadataFor(dataService.serviceName)) {
+    if ((!dataService.hasServerMetadata) || this.metadataStore.hasMetadataFor(dataService.serviceName!)) {
       promise = executeQueryCore(this, query, queryOptions, dataService);
     } else {
       promise = this.fetchMetadata(dataService).then(() => {
@@ -1252,7 +1261,7 @@ export class EntityManager {
   **/
   fetchEntityByKey(...args: any[]) {
     let dataService = DataService.resolve([this.dataService]);
-    if ((!dataService.hasServerMetadata) || this.metadataStore.hasMetadataFor(dataService.serviceName)) {
+    if ((!dataService.hasServerMetadata) || this.metadataStore.hasMetadataFor(dataService.serviceName!)) {
       return fetchEntityByKeyCore(this, args);
     } else {
       return this.fetchMetadata(dataService).then(() => {
@@ -2221,7 +2230,7 @@ function executeQueryCore(em: EntityManager, query: EntityQuery | string, queryO
         }
         return;
       }, function () {
-        let nodes = dataService.jsonResultsAdapter.extractResults(data);
+        let nodes = dataService.jsonResultsAdapter!.extractResults(data);
         nodes = core.toArray(nodes);
 
         results = mappingContext!.visitAndMerge(nodes, { nodeType: "root" });
