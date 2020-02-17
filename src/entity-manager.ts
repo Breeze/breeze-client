@@ -1,5 +1,5 @@
 ﻿import { DataServiceAdapter } from './interface-registry';
-import { core, Callback, ErrorCallback, ObjMap } from './core';
+import { core, ObjMap } from './core';
 import { assertParam, assertConfig } from './assert-param';
 import { config } from './config';
 import { BreezeEvent } from './event';
@@ -100,12 +100,12 @@ export interface QueryResult {
   httpResponse?: HttpResponse;
 }
 
-export interface QuerySuccessCallback {
-  (data: QueryResult): void;
-}
-
-export interface QueryErrorCallback {
-  (error: { query: EntityQuery; httpResponse: HttpResponse; entityManager: EntityManager; message?: string; stack?: string }): void;
+export interface QueryError {
+   query: EntityQuery; 
+   httpResponse: HttpResponse; 
+   entityManager: EntityManager; 
+   message?: string; 
+   stack?: string;
 }
 
 /** Key mapping information returned as part of an [[ISaveResult]]. */
@@ -181,7 +181,7 @@ export interface EntityManagerConfig {
   metadataStore?: MetadataStore;
 }
 
-/** The shape returned by callbacks registered with [[EntityManager.entityChanged]] event */
+/** The shape returned by event callbacks registered with [[EntityManager.entityChanged]] event */
 export interface EntityChangedEventArgs {
   entityAction: EntityAction;
   entity?: Entity;
@@ -863,31 +863,18 @@ export class EntityManager {
   >           // handle exception here
   >       });
   
-  @param callback - Function called on success.
-  @param errorCallback - Function called on failure.
   @return {Promise}
     - schema {Object} The raw Schema object from metadata provider - Because this schema will differ depending on the metadata provider
         it is usually better to access metadata via the 'metadataStore' property of the EntityManager instead of using this 'raw' data.
   **/
-  fetchMetadata(dataService?: DataService, callback?: Callback, errorCallback?: ErrorCallback) {
-    if (typeof (dataService) === "function") {
-      // legacy support for when dataService was not an arg. i.e. first arg was callback
-      errorCallback = callback;
-      callback = dataService;
-      dataService = undefined;
-    } else {
-      assertParam(dataService, "dataService").isInstanceOf(DataService).isOptional().check();
-      assertParam(callback, "callback").isFunction().isOptional().check();
-      assertParam(errorCallback, "errorCallback").isFunction().isOptional().check();
-    }
-
-    let promise = this.metadataStore.fetchMetadata(dataService || this.dataService);
-    return promiseWithCallbacks(promise, callback, errorCallback);
+  async fetchMetadata(dataService?: DataService) {
+    assertParam(dataService, "dataService").isInstanceOf(DataService).isOptional().check();
+    return this.metadataStore.fetchMetadata(dataService || this.dataService);
   }
 
 
-  executeQuery(query: string, callback?: QuerySuccessCallback, errorCallback?: QueryErrorCallback): Promise<QueryResult>;
-  executeQuery(query: EntityQuery, callback?: QuerySuccessCallback, errorCallback?: QueryErrorCallback): Promise<QueryResult>;
+  executeQuery(query: string): Promise<QueryResult>;
+  executeQuery(query: EntityQuery): Promise<QueryResult>;
   /**
   Executes the specified query. __Async__ 
   
@@ -900,19 +887,7 @@ export class EntityManager {
   >         ... query failure processed here
   >     });
 
-  or with callbacks
-  >     let em = new EntityManager(serviceName);
-  >     let query = new EntityQuery("Orders");
-  >     em.executeQuery(query,
-  >         function(data) {
-  >             let orders = data.results;
-  >             ... query results processed here
-  >         },
-  >         function(err) {
-  >             ... query failure processed here
-  >         });
-
-  Either way this method is the same as calling the The [[EntityQuery]] 'execute' method.
+  This method is the same as calling the The [[EntityQuery]] 'execute' method.
   >     let em = new EntityManager(serviceName);
   >     let query = new EntityQuery("Orders").using(em);
   >     query.execute().then( function(data) {
@@ -922,8 +897,6 @@ export class EntityManager {
   >         ... query failure processed here
   >     });
   @param query - The [[EntityQuery]] or OData query string to execute.
-  @param callback - Function called on success.
-  @param errorCallback - {Function} Function called on failure.
   @return Promise of 
     - results - An array of entities
     - retrievedEntities - A array of all of the entities returned by the query.  Differs from results (above) when .expand() is used.
@@ -934,11 +907,9 @@ export class EntityManager {
     items that would have been returned by the query before applying any skip or take operators, but after any filter/where predicates
     would have been applied.
   **/
-  executeQuery(query: EntityQuery | string, callback?: QuerySuccessCallback, errorCallback?: QueryErrorCallback) {
+  async executeQuery(query: EntityQuery | string) {
     assertParam(query, "query").isInstanceOf(EntityQuery).or().isString().check();
-    assertParam(callback, "callback").isFunction().isOptional().check();
-    assertParam(errorCallback, "errorCallback").isFunction().isOptional().check();
-    let promise: Promise<any>;
+    
     // 'resolve' methods create a new typed object with all of its properties fully resolved against a list of sources.
     // Thought about creating a 'normalized' query with these 'resolved' objects
     // but decided not to because the 'query' may not be an EntityQuery (it can be a string) and hence might not have a queryOptions or dataServices property on it.
@@ -946,26 +917,23 @@ export class EntityManager {
     let dataService = DataService.resolve([(query as any).dataService!, this.dataService]);
 
     if ((!dataService.hasServerMetadata) || this.metadataStore.hasMetadataFor(dataService.serviceName!)) {
-      promise = executeQueryCore(this, query, queryOptions, dataService);
+      return executeQueryCore(this, query, queryOptions, dataService);
     } else {
-      promise = this.fetchMetadata(dataService).then(() => {
-        return executeQueryCore(this, query, queryOptions, dataService);
-      });
+      await this.fetchMetadata(dataService);
+      return executeQueryCore(this, query, queryOptions, dataService);
     }
-
-    return promiseWithCallbacks(promise, callback, errorCallback as ErrorCallback);
   }
 
   /**
   Executes the specified query against this EntityManager's local cache.
 
-  Because this method is executed immediately there is no need for a promise or a callback
+  Because this method is executed immediately there is no need for a promise 
   >     let em = new EntityManager(serviceName);
   >     let query = new EntityQuery("Orders");
   >     let orders = em.executeQueryLocally(query);
 
   Note that this can also be accomplished using the 'executeQuery' method with
-  a FetchStrategy of FromLocalCache and making use of the Promise or callback
+  a FetchStrategy of FromLocalCache and making use of the Promise
   >     let em = new EntityManager(serviceName);
   >     let query = new EntityQuery("Orders").using(FetchStrategy.FromLocalCache);
   >     em.executeQuery(query).then( function(data) {
@@ -1006,16 +974,7 @@ export class EntityManager {
   >      }).catch(function (e) {
   >          // e is any exception that was thrown.
   >      });
-
-  Callback methods can also be used
-  >      em.saveChanges(entitiesToSave, null,
-  >          function(saveResult) {
-  >              let savedEntities = saveResult.entities;
-  >              let keyMappings = saveResult.keyMappings;
-  >          }, function (e) {
-  >              // e is any exception that was thrown.
-  >          }
-  >      );
+  
 
   @param entities - The list of entities to save.
   Every entity in that list will be sent to the server, whether changed or unchanged,
@@ -1024,15 +983,11 @@ export class EntityManager {
   every entity with pending changes in this EntityManager will be saved.
   @param saveOptions - [[SaveOptions]] for the save - will default to
   [[EntityManager.saveOptions]] if null.
-  @param callback -  Function called on success.
-  @param errorCallback - Function called on failure.
   @return {Promise} Promise
   **/
-  saveChanges(entities?: Entity[] | null, saveOptions?: SaveOptions, callback?: Function, errorCallback?: Function) {
+  async saveChanges(entities?: Entity[] | null, saveOptions?: SaveOptions ) {
     assertParam(entities, "entities").isOptional().isArray().isEntity().check();
     assertParam(saveOptions, "saveOptions").isInstanceOf(SaveOptions).isOptional().check();
-    assertParam(callback, "callback").isFunction().isOptional().check();
-    assertParam(errorCallback, "errorCallback").isFunction().isOptional().check();
 
     saveOptions = saveOptions || this.saveOptions || SaveOptions.defaultInstance;
 
@@ -1040,7 +995,7 @@ export class EntityManager {
 
     if (entitiesToSave.length === 0) {
       let result = { entities: [], keyMappings: [] } as SaveResult;
-      if (callback) callback(result);
+      
       return Promise.resolve(result);
     }
 
@@ -1050,7 +1005,6 @@ export class EntityManager {
       });
       if (anyPendingSaves) {
         let err = new Error("Concurrent saves not allowed - SaveOptions.allowConcurrentSaves is false");
-        if (errorCallback) errorCallback(err);
         return Promise.reject(err);
       }
     }
@@ -1059,7 +1013,6 @@ export class EntityManager {
 
     let valError = this.saveChangesValidateOnClient(entitiesToSave);
     if (valError) {
-      if (errorCallback) errorCallback(valError);
       return Promise.reject(valError);
     }
 
@@ -1084,7 +1037,6 @@ export class EntityManager {
     } catch (err) {
       // undo the marking by updateConcurrencyProperties
       markIsBeingSaved(entitiesToSave, false);
-      if (errorCallback) errorCallback(err);
       return Promise.reject(err);
     }
 
@@ -1101,7 +1053,6 @@ export class EntityManager {
       //      let hasChanges = (isFullSave && haveSameContents(entitiesToSave, savedEntities)) ? false : null;
       //      em._setHasChanges(hasChanges);
 
-      if (callback) callback(saveResult);
       return Promise.resolve(saveResult);
     }
 
@@ -1147,7 +1098,6 @@ export class EntityManager {
     function saveFail(serverError: SaveErrorFromServer) {
       markIsBeingSaved(entitiesToSave, false);
       let clientError = processServerErrors(saveContext, serverError);
-      if (errorCallback) errorCallback(clientError);
       return Promise.reject(clientError);
     }
   }
@@ -2071,16 +2021,7 @@ function getMappedKey(tempKeyMap: ITempKeyMap, entityKey: EntityKey) {
   return null;
 }
 
-function promiseWithCallbacks<T>(promise: Promise<T>, callback?: Callback, errorCallback?: ErrorCallback) {
-  promise = promise.then(function (data) {
-    if (callback) callback(data);
-    return Promise.resolve(data);
-  }, function (error) {
-    if (errorCallback) errorCallback(error);
-    return Promise.reject(error);
-  });
-  return promise;
-}
+
 
 function getEntitiesToSave(em: EntityManager, entities?: Entity[]) {
   let entitiesToSave: Entity[];

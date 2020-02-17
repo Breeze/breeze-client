@@ -26,7 +26,7 @@ import { ValidationError, Validator } from './validate';
 import { ValidationOptions } from './validation-options';
 
 import { config, BaseAdapter } from './config';
-import { core, Callback, ErrorCallback } from './core';
+import { core } from './core';
 import { makeRelationArray, makePrimitiveArray, makeComplexArray } from './array';
 
 import { RelationArray } from './relation-array';
@@ -47,7 +47,6 @@ export {
   BinaryPredicate,
   BreezeEnum,
   BreezeEvent, 
-  Callback,
   ChangeRequestInterceptor,
   ComplexAspect,
   ComplexType,
@@ -70,7 +69,6 @@ export {
   EntityQuery,
   EntityState,
   EntityType,
-  ErrorCallback,
   ExpandClause,
   ExpressionContext,
   FetchStrategy,

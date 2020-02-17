@@ -1,4 +1,6 @@
-﻿import { core } from './core';
+﻿// Converted to ES6
+
+import { core } from './core';
 import { assertParam } from './assert-param';
 import { EntityType, MetadataStore } from './entity-metadata';
 import { DataType } from './data-type';
@@ -45,17 +47,14 @@ export class EntityKey {
     assertParam(entityType, "entityType").isInstanceOf(EntityType).check();
     let subtypes = entityType.getSelfAndSubtypes();
     
-    this._subtypes = subtypes.filter(function (st) {
-      return st.isAbstract === false;
-    });
-    
+    this._subtypes = subtypes.filter( st => st.isAbstract === false);
 
     if (!Array.isArray(keyValues)) {
       keyValues = [keyValues];
     }
 
     this.entityType = entityType;
-    entityType.keyProperties.forEach(function (kp, i) {
+    entityType.keyProperties.forEach( (kp, i) => {
       // insure that guid keys are comparable.
       if (kp.dataType === DataType.Guid) {
         keyValues[i] = keyValues[i] && keyValues[i].toLowerCase ? keyValues[i].toLowerCase() : keyValues[i];
@@ -64,9 +63,7 @@ export class EntityKey {
 
     this.values = keyValues;
     this._keyInGroup = EntityKey.createKeyString(keyValues);
-
   }
-
 
   toJSON() {
     return {

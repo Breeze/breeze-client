@@ -36,7 +36,7 @@ describe("Old Fixed Bugs", () => {
     const em = TestFns.newEntityManager(); // creates a new EntityManager configured with metadata
     const query = new breeze.EntityQuery("Suppliers");
     const data = await em.executeQuery(query);
-    
+
     const count = data.results.length;
     expect(count).toBeGreaterThan(0);
 
@@ -51,7 +51,7 @@ describe("Old Fixed Bugs", () => {
     const suppliers = em.executeQueryLocally(localQuery);
     // Defect #2486 Fails with "Invalid ISO8601 duration 'Papa'"
     expect(suppliers.length).toBe(0);
-  
+
   });
 
   test("bug with expand not working with paging or inlinecount", async () => {
@@ -106,34 +106,38 @@ describe("Old Fixed Bugs", () => {
   });
 
   test("bug with detached unresolved children", async () => {
-      expect.hasAssertions();
-      const em1 = TestFns.newEntityManager();
-      const metadataStore = em1.metadataStore;
-      const orderType = metadataStore.getEntityType("Order") as EntityType;
+    expect.hasAssertions();
+    const em1 = TestFns.newEntityManager();
+    const metadataStore = em1.metadataStore;
+    const orderType = metadataStore.getEntityType("Order") as EntityType;
 
-      const query = EntityQuery.from("Customers")
-        .where("customerID", "==", "729de505-ea6d-4cdf-89f6-0360ad37bde7")
-        .expand("orders");
-      let newOrder = orderType.createEntity(); // call the factory function for the Customer type
-      em1.addEntity(newOrder);
-      newOrder.setProperty("customerID", "729de505-ea6d-4cdf-89f6-0360ad37bde7");
+    const query = EntityQuery.from("Customers")
+      .where("customerID", "==", "729de505-ea6d-4cdf-89f6-0360ad37bde7")
+      .expand("orders");
 
-      let items = em1.rejectChanges();
+    const qr0 = await em1.executeQuery(query);
+    const orders0 = qr0.results[0].getProperty("orders");
+    const origLength = orders0.length;
 
-      const qr1 = await em1.executeQuery(query);
-      let orders = qr1.results[0].getProperty("orders");
-      // the bug was that this included the previously detached order above. ( making a length of 11).
-      expect(orders.length).toBe(10);
+    let newOrder = orderType.createEntity(); // call the factory function for the Customer type
+    em1.addEntity(newOrder);
+    newOrder.setProperty("customerID", "729de505-ea6d-4cdf-89f6-0360ad37bde7");
+    let items = em1.rejectChanges();
 
-      newOrder = orderType.createEntity(); // call the factory function for the Customer type
-      em1.addEntity(newOrder);
-      newOrder.setProperty("customerID", "729de505-ea6d-4cdf-89f6-0360ad37bde7");
+    const qr1 = await em1.executeQuery(query);
+    let orders = qr1.results[0].getProperty("orders");
+    // the bug was that this included the previously detached order above. ( making a length of 11).
+    expect(orders.length).toBe(origLength);
 
-      items = em1.rejectChanges();
-      const qr2 = await em1.executeQuery(query);
-      orders = qr2.results[0].getProperty("orders");
-      expect(orders.length).toBe(10);
-    });
+    newOrder = orderType.createEntity(); // call the factory function for the Customer type
+    em1.addEntity(newOrder);
+    newOrder.setProperty("customerID", "729de505-ea6d-4cdf-89f6-0360ad37bde7");
+    // items = em1.rejectChanges();
+
+    const qr2 = await em1.executeQuery(query);
+    orders = qr2.results[0].getProperty("orders");
+    expect(orders.length).toBe(origLength + 1);
+  });
 
   test("bug with duplicates after relation query", async () => {
     expect.hasAssertions();
@@ -187,7 +191,7 @@ describe("Old Fixed Bugs", () => {
     const qr1 = await refreshQuery.using(em1).execute();
     const results = qr1.results, count = results.length;
     expect(count).toBe(1);
-    
+
     const inCache = em1.getEntities();
     if (inCache.length === 2) {
       const c1 = inCache[0], c2 = inCache[1];
@@ -200,7 +204,7 @@ describe("Old Fixed Bugs", () => {
     // whose updated name is " + customer.getProperty("companyName"));
     // This test should succeed; it fails because of above bug!!!
     expect(results[0]).toBe(customer);
-      
+
   });
 
   //Using EntityManager em1, query Entity A and it's nav property (R1) Entity B1.
@@ -267,8 +271,8 @@ describe("Old Fixed Bugs", () => {
     manager.importEntities(exportImportSample1);
 
     const q2 = new breeze.EntityQuery("OrderHeaders")
-        .using(breeze.FetchStrategy.FromLocalCache);
-    
+      .using(breeze.FetchStrategy.FromLocalCache);
+
     const data2 = await manager.executeQuery(q2);
     const order = data2.results[0];
     //uncomment line below and the relationship is resolved
@@ -277,14 +281,14 @@ describe("Old Fixed Bugs", () => {
     expect(orderShipments.length).toBeGreaterThan(0);
   });
 
-  
+
   test("bug were detaching the parent modifies the in-cache children", async function () {
     // Bug - D2460
     expect.hasAssertions();
     const em = TestFns.newEntityManager();
     const q = EntityQuery.from("Employees").where("employeeID", "==", 1)
-        .expand("orders");
-    
+      .expand("orders");
+
     const qr = await em.executeQuery(q);
     const employee = qr.results[0];
     employee.entityAspect.setDetached();
@@ -299,7 +303,7 @@ describe("Old Fixed Bugs", () => {
     em.metadataStore.registerEntityTypeCtor("Customer", Customer);
 
     const m1 = em.createEmptyCopy();
-    
+
     const cfg = {};
     cfg[customerKeyName] = breeze.core.getUuid();
     const customer = m1.createEntity("Customer", cfg);

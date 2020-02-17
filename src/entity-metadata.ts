@@ -1,6 +1,6 @@
 ﻿// Converted to ES6
 
-import { core, ObjMap, ErrorCallback } from './core';
+import { core, ObjMap  } from './core';
 import { config } from './config';
 import { BreezeEvent } from './event';
 import { assertParam, assertConfig, Param } from './assert-param';
@@ -409,15 +409,13 @@ export class MetadataStore {
   >          // handle exception here
   >      });
   @param dataService -  Either a DataService or just the name of the DataService to fetch metadata for.
-  @param callback - Function called on success.
-  @param errorCallback - Function called on failure.
+
   @return Promise
   **/
-  async fetchMetadata(dataService: string | DataService, callback?: (schema: any) => void, errorCallback?: ErrorCallback) {
+  async fetchMetadata(dataService: string | DataService) {
     
     assertParam(dataService, "dataService").isString().or().isInstanceOf(DataService).check();
-    assertParam(callback, "callback").isFunction().isOptional().check();
-    assertParam(errorCallback, "errorCallback").isFunction().isOptional().check();
+
 
     if (typeof dataService === "string") {
       // use the dataService with a matching name or create a new one.
@@ -431,19 +429,10 @@ export class MetadataStore {
         + `ServiceName: ${dataService.serviceName}`);
     }
 
-    try {
-      const rawMetadata = await dataService.adapterInstance!.fetchMetadata(this, dataService);
-      this.metadataFetched.publish({ metadataStore: this, dataService: dataService, rawMetadata: rawMetadata });
-      if (callback) callback(rawMetadata);
-      return rawMetadata;
-    } catch (e) {
-      if (errorCallback) {
-        errorCallback(e);
-      } else {
-        throw e;
-      }
-    }
-    
+    const rawMetadata = await dataService.adapterInstance!.fetchMetadata(this, dataService);
+    this.metadataFetched.publish({ metadataStore: this, dataService: dataService, rawMetadata: rawMetadata });
+    return rawMetadata;
+   
   }
 
 
@@ -566,7 +555,8 @@ export class MetadataStore {
   } else if (okIfNotFound) {
     return null;
   } else {
-    const msg = `Unable to locate an 'ComplexType' by the name: '${typeName}'. Be sure to execute a query or call fetchMetadata first.`
+    const msg = `Unable to locate an 'ComplexType' by the name: '${typeName}'. `
+      + `Be sure to execute a query or call fetchMetadata first.`;
     throw new Error(msg);
   }
 }

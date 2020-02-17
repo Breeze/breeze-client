@@ -3,14 +3,6 @@ import { BreezeEnum } from './enum';
 declare var global: any;
 declare var window: any;
 
-export interface ErrorCallback {
-  (error: Error): void;
-}
-
-export interface Callback {
-  (data: any): void;
-}
-
 export type ObjMap<TValue> = {
   [key: string]: TValue;
 };
@@ -748,10 +740,6 @@ export const core = {
   toJSONSafeReplacer: toJSONSafeReplacer,
   dump: dump
 };
-
-export interface ErrorCallback {
-  (error: any): void;
-}
 
 
 // Unused

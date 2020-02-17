@@ -565,7 +565,7 @@ describe("Query Local", () => {
 
   });
 
-  test("local query", function () {
+  test("local query", async function () {
     expect.hasAssertions();
     const em = TestFns.newEntityManager();
 
@@ -578,18 +578,17 @@ describe("Query Local", () => {
         .where("freight", ">=", 500);
 
     
-    return em.executeQuery(query, function (data) {
-      const orders = data.results;
-      const ordersL = em.executeQueryLocally(query);
-      expect(core.arrayEquals(orders, ordersL)).toBeTrue();
-      const orders2 = em.executeQueryLocally(query2);
-      expect(orders2.length).toBeGreaterThan(0);
-      expect(orders2.length < orders.length);
-      expect(orders2.every(function (o) {
-        return o.getProperty("freight") >= 500;
-      }));
-
-    });
+    const data = await em.executeQuery(query); 
+    const orders = data.results;
+    const ordersL = em.executeQueryLocally(query);
+    expect(core.arrayEquals(orders, ordersL)).toBeTrue();
+    const orders2 = em.executeQueryLocally(query2);
+    expect(orders2.length).toBeGreaterThan(0);
+    expect(orders2.length < orders.length);
+    expect(orders2.every(function (o) {
+      return o.getProperty("freight") >= 500;
+    }));
+    
   });
 
   test("local query - fetchStrategy", async function () {

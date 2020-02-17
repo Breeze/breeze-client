@@ -1,7 +1,7 @@
 // Converted to ES6
 
 import { Entity } from './entity-aspect';
-import { QueryErrorCallback, QueryResult, QuerySuccessCallback } from './entity-manager';
+import { QueryResult  } from './entity-manager';
 import { NavigationProperty } from './entity-metadata';
 import { EntityQuery } from './entity-query';
 import { EntityState } from './entity-state';
@@ -57,15 +57,13 @@ export class RelationArray extends ObservableArray<Entity> {
       // associated with a specific customer.
       orders.load().then(...)
   @method load
-  @param [callback] {Function}
-  @param [errorCallback] {Function}
   @return {Promise}
   **/
-  load(callback?: QuerySuccessCallback, errorCallback?: QueryErrorCallback): Promise<QueryResult> {
+  async load(): Promise<QueryResult> {
     let parent = this.parentEntity;
     let query = EntityQuery.fromEntityNavigation(this.parentEntity, this.navigationProperty);
     let em = parent.entityAspect.entityManager;
-    return em!.executeQuery(query, callback, errorCallback);
+    return em!.executeQuery(query);
   }
 
   // Impl of abstract methods

@@ -9,7 +9,7 @@ import { EntityAction } from './entity-action';
 import { EntityType, ComplexType, DataProperty, NavigationProperty, EntityProperty, MetadataStore } from './entity-metadata';
 import { EntityKey } from './entity-key';
 import { EntityGroup } from './entity-group';
-import { EntityManager, QueryResult, QueryErrorCallback, QuerySuccessCallback } from './entity-manager';
+import { EntityManager, QueryResult  } from './entity-manager';
 import { Validator, ValidationError } from './validate';
 import { EntityQuery } from './entity-query';
 
@@ -423,8 +423,8 @@ export class EntityAspect {
     return true;
   }
 
-  loadNavigationProperty(navigationProperty: string, callback?: QuerySuccessCallback, errorCallback?: QueryErrorCallback): Promise<QueryResult>;
-  loadNavigationProperty(navigationProperty: NavigationProperty, callback?: QuerySuccessCallback, errorCallback?: QueryErrorCallback): Promise<QueryResult>;
+  loadNavigationProperty(navigationProperty: string ): Promise<QueryResult>;
+  loadNavigationProperty(navigationProperty: NavigationProperty ): Promise<QueryResult>;
   /**
   Performs a query for the value of a specified [[NavigationProperty]]. __Async__
   >      emp.entityAspect.loadNavigationProperty("Orders").then(function (data) {
@@ -433,31 +433,19 @@ export class EntityAspect {
   >          // handle exception here;
   >      });
   @param navigationProperty - The NavigationProperty or the name of the NavigationProperty to 'load'.
-  @param callback - Function to call on success.
-  @param errorCallback - Function to call on failure.
   @return Promise with shape
     - results {Array of Entity}
     - query {EntityQuery} The original query
     - httpResponse {httpResponse} The HttpResponse returned from the server.
   **/
-  async loadNavigationProperty(navigationProperty: NavigationProperty | string, callback?: QuerySuccessCallback, errorCallback?: QueryErrorCallback) {
+  async loadNavigationProperty(navigationProperty: NavigationProperty | string ) {
     let entity = this.entity;
     let navProperty = entity.entityType._checkNavProperty(navigationProperty);
     let query = EntityQuery.fromEntityNavigation(entity, navProperty);
     
-    try {
-      const data = await entity.entityAspect.entityManager!.executeQuery(query);
-      this._markAsLoaded(navProperty.name);
-      if (callback) callback(data);
-      return data;
-    } catch (error) {
-      if (errorCallback) {
-        errorCallback(error);
-        return;
-      } else {
-        throw error;
-      }
-    }
+    const data = await entity.entityAspect.entityManager!.executeQuery(query);
+    this._markAsLoaded(navProperty.name);
+    return data;
   }
 
   /**

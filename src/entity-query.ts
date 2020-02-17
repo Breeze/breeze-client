@@ -1,4 +1,4 @@
-﻿import { core, Callback, ErrorCallback, ObjMap } from './core';
+﻿import { core, ObjMap } from './core';
 import { assertParam } from './assert-param';
 import { DataType } from './data-type';
 import { EntityAspect, Entity } from './entity-aspect';
@@ -486,19 +486,8 @@ export class EntityQuery {
   >          ... query failure processed here
   >      });
 
-  or with callbacks
-  >      let em = new EntityManager(serviceName);
-  >      let query = new EntityQuery("Orders").using(em);
-  >      query.execute(
-  >        function(data) {
-  >                    let orders = data.results;
-  >                    ... query results processed here
-  >                },
-  >        function(err) {
-  >                    ... query failure processed here
-  >                });
-
-  Either way this method is the same as calling the EntityManager 'execute' method.
+  
+  This method is the same as calling the EntityManager 'execute' method.
   >      let em = new EntityManager(serviceName);
   >      let query = new EntityQuery("Orders");
   >      em.executeQuery(query).then( function(data) {
@@ -508,15 +497,14 @@ export class EntityQuery {
   >         ... query failure processed here
   >      });
 
-  @param callback -  Function called on success.
-  @param errorCallback - Function called on failure.
+  
   @return Promise
   **/
-  execute(callback?: Callback, errorCallback?: ErrorCallback): Promise<QueryResult> {
+  async execute(): Promise<QueryResult> {
     if (!this.entityManager) {
       throw new Error("An EntityQuery must have its EntityManager property set before calling 'execute'");
     }
-    return this.entityManager.executeQuery(this, callback, errorCallback);
+    return this.entityManager.executeQuery(this);
   }
 
   /**
