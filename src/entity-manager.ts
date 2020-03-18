@@ -1190,14 +1190,13 @@ export class EntityManager {
       - entityKey {EntityKey} The entityKey of the entity to fetch.
       - fromCache {Boolean} Whether this entity was fetched from the server or was found in the local cache.
   **/
-  fetchEntityByKey(...args: any[]) {
+  async fetchEntityByKey(...args: any[]) {
     let dataService = DataService.resolve([this.dataService]);
     if ((!dataService.hasServerMetadata) || this.metadataStore.hasMetadataFor(dataService.serviceName!)) {
       return fetchEntityByKeyCore(this, args);
     } else {
-      return this.fetchMetadata(dataService).then(() => {
-        return fetchEntityByKeyCore(this, args);
-      });
+      await this.fetchMetadata(dataService);
+      return fetchEntityByKeyCore(this, args);
     }
   }
 
@@ -1653,7 +1652,7 @@ export interface IEntityByKeyResult {
   fromCache: boolean;
 }
 
-function fetchEntityByKeyCore(em: EntityManager, args: any[]): Promise<IEntityByKeyResult> {
+async function fetchEntityByKeyCore(em: EntityManager, args: any[]): Promise<IEntityByKeyResult> {
   let tpl = createEntityKey(em, args);
   let entityKey = tpl.entityKey;
 
@@ -1673,12 +1672,11 @@ function fetchEntityByKeyCore(em: EntityManager, args: any[]): Promise<IEntityBy
     }
   }
   if (foundIt) {
-    return Promise.resolve({ entity: entity || undefined, entityKey: entityKey, fromCache: true });
+    return { entity: entity || undefined, entityKey: entityKey, fromCache: true };
   } else {
-    return EntityQuery.fromEntityKey(entityKey).using(em).execute().then( qr => {
-      entity = (qr.results.length === 0) ? undefined : qr.results[0];
-      return Promise.resolve({ entity: entity || undefined, entityKey: entityKey, fromCache: false });
-    });
+    const qr = await EntityQuery.fromEntityKey(entityKey).using(em).execute();
+    entity = (qr.results.length === 0) ? undefined : qr.results[0];
+    return { entity: entity || undefined, entityKey: entityKey, fromCache: false };
   }
 }
 
@@ -2079,7 +2077,7 @@ function attachRelatedEntities(em: EntityManager, entity: Entity, entityState: E
 }
 
 // returns a promise
-function executeQueryCore(em: EntityManager, query: EntityQuery | string, queryOptions: QueryOptions, dataService: DataService): Promise<QueryResult> {
+async function executeQueryCore(em: EntityManager, query: EntityQuery | string, queryOptions: QueryOptions, dataService: DataService): Promise<QueryResult> {
   try {
     let results: any[];
     let metadataStore = em.metadataStore;
@@ -2089,18 +2087,14 @@ function executeQueryCore(em: EntityManager, query: EntityQuery | string, queryO
     }
 
     if (queryOptions.fetchStrategy === FetchStrategy.FromLocalCache) {
-      try {
-        if (typeof query === 'string') {
-          throw new Error("cannot execute 'string' EntityQuery locally.");
-        }
-        let qr = executeQueryLocallyCore(em, query);
-        return Promise.resolve({ results: qr.results, entityManager: em, inlineCount: qr.inlineCount, query: query });
-      } catch (e) {
-        return Promise.reject(e);
+      if (typeof query === 'string') {
+        throw new Error("cannot execute 'string' EntityQuery locally.");
       }
+      let qr = executeQueryLocallyCore(em, query);
+      return { results: qr.results, entityManager: em, inlineCount: qr.inlineCount, query: query };
     }
 
-    let mappingContext: MappingContext | undefined = new MappingContext({
+    let mappingContext = new MappingContext({
       query: query,
       entityManager: em,
       dataService: dataService,
@@ -2113,59 +2107,50 @@ function executeQueryCore(em: EntityManager, query: EntityQuery | string, queryO
 
     let validateOnQuery = em.validationOptions.validateOnQuery;
 
-    return dataService.adapterInstance!.executeQuery(mappingContext).then( (data: any) => {
-      let result = core.wrapExecution( () => {
-        let state = { isLoading: em.isLoading };
-        em.isLoading = true;
-        em._pendingPubs = [];
-        return state;
-      }, (state) => {
-        // cleanup
-        em.isLoading = state.isLoading;
-        em._pendingPubs!.forEach(fn => fn());
-        em._pendingPubs = undefined;
-        em._hasChangesAction && em._hasChangesAction();
-        // TODO: removed - not sure why needed in first place...
-        // // HACK for GC
-        // query = undefined;
-        mappingContext = undefined;
-        // HACK: some errors thrown in next function do not propogate properly - this catches them.
+    
+    const data = await dataService.adapterInstance!.executeQuery(mappingContext);
+    const result = core.wrapExecution( () => {
+      let state = { isLoading: em.isLoading };
+      em.isLoading = true;
+      em._pendingPubs = [];
+      return state;
+    }, (state) => {
+      // cleanup
+      em.isLoading = state.isLoading;
+      em._pendingPubs!.forEach(fn => fn());
+      em._pendingPubs = undefined;
+      em._hasChangesAction && em._hasChangesAction();
+      
+      // TODO: determine why next line was necessary.
+      // mappingContext = undefined;
 
-        if (state.error) {
-          return Promise.reject(state.error);
-        }
-        return;
-      },  () => {
-        let nodes = dataService.jsonResultsAdapter!.extractResults(data);
-        nodes = core.toArray(nodes);
-
-        results = mappingContext!.visitAndMerge(nodes, { nodeType: "root" });
-        if (validateOnQuery) {
-          // anon types and simple types will not have an entityAspect.
-          results.forEach( (r: any) => r.entityAspect && r.entityAspect.validateEntity());
-        }
-        mappingContext!.processDeferred();
-        // if query has expand clauses walk each of the 'results' and mark the expanded props as loaded.
-        if (query instanceof EntityQuery) {
-          markLoadedNavProps(results, query);
-        }
-        let retrievedEntities = core.objectMap(mappingContext!.refMap);
-        return { results: results, query: query, entityManager: em, httpResponse: data.httpResponse, inlineCount: data.inlineCount, retrievedEntities: retrievedEntities };
-      });
-      return Promise.resolve(result);
-    },  (e: any) => {
-      if (e) {
-        e.query = query;
-        e.entityManager = em;
+      // HACK: some errors thrown in next function do not propogate properly - this catches them.
+      if (state.error) {
+        throw state.error;
       }
-      return Promise.reject(e);
-    });
+      
+    },  () => {
+      let nodes = dataService.jsonResultsAdapter!.extractResults(data);
+      nodes = core.toArray(nodes);
 
+      results = mappingContext!.visitAndMerge(nodes, { nodeType: "root" });
+      if (validateOnQuery) {
+        // anon types and simple types will not have an entityAspect.
+        results.forEach( (r: any) => r.entityAspect && r.entityAspect.validateEntity());
+      }
+      mappingContext!.processDeferred();
+      // if query has expand clauses walk each of the 'results' and mark the expanded props as loaded.
+      if (query instanceof EntityQuery) {
+        markLoadedNavProps(results, query);
+      }
+      let retrievedEntities = core.objectMap(mappingContext!.refMap);
+      return { results: results, query: query, entityManager: em, httpResponse: data.httpResponse, inlineCount: data.inlineCount, retrievedEntities: retrievedEntities };
+    });
+    return result;
   } catch (e) {
-    if (e) {
-      e.query = query;
-    }
-    return Promise.reject(e);
+    e.query = query;
+    e.entityManager = em;
+    throw e;
   }
 }
 
