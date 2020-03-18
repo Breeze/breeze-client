@@ -21,7 +21,7 @@
         "noImplicitThis": true,
         "alwaysStrict": true,
 
-        "noUnusedLocals": false,
+        "noUnusedLocals": true,
         "noImplicitReturns": true,
         "strictFunctionTypes": true,
         "strictPropertyInitialization": false,

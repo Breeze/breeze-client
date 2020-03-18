@@ -162,7 +162,6 @@ export class BreezeEvent<T> {
   **/
   unsubscribe(unsubKey: number) {
     if (this._subscribers.length === 0) return false;
-    let subs = this._subscribers;
     let ix = this._subscribers.findIndex( s => s.unsubKey === unsubKey);
     if (ix !== -1) {
       this._subscribers.splice(ix, 1);

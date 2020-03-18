@@ -2,7 +2,7 @@
 import { DataServiceAdapter, UriBuilderAdapter } from './interface-registry';
 import { KeyMapping } from './entity-manager';
 import { MappingContext } from './mapping-context';
-import { assertConfig, Param } from './assert-param';
+import { assertConfig } from './assert-param';
 import { config } from './config';
 import { core } from './core';
 

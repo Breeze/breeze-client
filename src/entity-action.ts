@@ -1,5 +1,4 @@
-﻿import { core } from './core';
-import { BreezeEnum} from './enum';
+﻿import { BreezeEnum} from './enum';
 
 /** EntityAction is an 'Enum' containing all of the valid actions that can occur to an 'Entity'. 
  
