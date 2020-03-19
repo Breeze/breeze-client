@@ -311,14 +311,16 @@ function arrayFirst<T>(array: T[], predicate: Predicate<T>) {
   return null;
 }
 
-/** Return index of first element matching predicate */
-function arrayIndexOf<T>(array: T[], predicate: Predicate<any>): number;
-function arrayIndexOf<T>(array: T[], predicate: Predicate<T>): number {
-  for (let i = 0, j = array.length; i < j; i++) {
-    if (predicate(array[i])) return i;
-  }
-  return -1;
-}
+// No longer needed
+
+// /** Return index of first element matching predicate */
+// function arrayIndexOf<T>(array: T[], predicate: Predicate<any>): number;
+// function arrayIndexOf<T>(array: T[], predicate: Predicate<T>): number {
+//   for (let i = 0, j = array.length; i < j; i++) {
+//     if (predicate(array[i])) return i;
+//   }
+//   return -1;
+// }
 
 /** Add item if not already in array */
 function arrayAddItemUnique<T>(array: T[], item: T) {
@@ -704,7 +706,7 @@ export const core = {
   arrayEquals: arrayEquals,
   arraySlice: arraySlice,
   arrayFirst: arrayFirst,
-  arrayIndexOf: arrayIndexOf,
+  // arrayIndexOf: arrayIndexOf,
   arrayRemoveItem: arrayRemoveItem,
   arrayZip: arrayZip,
   arrayAddItemUnique: arrayAddItemUnique,

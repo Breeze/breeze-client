@@ -26,7 +26,7 @@ export class AjaxFetchAdapter implements breeze.AjaxAdapter {
   initialize() {
   }
 
-  ajax(config: breeze.AjaxConfig) {
+  async ajax(config: breeze.AjaxConfig) {
     if (!fetch) {
       throw new Error("fetch API not supported in this browser");
     }
@@ -87,19 +87,18 @@ export class AjaxFetchAdapter implements breeze.AjaxAdapter {
     }
 
     if (requestInfo.config) { // exists unless requestInterceptor killed it.
-      fetch(url, requestInfo.config).then(response => {
+      try {
+        const response = await fetch(url, requestInfo.config);
         if (!response.ok) {
-          response.text().then(s => {
-            requestInfo.error(response.status, response.statusText, s, response, null);
-          });
+          const s = await response.text();
+          requestInfo.error(response.status, response.statusText, s, response, null);
         } else {
-          response.json().then(j => {
-            requestInfo.success(j, response.statusText, response);
-          });
+          const j = await response.json();
+          requestInfo.success(j, response.statusText, response);
         }
-      }).catch(err => {
+      } catch (err) {
         requestInfo.error(0, err && err.message || err, '', undefined, err);
-      });
+      }
     }
 
     function encodeParams(obj: any) {
