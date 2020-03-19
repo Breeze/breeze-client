@@ -638,15 +638,16 @@ function stringEndsWith(str: string, suffix: string) {
   return str.indexOf(suffix, str.length - suffix.length) !== -1;
 }
 
-// Based on fragment from Dean Edwards' Base 2 library
-/** format("a %1 and a %2", "cat", "dog") -> "a cat and a dog" */
-function formatString(str: string, ...params: any[]) {
-  let args = arguments;
-  let pattern = RegExp("%([1-" + (arguments.length - 1) + "])", "g");
-  return str.replace(pattern, function (match, index) {
-    return args[index];
-  });
-}
+// No longer needed
+// // Based on fragment from Dean Edwards' Base 2 library
+// /** format("a %1 and a %2", "cat", "dog") -> "a cat and a dog" */
+// function formatString(str: string, ...params: any[]) {
+//   let args = arguments;
+//   let pattern = RegExp("%([1-" + (arguments.length - 1) + "])", "g");
+//   return str.replace(pattern, function (match, index) {
+//     return args[index];
+//   });
+// }
 
 // See http://stackoverflow.com/questions/7225407/convert-camelcasetext-to-camel-case-text
 /** Change text to title case with spaces, e.g. 'myPropertyName12' to 'My Property Name 12' */
@@ -732,7 +733,6 @@ export const core = {
 
   stringStartsWith: stringStartsWith,
   stringEndsWith: stringEndsWith,
-  formatString: formatString,
   titleCase: titleCaseSpace,
 
   toJson: toJson,

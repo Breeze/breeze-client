@@ -591,8 +591,7 @@ export class EntityQuery {
     if (ents.some(function (e) {
       return e.entityType !== type;
     })) {
-      throw new Error("All 'fromEntities' must be the same type; at least one is not of type " +
-        type.name);
+      throw new Error(`All 'fromEntities' must be the same type; at least one is not of type ${type.name}`);
     }
     let q = new EntityQuery(type.defaultResourceName);
     let preds = ents.map(function (entity) {
@@ -643,7 +642,7 @@ export class EntityQuery {
     let q = new EntityQuery(navProperty.entityType.defaultResourceName);
     let pred = buildNavigationPredicate(entity, navProperty);
     if (pred == null) {
-      throw new Error("Unable to create a NavigationQuery for navigationProperty: " + navProperty.name );
+      throw new Error(`Unable to create a NavigationQuery for navigationProperty: ${navProperty.name}` );
     }
     q = q.where(pred);
     let em = entity.entityAspect.entityManager;
@@ -682,9 +681,9 @@ export class EntityQuery {
 
     if (!entityType) {
       if (throwErrorIfNotFound) {
-        throw new Error(core.formatString("Cannot find an entityType for resourceName: '%1'. "
-          + " Consider adding an 'EntityQuery.toType' call to your query or "
-          + "calling the MetadataStore.setEntityTypeForResourceName method to register an entityType for this resourceName.", resourceName));
+        throw new Error(`Cannot find an entityType for resourceName: ${resourceName}. 
+           Consider adding an 'EntityQuery.toType' call to your query or 
+           calling the MetadataStore.setEntityTypeForResourceName method to register an entityType for this resourceName.`);
       } else {
         return undefined;
       }
@@ -795,12 +794,12 @@ function processUsing(eq: EntityQuery, map: ObjMap<any>, value: any, propertyNam
   let typeName = value._$typeName || ((value instanceof BreezeEnum) && (value.constructor as any).name);
   let key = typeName && typeName.substr(0, 1).toLowerCase() + typeName.substr(1);
   if (propertyName && key !== propertyName) {
-    throw new Error("Invalid value for property: " + propertyName);
+    throw new Error(`Invalid value for property: ${propertyName}`);
   }
   if (key) {
     let fn = map[key];
     if (fn === undefined) {
-      throw new Error("Invalid config property: " + key);
+      throw new Error(`Invalid config property: ${key}`);
     } else if (fn === null) {
       (eq as ObjMap<any>)[key] = value;
     } else {

@@ -454,7 +454,7 @@ function fmtDateTime(val: Date) {
   try {
     return "datetime'" + val.toISOString() + "'";
   } catch (e) {
-    throw fmtError("'%1' is not a valid dateTime", val);
+    throw new Error(`'${val}' is not a valid dateTime`);
   }
 }
 
@@ -463,14 +463,14 @@ function fmtDateTimeOffset(val: Date) {
   try {
     return "datetimeoffset'" + val.toISOString() + "'";
   } catch (e) {
-    throw fmtError("'%1' is not a valid dateTime", val);
+    throw new Error(`'${val}' is not a valid dateTime`);
   }
 }
 
 function fmtTime(val: any) {
   if (val == null) return null;
   if (!core.isDuration(val)) {
-    throw fmtError("'%1' is not a valid ISO 8601 duration", val);
+    throw new Error(`'${val}' is not a valid ISO 8601 duration`);
   }
   return "time'" + val + "'";
 }
@@ -478,7 +478,7 @@ function fmtTime(val: any) {
 function fmtGuid(val: any) {
   if (val == null) return null;
   if (!core.isGuid(val)) {
-    throw fmtError("'%1' is not a valid guid", val);
+    throw new Error(`'${val}' is not a valid guid`);
   }
   return "guid'" + val + "'";
 }
@@ -500,11 +500,6 @@ function fmtBinary(val: any) {
 // TODO: use __identity instead;
 function fmtUndefined(val: any) {
   return val;
-}
-
-function fmtError(msg: string, val: any) {
-  msg = core.formatString(msg, val);
-  return new Error(msg);
 }
 
 function parseRawDate(val: any) {

@@ -313,8 +313,8 @@ export class MetadataStore {
 
     let json = metadataJson as IMetadataJson;
     if (json.metadataVersion && json.metadataVersion !== MetadataStore.metadataVersion) {
-      let msg = core.formatString("Cannot import metadata with a different 'metadataVersion' (%1) than the current 'MetadataStore.metadataVersion' (%2) ",
-        json.metadataVersion, MetadataStore.metadataVersion);
+      let msg = `Cannot import metadata with a different 'metadataVersion' (${json.metadataVersion})`
+      + ` than the current 'MetadataStore.metadataVersion' (${MetadataStore.metadataVersion}).`;
       throw new Error(msg);
     }
 

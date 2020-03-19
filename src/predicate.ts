@@ -435,7 +435,7 @@ function createPredicateFromKeyValue(key: string, value: any): Predicate {
       return new BinaryPredicate("eq", expr, value[op]);
     }
 
-    let msg = core.formatString("Unable to resolve predicate after the phrase: '%1' for operator: '%2'  and value: '%3'", expr, op, value[op]);
+    let msg = `Unable to resolve predicate after the phrase: '${expr}' for operator: '${op}'  and value: '${value[op]}`;
     throw new Error(msg);
 
   });
@@ -753,7 +753,7 @@ export class PropExpr extends PredicateExpression {
     let props = entityType.getPropertiesOnPath(this.propertyPath, null, false);
 
     if (!props) {
-      let msg = core.formatString("Unable to resolve propertyPath.  EntityType: '%1'   PropertyPath: '%2'", entityType.name, this.propertyPath);
+      let msg = `Unable to resolve propertyPath. EntityType: '${entityType.name}' PropertyPath: '${this.propertyPath}'`;
       throw new Error(msg);
     }
     // get the last property

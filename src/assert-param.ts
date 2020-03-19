@@ -174,7 +174,7 @@ export class Param {
     let message = this._contexts
       .map(context => getMessage(context, this.v))
       .join(", or it ");
-    return core.formatString(this.MESSAGE_PREFIX, this.name) + " " + message;
+    return `The ${this.name} parameter ${message}`;
   }
 
   withDefault(defaultValue: any) {
@@ -206,7 +206,7 @@ export class Param {
       for (let key in clone) {
         // allow props with an undefined value
         if (clone[key] !== undefined) {
-          throwConfigError(instance, core.formatString("Unknown property: '%1'.", key));
+          throwConfigError(instance, `Unknown property: ${key}.`);
         }
       }
     }
@@ -223,7 +223,7 @@ export class Param {
     }
   };
 
-  MESSAGE_PREFIX = "The '%1' parameter ";
+  
 
 }
 
@@ -357,7 +357,8 @@ function exec(self: Param) {
 }
 
 function throwConfigError(instance: any, message: string) {
-  throw new Error(core.formatString("Error configuring an instance of '%1'. %2", (instance && instance._$typeName) || "object", message));
+  const typeName = (instance && instance._$typeName) || "object";
+  throw new Error(`Error configuring an instance of '${typeName}'. ${message}`);
 }
 
 class ConfigParam {
@@ -365,7 +366,7 @@ class ConfigParam {
   params: Param[];
   constructor(config: Object) {
     if (typeof (config) !== "object") {
-      throw new Error("Configuration parameter should be an object, instead it is a: " + typeof (config));
+      throw new Error(`Configuration parameter should be an object, instead it is a: ${typeof (config)}`);
     }
     this.config = config;
     this.params = [];

@@ -136,9 +136,7 @@ as shown in this revision to the pertinent part of the previous example:
 @example
     // ... as before
     // ... but bake the min/max values into the message template.
-    var template = breeze.core.formatString(
-        "'%displayName%' must be a number between the values of %1 and %2",
-        context.min, context.max);
+    var template = `'%displayName%' must be a number between the values of ${context.min} and ${context.max}";
     return new Validator("numericRange", valFn, {
         messageTemplate: template,
         min: context.min,
@@ -859,8 +857,7 @@ function intRangeValidatorCtor(validatorName: string, minValue: number, maxValue
   if (maxValue !== undefined) { context.max = maxValue; }
   let templateExists = context.messageTemplate || Validator.messageTemplates[validatorName];
   if (!templateExists) {
-    Validator.messageTemplates[validatorName] = core.formatString("'%displayName%' must be an integer between the values of %1 and %2",
-        minValue, maxValue);
+    Validator.messageTemplates[validatorName] = `'%displayName%' must be an integer between the values of ${minValue} and ${maxValue}`;
   }
   return function () {
     let valFn = function (v: any, ctx: any) {
