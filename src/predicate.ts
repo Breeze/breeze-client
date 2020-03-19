@@ -325,7 +325,7 @@ export class Predicate {
     let tVisitor = visitor || context.visitor!;
     let fn = tVisitor[this.visitorMethodName];
     if (fn == null) {
-      throw new Error("Unable to locate method: " + this.visitorMethodName + " on visitor");
+      throw new Error(`Unable to locate method: ${this.visitorMethodName} on visitor`);
     }
 
     let entityType = context.entityType;
@@ -355,7 +355,7 @@ export class Predicate {
     let opStr = (typeof op === "string") ? op : op.operator;
     let result = this.aliasMap[opStr.toLowerCase()];
     if (!result && !okIfNotFound) {
-      throw new Error("Unable to resolve operator: " + opStr);
+      throw new Error(`Unable to resolve operator: ${opStr}`);
     }
     return result;
   }
@@ -386,7 +386,7 @@ function createPredicateFromObject(obj: Object) {
   if (obj instanceof Predicate) return obj;
 
   if (typeof obj !== 'object') {
-    throw new Error("Unable to convert to a Predicate: " + obj);
+    throw new Error(`Unable to convert to a Predicate: ${obj}`);
   }
   let keys = Object.keys(obj);
   let preds = keys.map(function (key) {
@@ -415,7 +415,7 @@ function createPredicateFromKeyValue(key: string, value: any): Predicate {
   }
 
   if (Array.isArray(value)) {
-    throw new Error("Unable to resolve predicate after the phrase: " + key);
+    throw new Error(`Unable to resolve predicate after the phrase: ${key}`);
   }
 
   let expr = key;
@@ -525,7 +525,7 @@ export class BinaryPredicate extends Predicate {
     let expr1Context = { entityType: entityType, usesNameOnServer: usesNameOnServer };
     this.expr1 = createExpr(this.expr1Source, expr1Context);
     if (this.expr1 == null) {
-      throw new Error("Unable to validate 1st expression: " + this.expr1Source);
+      throw new Error(`Unable to validate 1st expression: ${this.expr1Source}`);
     }
     if (this.expr1 instanceof LitExpr) {
       // lhs must be either a property or a function.
@@ -538,7 +538,7 @@ export class BinaryPredicate extends Predicate {
     let expr2Context = core.extend(expr1Context, { isRHS: true, dataType: this.expr1.dataType });
     this.expr2 = createExpr(this.expr2Source, expr2Context);
     if (this.expr2 == null) {
-      throw new Error("Unable to validate 2nd expression: " + this.expr2Source);
+      throw new Error(`Unable to validate 2nd expression: ${this.expr2Source}`);
     }
 
     if (this.expr1.dataType == null) {
@@ -722,10 +722,10 @@ function resolveDataType(dataType?: DataType | string) {
   if (typeof dataType === 'string') {
     let dt = DataType.fromName(dataType) as DataType;
     if (dt) return dt;
-    throw new Error("Unable to resolve a dataType named: " + dataType);
+    throw new Error(`Unable to resolve a dataType named: ${dataType}`);
   }
 
-  throw new Error("The dataType parameter passed into this literal expression is not a 'DataType'" + dataType);
+  throw new Error(`The dataType parameter passed into this literal expression is not a 'DataType'${dataType}`);
 }
 
 /** For use by breeze plugin authors only. The class is for use in building a [[IUriBuilderAdapter]] implementation. 
@@ -783,7 +783,7 @@ export class FnExpr extends PredicateExpression {
     this.exprs = exprs;
     let qf = FnExpr._funcMap[fnName];
     if (qf == null) {
-      throw new Error("Unknown function: " + fnName);
+      throw new Error(`Unknown function: ${fnName}`);
     }
     this.localFn = qf.fn;
     this.dataType = qf.dataType;
@@ -926,7 +926,7 @@ function createExpr(source: any, exprContext: ExpressionContext) {
     if (source != null && typeof source === 'object' && !source.toISOString) {
       // source is an object but not a Date-like thing such as a JS or MomentJS Date
       if (source.value === undefined) {
-        throw new Error("Unable to resolve an expression for: " + source + " on entityType: " + (entityType ? entityType.name : 'null'));
+        throw new Error(`Unable to resolve an expression for: ${source} on entityType: ${entityType ? entityType.name : 'null'}`);
       }
       if (source.isProperty) {
         return new PropExpr(source.value);
@@ -1053,7 +1053,7 @@ let toFunctionVisitor = {
           return !predFn(entity);
         };
       default:
-        throw new Error("Invalid unary operator:" + this.op.key);
+        throw new Error(`Invalid unary operator:${this.op.key}`);
     }
   },
 
@@ -1064,7 +1064,7 @@ let toFunctionVisitor = {
     let lqco = context.entityType!.metadataStore.localQueryComparisonOptions;
     let predFn = getBinaryPredicateFn(this, dataType as DataType, lqco);
     if (predFn == null) {
-      throw new Error("Invalid binaryPredicate operator:" + this.op.key);
+      throw new Error(`Invalid binaryPredicate operator: ${this.op.key}`);
     }
     return function (entity: Entity) {
       return predFn!(expr1Fn(entity), expr2Fn(entity));
@@ -1091,7 +1091,7 @@ let toFunctionVisitor = {
           return result;
         };
       default:
-        throw new Error("Invalid boolean operator:" + this.op!.key);
+        throw new Error(`Invalid boolean operator: ${this.op!.key}`);
     }
   },
 
@@ -1159,7 +1159,7 @@ function getAnyAllPredicateFn(op: Op): (v1: any[], v2: any) => boolean {
         });
       };
     default:
-      throw new Error("Unknown operator: " + op.key);
+      throw new Error(`Unknown operator: ${op.key}`);
   }
 }
 

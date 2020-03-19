@@ -38,7 +38,7 @@ export abstract class AbstractDataServiceAdapter implements DataServiceAdapter {
     if (this.ajaxImpl && this.ajaxImpl.ajax) {
       return;
     }
-    throw new Error("Unable to find ajax adapter for dataservice adapter '" + (this.name || '') + "'.");
+    throw new Error(`Unable to find ajax adapter for dataservice adapter '${this.name || ''}'.`);
   }
 
   fetchMetadata(metadataStore: MetadataStore, dataService: DataService) {

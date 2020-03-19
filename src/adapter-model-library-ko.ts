@@ -135,7 +135,7 @@ export class ModelLibraryKnockoutAdapter implements breeze.ModelLibraryAdapter {
         // check if property is already exposed as a ko object
       } else if (ko.isObservable(val)) {
         if (prop.isNavigationProperty) {
-          throw new Error("Cannot assign a navigation property in an entity ctor.: " + propName);
+          throw new Error(`Cannot assign a navigation property in an entity ctor.: ${propName}`);
         }
         koObj = val;
         // otherwise
@@ -210,7 +210,7 @@ function initializeValueForProp(entity: any, prop: breeze.EntityProperty, val: a
 
   } else if (prop instanceof breeze.NavigationProperty) {
     if (val !== undefined) {
-      throw new Error("Cannot assign a navigation property in an entity ctor.: " + prop.name);
+      throw new Error(`Cannot assign a navigation property in an entity ctor.: ${prop.name}`);
     }
     if (prop.isScalar) {
       // TODO: change this to nullEntity later.
@@ -219,7 +219,7 @@ function initializeValueForProp(entity: any, prop: breeze.EntityProperty, val: a
       val = breeze.makeRelationArray([], entity, prop);
     }
   } else {
-    throw new Error("unknown property: " + (prop as any).name);
+    throw new Error(`unknown property: ${(prop as any).name}`);
   }
   return val;
 }

@@ -134,7 +134,7 @@ export class BreezeConfig {
     let idef = this.getInterfaceDef(interfaceName);
     let impl = idef.getImpl(adapterName);
     if (!impl) {
-      throw new Error("Unregistered adapter.  Interface: " + interfaceName + " AdapterName: " + adapterName);
+      throw new Error(`Unregistered adapter.  Interface: ${interfaceName} AdapterName: ${adapterName}`);
     }
 
     return this._initializeAdapterInstanceCore(idef, impl, isDefault);
@@ -200,7 +200,7 @@ export class BreezeConfig {
       return k.toLowerCase() === lcName;
     });
     if (!kv) {
-      throw new Error("Unknown interface name: " + interfaceName);
+      throw new Error(`Unknown interface name: ${interfaceName}`);
     }
     return <InterfaceDef<T>>kv.value;
   }
@@ -225,7 +225,7 @@ export class BreezeConfig {
     let key = (typeof (type) === "string" ? type : type.prototype._$typeName) + "." + name;
     let result = this.objectRegistry[key];
     if (!result) {
-      throw new Error("Unable to locate a registered object by the name: " + key);
+      throw new Error(`Unable to locate a registered object by the name: ${key}`);
     }
     return result;
   }

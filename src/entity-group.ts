@@ -48,7 +48,7 @@ export class EntityGroup {
       if (targetEntity === entity) {
         aspect.entityState = entityState;
       } else if (mergeStrategy === MergeStrategy.Disallowed) {
-        throw new Error("A MergeStrategy of 'Disallowed' does not allow you to attach an entity when an entity with the same key is already attached: " + aspect.getKey());
+        throw new Error(`A MergeStrategy of 'Disallowed' does not allow you to attach an entity when an entity with the same key is already attached: ${aspect.getKey()}`);
       } else if (mergeStrategy === MergeStrategy.OverwriteChanges || (mergeStrategy === MergeStrategy.PreserveChanges && wasUnchanged)) {
         // unwrapInstance returns an entity with server side property names - so we need to use DataProperty.getRawValueFromServer these when we apply
         // the property values back to the target.

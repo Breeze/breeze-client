@@ -267,7 +267,7 @@ function mergeEntity(mc: MappingContext, node: any, meta: NodeMeta) {
     }
     let targetEntityState = targetEntity.entityAspect.entityState;
     if (mergeStrategy === MergeStrategy.Disallowed) {
-      throw new Error("A MergeStrategy of 'Disallowed' prevents " + entityKey.toString() + " from being merged");
+      throw new Error(`A MergeStrategy of 'Disallowed' prevents ${entityKey.toString()} from being merged`);
     } else if (mergeStrategy === MergeStrategy.SkipMerge) {
       updateEntityNoMerge(mc, targetEntity, node);
     } else {

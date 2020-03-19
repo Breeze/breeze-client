@@ -205,7 +205,7 @@ export class EntityAspect {
       if (!typeName) {
         throw new Error("This entity is not registered as a valid EntityType");
       } else {
-        throw new Error("Metadata for this entityType has not yet been resolved: " + typeName);
+        throw new Error(`Metadata for this entityType has not yet been resolved: ${typeName}`);
       }
     }
     let entityCtor = entityType.getEntityCtor();
@@ -667,7 +667,7 @@ export class EntityAspect {
   /** @hidden @internal */
   _checkOperation(operationName: string) {
     if (this.isBeingSaved) {
-      throw new Error("Cannot perform a '" + operationName + "' on an entity that is in the process of being saved");
+      throw new Error(`Cannot perform a '${operationName}' on an entity that is in the process of being saved`);
     }
     // allows chaining
     return this;
@@ -920,7 +920,7 @@ export class ComplexAspect {
       if (!typeName) {
         throw new Error("This entity is not registered as a valid ComplexType");
       } else {
-        throw new Error("Metadata for this complexType has not yet been resolved: " + typeName);
+        throw new Error(`Metadata for this complexType has not yet been resolved: ${typeName}`);
       }
     }
     let complexCtor = complexType.getCtor();

@@ -302,7 +302,7 @@ export class Validator {
     let validatorName = "Validator." + json.name;
     let fn = config.getRegisteredFunction(validatorName);
     if (!fn) {
-      throw new Error("Unable to locate a validator named:" + json.name);
+      throw new Error(`Unable to locate a validator named: ${json.name}`);
     }
     return fn(json);
   }

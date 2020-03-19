@@ -33,7 +33,7 @@ export class AjaxHttpClientAdapter {
     }
 
     if (config.crossDomain) {
-      throw new Error(this.name + ' does not support JSONP (crossDomain) requests');
+      throw new Error(`${this.name} does not support JSONP (crossDomain) requests`);
     }
 
     let url = config.url;

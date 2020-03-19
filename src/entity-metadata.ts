@@ -189,7 +189,7 @@ export class MetadataStore {
       if (!!shouldOverwrite) {
         this.dataServices[ix] = dataService;
       } else {
-        throw new Error("A dataService with this name '" + dataService.serviceName + "' already exists in this MetadataStore");
+        throw new Error(`A dataService with this name '${dataService.serviceName}' already exists in this MetadataStore`);
       }
     } else {
       this.dataServices.push(dataService);
@@ -1251,7 +1251,7 @@ export class EntityType {
     if (ctorType && ctorType.metadataStore !== this.metadataStore) {
       // We can't risk a mismatch between the ctor and the type info in a specific metadatastore
       // because modelLibraries rely on type info to intercept ctor properties
-      throw new Error("Cannot register the same constructor for " + this.name + " in different metadata stores.  Please define a separate constructor for each metadata store.");
+      throw new Error(`Cannot register the same constructor for ${this.name} in different metadata stores.  Please define a separate constructor for each metadata store.`);
     }
 
 
@@ -1414,7 +1414,7 @@ export class EntityType {
         parentType = (prop instanceof NavigationProperty) ? prop.entityType : prop.dataType as ComplexType;
         // parentType = prop.isNavigationProperty ? prop.entityType : prop.dataType;
       } else if (throwIfNotFound) {
-        throw new Error("unable to locate property: " + propName + " on entityType: " + parentType.name);
+        throw new Error(`unable to locate property: ${propName} on entityType: ${parentType.name}`);
       } else {
         ok = false;
       }
@@ -1728,7 +1728,7 @@ function resolveCp(cp: DataProperty, metadataStore: MetadataStore) {
   let complexType = metadataStore._getStructuralType(cp.complexTypeName, true);
   if (!complexType) return false;
   if (!(complexType instanceof ComplexType)) {
-    throw new Error("Unable to resolve ComplexType with the name: " + cp.complexTypeName + " for the property: " + cp.name);
+    throw new Error(`Unable to resolve ComplexType with the name: ${cp.complexTypeName} for the property: ${cp.name}`);
   }
   cp.dataType = complexType;
   cp.defaultValue = null;
@@ -2077,7 +2077,7 @@ export class DataProperty {
     } else if (typeof (this.dataType) === "string") {
       let dt = DataType.fromName(this.dataType);
       if (!dt) {
-        throw new Error("Unable to find a DataType enumeration by the name of: " + this.dataType);
+        throw new Error(`Unable to find a DataType enumeration by the name of: ${this.dataType}`);
       }
       this.dataType = dt;
     } else if (!this.dataType) {
@@ -2096,7 +2096,7 @@ export class DataProperty {
         } else {
           this.defaultValue = (this.dataType as any).defaultValue;
           if (this.defaultValue == null) {
-            throw new Error("A nonnullable DataProperty cannot have a null defaultValue. Name: " + (this.name || this.nameOnServer));
+            throw new Error(`A nonnullable DataProperty cannot have a null defaultValue. Name: ${this.name || this.nameOnServer}`);
           }
         }
       }
@@ -2487,7 +2487,7 @@ export class NavigationProperty {
 NavigationProperty.prototype._$typeName = "NavigationProperty";
 
 function throwSetInverseError(np: NavigationProperty, message: string) {
-  throw new Error("Cannot set the inverse property for: " + np.formatName() + ". " + message);
+  throw new Error(`Cannot set the inverse property for: ${np.formatName()}. ${message}`);
 }
 
 // sets navigation property: relatedDataProperties and dataProperty: relatedNavigationProperty

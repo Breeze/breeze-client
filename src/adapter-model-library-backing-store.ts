@@ -43,9 +43,6 @@ export class ModelLibraryBackingStoreAdapter implements breeze.ModelLibraryAdapt
     };
 
     proto.setProperty = function (propertyName: string, value: any) {
-      //if (!this._backingStore.hasOwnProperty(propertyName)) {
-      //    throw new Error("Unknown property name:" + propertyName);
-      //}
       this[propertyName] = value;
       // allow setProperty chaining.
       return this;
@@ -84,7 +81,7 @@ export class ModelLibraryBackingStoreAdapter implements breeze.ModelLibraryAdapt
 
       } else if (prop.isNavigationProperty) {
         if (val !== undefined && val !== null) {
-          throw new Error("Cannot assign a navigation property in an entity ctor.: " + propName);
+          throw new Error(`Cannot assign a navigation property in an entity ctor.: ${propName}`);
         }
         if (prop.isScalar) {
           // TODO: change this to nullstob later.
@@ -93,7 +90,7 @@ export class ModelLibraryBackingStoreAdapter implements breeze.ModelLibraryAdapt
           val = breeze.makeRelationArray([], entity as breeze.Entity, prop);
         }
       } else {
-        throw new Error("unknown property: " + propName);
+        throw new Error(`unknown property: ${propName}`);
       }
       // can't touch the normal property sets within this method (IE9 Bug) - so we access the backingStore directly instead.
       // otherwise we could just do

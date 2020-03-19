@@ -126,7 +126,7 @@ function getEntityGraphCore(root: Entity | Array<Entity>, expand: string | Array
     });
 
     function getRootErr(ix: number, msg: string) {
-      return new Error("'getEntityGraph' root[" + ix + "] " + msg);
+      return new Error(`'getEntityGraph' root[${ix}] ${msg}`);
     }
 
     function getRootType(root: Entity, ix: number) {
@@ -241,7 +241,7 @@ function getEntityGraphCore(root: Entity | Array<Entity>, expand: string | Array
       let nav = baseType.getNavigationProperty(segment);
       let fkName = nav.foreignKeyNames[0];
       if (!nav) {
-        throw new Error(segment + " is not a navigation property of " + baseTypeName);
+        throw new Error(`${segment} is not a navigation property of ${baseTypeName}`);
       }
       navType = nav.entityType;
       // add derived types
@@ -300,7 +300,7 @@ function getEntityGraphCore(root: Entity | Array<Entity>, expand: string | Array
 
     function rethrow(e: Error) {
       let typeName = baseTypeName || baseType;
-      let error = new Error("'getEntityGraph' can't expand '" + segment + "' for " + typeName);
+      let error = new Error(`'getEntityGraph' can't expand '${segment}' for ${typeName}`);
       (error as any).innerError = e;
       throw error;
     }

@@ -65,7 +65,7 @@ function parse(metadataStore: MetadataStore, schemas: any, altMetadata: any) {
       }
       return npa.parentType.name + ":" + npa.name;
     }).join(', ');
-    throw new Error("Incomplete navigation properties: " + msg);
+    throw new Error(`Incomplete navigation properties: ${msg}`);
   }
   if (altMetadata) {
     metadataStore.importMetadata(altMetadata, true);
@@ -222,7 +222,7 @@ function parseCsdlComplexProperty(parentType: EntityType | ComplexType, csdlProp
 function parseCsdlNavProperty(entityType: EntityType, csdlProperty: any, schema: any, schemas: any[]) {
   let association = getAssociation(csdlProperty, schema, schemas);
   if (!association) {
-    throw new Error("Unable to resolve Foreign Key Association: " + csdlProperty.relationship);
+    throw new Error(`Unable to resolve Foreign Key Association: ${csdlProperty.relationship}`);
   }
   let toEnd = core.arrayFirst(association.end, (assocEnd) => {
     return assocEnd.role === csdlProperty.toRole;

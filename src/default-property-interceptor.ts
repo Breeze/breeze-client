@@ -122,7 +122,7 @@ function setDpValueSimple(context: IContext, rawAccessorFn: any) {
     let values = keyProps.map( p => (p === property) ? newValue : parent.getProperty(p.name));
     let newKey = new EntityKey(entityType, values);
     if (entityManager.findEntityByKey(newKey)) {
-      throw new Error("An entity with this key is already in the cache: " + newKey.toString());
+      throw new Error(`An entity with this key is already in the cache: ${newKey.toString()}`);
     }
     let oldKey = (parent as Entity).entityAspect.getKey();
     let eg = entityManager._findEntityGroup(entityType);

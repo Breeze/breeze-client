@@ -424,7 +424,7 @@ function requireLib(libNames: string, errMessage?: string) {
     if (lib) return lib;
   }
   if (errMessage) {
-    throw new Error("Unable to initialize " + libNames + ".  " + errMessage);
+    throw new Error(`Unable to initialize ${libNames}.  ${errMessage}`);
   }
 }
 
@@ -526,12 +526,12 @@ function getUuid(): string {
 
 function durationToSeconds(duration: string) {
   // basic algorithm from https://github.com/nezasa/iso8601-js-period
-  if (typeof duration !== "string") throw new Error("Invalid ISO8601 duration '" + duration + "'");
+  if (typeof duration !== "string") throw new Error(`Invalid ISO8601 duration '${duration}'`);
 
   // regex splits as follows - grp0, grp1, y, m, d, grp2, h, m, s
   //                           0     1     2  3  4  5     6  7  8
   let struct = /^P((\d+Y)?(\d+M)?(\d+D)?)?(T(\d+H)?(\d+M)?(\d+S)?)?$/.exec(duration);
-  if (!struct) throw new Error("Invalid ISO8601 duration '" + duration + "'");
+  if (!struct) throw new Error(`Invalid ISO8601 duration '${duration}'`);
 
   let ymdhmsIndexes = [2, 3, 4, 6, 7, 8]; // -> grp1,y,m,d,grp2,h,m,s
   let factors = [31104000, // year (360*24*60*60)

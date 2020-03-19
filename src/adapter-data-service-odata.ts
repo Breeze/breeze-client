@@ -87,7 +87,7 @@ export class DataServiceODataAdapter extends breeze.AbstractDataServiceAdapter {
           // data.dataServices.schema is an array of schemas. with properties of
           // entityContainer[], association[], entityType[], and namespace.
           if (!data || !data.dataServices) {
-            let error = new Error("Metadata query failed for: " + url);
+            let error = new Error(`Metadata query failed for: ${url}`);
             return reject(error);
           }
           let csdlMetadata = data.dataServices;
@@ -97,7 +97,7 @@ export class DataServiceODataAdapter extends breeze.AbstractDataServiceAdapter {
             try {
               metadataStore.importMetadata(csdlMetadata);
             } catch (e) {
-              return reject(new Error("Metadata query failed for " + url + "; Unable to process returned metadata: " + e.message));
+              return reject(new Error(`Metadata query failed for ${url}; Unable to process returned metadata: ${e.message}`));
             }
 
             metadataStore.addDataService(dataService);
@@ -107,7 +107,7 @@ export class DataServiceODataAdapter extends breeze.AbstractDataServiceAdapter {
 
         }, function (error: any) {
           let err = createError(error, url!);
-          err.message = "Metadata query failed for: " + url + "; " + (err.message || "");
+          err.message = `Metadata query failed for: ${url}; ${err.message || ""}`;
           return reject(err);
         },
         OData.metadataHandler

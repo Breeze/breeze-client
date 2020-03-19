@@ -77,7 +77,7 @@ export class KeyGenerator {
           nextId = getNextFn(this);
         }
       } else {
-        throw new Error("Cannot use a property with a dataType of: " + dataType.toString() + " for id generation");
+        throw new Error(`Cannot use a property with a dataType of: ${dataType.toString()} for id generation`);
       }
     }
 

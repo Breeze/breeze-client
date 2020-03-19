@@ -47,8 +47,8 @@ config.interfaceRegistry = new InterfaceRegistry();
 config._interfaceRegistry = config.interfaceRegistry;
 config.interfaceRegistry.modelLibrary.getDefaultInstance = function () {
   if (!this.defaultInstance) {
-    throw new Error("Unable to locate the default implementation of the '" + this.name +
-      "' interface.  Possible options are 'ko', 'backingStore' or 'backbone'. See the breeze.config.initializeAdapterInstances method.");
+    throw new Error(`Unable to locate the default implementation of the '${this.name}' interface. ` 
+      + ` Possible options are 'ko' or 'backingStore'. See the breeze.config.initializeAdapterInstances method.`);
   }
   return this.defaultInstance;
 };
