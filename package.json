@@ -27,12 +27,11 @@
     "clean": "rimraf ./temp && rimraf ./src/*.js && rimraf ./src/*.d.ts && rimraf ./src/dist && rimraf node_modules/breeze-client.js",
     "install-to-spec": "cd ./spec && npm install ../breeze-client-2.0.8.tgz",
     "publish": "npm publish --tag latest ./src/dist",
-    "tsc": "tsc",
+    "tsc": "tsc --build ./src/tsconfig.json",
     "watch-tsc": "tsc -w",
     "typedoc": "typedoc --out ./temp/docs/ --exclude xx  --excludePrivate --excludeNotExported  --tsConfig ./src/tsconfig.typedoc.json --mode file --readme ./readme.doc.md ./src/breeze.ts && node ./tools/copy-if-different.js ./temp/docs ./docs ",
     "packagr": "ng-packagr -p ./src/package.json"
   },
-
   "author": {
     "name": "IdeaBlade",
     "email": "jayt@ideablade.com",
