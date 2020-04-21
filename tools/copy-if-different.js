@@ -2,7 +2,6 @@
  * Copy file/dirctory but only if content is different
  */
 var fs = require("fs-extra");
-var isDifferent = require("./build-util").isDifferent;
 
 var args = process.argv.slice(2);
 if (args.length < 2) {
@@ -29,5 +28,18 @@ function filter(src) {
   if (!stats.isFile()) return true;
   var dest = destName + src.substring(srcLen);
   return isDifferent(src, dest);
+}
+
+/** return true if the file contents are different, false otherwise. */
+function isDifferent(srcName, destName) {
+  if (!fs.existsSync(destName)) return true;
+
+  if (getFileSize(srcName) != getFileSize(destName)) return true;
+
+  var srcBuf = fs.readFileSync(srcName);
+  var destBuf = fs.readFileSync(destName);
+  if (srcBuf.compare(destBuf) != 0) return true;
+
+  return false;
 }
 

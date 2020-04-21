@@ -4,9 +4,7 @@
   "private": true,
   "description": "Breeze data management for JavaScript clients",
   "repository": "https://github.com/Breeze/breeze-client.git",
-  "dependencies": {
-    "tslib": "^1.9.0"
-  },
+  "dependencies": {},
   "author": {
     "name": "IdeaBlade",
     "email": "jayt@ideablade.com",
@@ -32,5 +30,8 @@
   "fesm2015": "fesm2015/breeze-client.js",
   "typings": "breeze-client.d.ts",
   "metadata": "breeze-client.metadata.json",
-  "sideEffects": false
+  "sideEffects": false,
+  "peerDependencies": {
+    "tslib": "^1.9.0"
+  }
 }
