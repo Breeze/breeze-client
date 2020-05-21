@@ -318,6 +318,9 @@ function setNpValue(context: IContext, rawAccessorFn: Function) {
 
   // manage attachment -
   if (newValue != null) {
+    if (!newValue.entityAspect) {
+      return;
+    }
     let newAspect = newValue.entityAspect;
     if (entityManager) {
       if (newAspect.entityState.isDetached()) {
