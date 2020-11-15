@@ -15,6 +15,8 @@ interface IEnd {
   role: string;
 }
 
+const RX_COLLECTION =  /Collection\((?<type>.*)\)/;
+
 function parse(metadataStore: MetadataStore, schemas: any, altMetadata: any) {
 
   metadataStore._entityTypeResourceMap = {};
@@ -148,7 +150,7 @@ function parseCsdlDataProperty(parentType: EntityType | ComplexType, csdlPropert
   let dp: DataProperty | undefined;
   let typeParts = csdlProperty.type.split(".");
   // Both tests on typeParts are necessary because of differing metadata conventions for OData and Edmx feeds.
-  if (typeParts[0] === "Edm" && typeParts.length === 2) {
+  if (typeParts[0].endsWith("Edm") && typeParts.length === 2) {
     dp = parseCsdlSimpleProperty(parentType, csdlProperty, keyNamesOnServer);
   } else {
     if (isEnumType(csdlProperty, schema)) {
@@ -168,7 +170,9 @@ function parseCsdlDataProperty(parentType: EntityType | ComplexType, csdlPropert
 }
 
 function parseCsdlSimpleProperty(parentType: EntityType | ComplexType, csdlProperty: any, keyNamesOnServer?: string[]) {
-  let dataType = DataType.fromEdmDataType(csdlProperty.type);
+  let isCollectionType = isCollection(csdlProperty.type);
+  let propertyType = getCollectionType(csdlProperty.type) || csdlProperty.type;
+  let dataType = DataType.fromEdmDataType(propertyType);
   if (dataType == null) {
     parentType.warnings.push("Unable to recognize DataType for property: " + csdlProperty.name + " DateType: " + csdlProperty.type);
     return undefined;
@@ -191,6 +195,7 @@ function parseCsdlSimpleProperty(parentType: EntityType | ComplexType, csdlPrope
     dataType: dataType,
     isNullable: isNullable,
     isPartOfKey: isPartOfKey,
+    isScalar: !isCollectionType,
     maxLength: maxLength,
     defaultValue: csdlProperty.defaultValue,
     // fixedLength: fixedLength,
@@ -208,12 +213,15 @@ function parseCsdlComplexProperty(parentType: EntityType | ComplexType, csdlProp
   // Complex properties are never nullable ( per EF specs)
   // let isNullable = csdlProperty.nullable === 'true' || csdlProperty.nullable == null;
   // let complexTypeName = csdlProperty.type.split("Edm.")[1];
-  let complexTypeName = parseTypeNameWithSchema(csdlProperty.type, schema).typeName;
+  let isCollectionType = isCollection(csdlProperty.type);
+  let propertyType = getCollectionType(csdlProperty.type) || csdlProperty.type;
+  let complexTypeName = parseTypeNameWithSchema(propertyType, schema).typeName;
   // can't set the name until we go thru namingConventions and these need the dp.
   let dp = new DataProperty({
     nameOnServer: csdlProperty.name,
     complexTypeName: complexTypeName,
-    isNullable: false
+    isNullable: false,
+    isScalar: !isCollectionType
   });
 
   return dp;
@@ -274,6 +282,9 @@ function parseCsdlNavProperty(entityType: EntityType, csdlProperty: any, schema:
   return np;
 }
 
+function isCollection(propertyType: string): boolean {
+  return RX_COLLECTION.test(propertyType);
+}
 
 function isEnumType(csdlProperty: any, schema: any) {
   if (schema.enumType) return isEdmxEnumType(csdlProperty, schema);
@@ -283,7 +294,8 @@ function isEnumType(csdlProperty: any, schema: any) {
 
 function isEdmxEnumType(csdlProperty: any, schema: any) {
   let enumTypes = core.toArray(schema.enumType);
-  let typeParts = csdlProperty.type.split(".");
+  let propertyType = getCollectionType(csdlProperty.type) || csdlProperty.type;
+  let typeParts = propertyType.split(".");
   let baseTypeName = typeParts[typeParts.length - 1];
   return enumTypes.some(function (enumType) {
     return enumType.name === baseTypeName;
@@ -294,7 +306,8 @@ function isODataEnumType(csdlProperty: any, schema: any) {
   let enumTypes = schema.extensions.filter((ext: any) => {
     return ext.name === "EnumType";
   });
-  let typeParts = csdlProperty.type.split(".");
+  let propertyType = getCollectionType(csdlProperty.type) || csdlProperty.type;
+  let typeParts = propertyType.split(".");
   let baseTypeName = typeParts[typeParts.length - 1];
   return enumTypes.some((enumType: any) => {
     return enumType.attributes.some((attr: any) => {
@@ -390,6 +403,11 @@ function parseTypeNameWithSchema(entityTypeName: string, schema: any) {
     }
   }
   return result;
+}
+
+function getCollectionType(propertyType: string): string {
+  const match = propertyType.match(RX_COLLECTION);
+  return match ? match["groups"].type : null;
 }
 
 function getNamespaceFor(shortName: string, schema: any) {
