@@ -5,7 +5,10 @@
 var fs = require("fs-extra");
 
 var sourceDir = 'dist/bundles/';
-var destFile = fs.realpathSync('../breeze.js/test/breeze/breeze.debug.js');
+var destFile = fs.realpathSync('../breeze.js/test') + '/breeze/breeze.debug.js';
+fs.ensureFileSync(destFile);
+destFile = fs.realpathSync(destFile);
+
 var files = [
   'breeze-client.umd.js',
   'breeze-client-adapter-model-library-backing-store.umd.js',
@@ -17,7 +20,6 @@ var files = [
   'breeze-client-adapter-data-service-webapi.umd.js',
 ];
 
-fs.ensureFileSync(destFile);
 var stream = fs.createWriteStream(destFile, {flags:'w'});
 console.log('Copying to ' + destFile);
 
