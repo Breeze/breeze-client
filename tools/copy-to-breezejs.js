@@ -13,10 +13,11 @@ var files = [
   'breeze-client-adapter-uri-builder-json.umd.js',
   'breeze-client-adapter-ajax-fetch.umd.js',
   'breeze-client-adapter-ajax-angularjs.umd.js',
-  'breeze-client-adapter-ajax-fake',
+  'breeze-client-adapter-ajax-jquery.umd.js',
   'breeze-client-adapter-data-service-webapi.umd.js',
 ];
 
+fs.ensureFileSync(destFile);
 var stream = fs.createWriteStream(destFile, {flags:'w'});
 console.log('Copying to ' + destFile);
 

@@ -8,7 +8,7 @@ import { ComplexArray } from './complex-array';
 import { DataService, DataServiceConfig, JsonResultsAdapter, JsonResultsAdapterConfig, NodeContext, NodeMeta } from './data-service';
 import { DataType  } from './data-type';
 import { EntityAction } from './entity-action';
-import { EntityAspect, ComplexAspect, Entity, StructuralObject, PropertyChangedEventArgs } from './entity-aspect';
+import { EntityAspect, ComplexAspect, Entity, ComplexObject, StructuralObject, PropertyChangedEventArgs } from './entity-aspect';
 import { EntityKey } from './entity-key';
 import { EntityManager, EntityManagerConfig, EntityError, EntityChangedEventArgs, SaveContext, SaveBundle, HttpResponse, KeyMapping, ServerError, SaveResult, QueryResult, ValidationErrorsChangedEventArgs, HasChangesChangedEventArgs } from './entity-manager';
 import { EntityQuery, FilterQueryOp, BooleanQueryOp, OrderByClause, ExpandClause, SelectClause } from './entity-query';
@@ -50,6 +50,7 @@ export {
   Callback,
   ChangeRequestInterceptor,
   ComplexAspect,
+  ComplexObject,
   ComplexType,
   config,
   core,
@@ -164,7 +165,7 @@ export const breeze = {
   ValidationError: ValidationError,
   ValidationOptions: ValidationOptions,
   Validator,
-  version: "2.0.3"
+  version: "2.0.8"
 };
 
 // breeze.assertConfig = assertConfig as any;
