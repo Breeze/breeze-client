@@ -1,4 +1,5 @@
 ﻿import * as breeze from 'breeze-client';
+import { appendQueryStringParameters } from "./adapter-core";
 
 export class UriBuilderODataAdapter implements breeze.UriBuilderAdapter {
 
@@ -44,8 +45,8 @@ export class UriBuilderODataAdapter implements breeze.UriBuilderAdapter {
     }
 
     let qoText = toQueryOptionsString(queryOptions as breeze.QueryOptions);
-    let sep = entityQuery.resourceName.includes("?") ? "&" : "?";
-    return entityQuery.resourceName + sep + qoText;
+
+    return appendQueryStringParameters(qoText, entityQuery.resourceName);
 
     // private methods to this func.
 

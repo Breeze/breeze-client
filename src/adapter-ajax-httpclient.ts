@@ -1,6 +1,7 @@
 ﻿import { HttpClient, HttpErrorResponse, HttpEvent, HttpHeaders, HttpRequest, HttpResponse } from "@angular/common/http";
 import { AjaxConfig, config, core, HttpResponse as BreezeHttpResponse, BreezeConfig } from "breeze-client";
 import { filter, map } from "rxjs/operators";
+import { appendQueryStringParameters } from "./adapter-core";
 
 export class AjaxHttpClientAdapter {
   static adapterName = 'httpclient';
@@ -36,13 +37,9 @@ export class AjaxHttpClientAdapter {
       throw new Error(this.name + ' does not support JSONP (crossDomain) requests');
     }
 
-    let url = config.url;
-    if (!core.isEmpty(config.params)) {
-      // Hack: Not sure how Angular handles writing 'search' parameters to the url.
-      // so this approach takes over the url param writing completely.
-      let delim = (url.indexOf('?') >= 0) ? '&' : '?';
-      url = url + delim + encodeParams(config.params);
-    }
+    let parameters = core.isEmpty(config.params) ? null : encodeParams(config.params);
+
+    const url = appendQueryStringParameters(parameters, config.url);
 
     let headers = new HttpHeaders(config.headers || {});
     if (!headers.has('Content-Type')) {
