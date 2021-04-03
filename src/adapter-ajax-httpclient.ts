@@ -1,6 +1,7 @@
 ﻿import { HttpClient, HttpErrorResponse, HttpEvent, HttpHeaders, HttpRequest, HttpResponse } from "@angular/common/http";
 import { AjaxConfig, config, core, HttpResponse as BreezeHttpResponse, BreezeConfig } from "breeze-client";
 import { filter, map } from "rxjs/operators";
+import { appendQueryStringParameter, encodeParams } from "./adapter-core";
 
 export class AjaxHttpClientAdapter {
   static adapterName = 'httpclient';
@@ -36,13 +37,10 @@ export class AjaxHttpClientAdapter {
       throw new Error(this.name + ' does not support JSONP (crossDomain) requests');
     }
 
-    let url = config.url;
-    if (!core.isEmpty(config.params)) {
-      // Hack: Not sure how Angular handles writing 'search' parameters to the url.
-      // so this approach takes over the url param writing completely.
-      let delim = (url.indexOf('?') >= 0) ? '&' : '?';
-      url = url + delim + encodeParams(config.params);
-    }
+    // Hack: Not sure how Angular handles writing 'search' parameters to the url.
+    // so this approach takes over the url param writing completely.
+    const parameters = core.isEmpty(config.params) ? null : encodeParams(config.params);
+    const url = appendQueryStringParameter(config.url, parameters);
 
     let headers = new HttpHeaders(config.headers || {});
     if (!headers.has('Content-Type')) {
@@ -152,45 +150,6 @@ export class AjaxHttpClientAdapter {
 }
 
 ///// Helpers ////
-
-function encodeParams(obj: {}) {
-  let query = '';
-  let subValue: any, innerObj: any, fullSubName: any;
-
-  for (let name in obj) {
-    if (!obj.hasOwnProperty(name)) { continue; }
-
-    let value = obj[name];
-
-    if (value instanceof Array) {
-      for (let i = 0; i < value.length; ++i) {
-        subValue = value[i];
-        fullSubName = name + '[' + i + ']';
-        innerObj = {};
-        innerObj[fullSubName] = subValue;
-        query += encodeParams(innerObj) + '&';
-      }
-    } else if (value && value.toISOString) { // a feature of Date-like things
-      query += encodeURIComponent(name) + '=' + encodeURIComponent(value.toISOString()) + '&';
-    } else if (value instanceof Object) {
-      for (let subName in value) {
-        if (obj.hasOwnProperty(name)) {
-          subValue = value[subName];
-          fullSubName = name + '[' + subName + ']';
-          innerObj = {};
-          innerObj[fullSubName] = subValue;
-          query += encodeParams(innerObj) + '&';
-        }
-      }
-    } else if (value === null) {
-      query += encodeURIComponent(name) + '=&';
-    } else if (value !== undefined) {
-      query += encodeURIComponent(name) + '=' + encodeURIComponent(value) + '&';
-    }
-  }
-
-  return query.length ? query.substr(0, query.length - 1) : query;
-}
 
 function makeGetHeaders(headers: HttpHeaders) {
   return function getHeaders(headerName?: string) { return headers.getAll(headerName).join('\r\n'); };

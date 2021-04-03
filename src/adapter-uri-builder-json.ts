@@ -1,4 +1,5 @@
 ﻿import * as breeze from 'breeze-client';
+import { appendQueryStringParameter } from './adapter-core';
 
 export class UriBuilderJsonAdapter implements breeze.UriBuilderAdapter {
   name: string;
@@ -30,8 +31,7 @@ export class UriBuilderJsonAdapter implements breeze.UriBuilderAdapter {
     let jsonString = JSON.stringify(json);
     if (jsonString.length > 2) {
       let urlBody = encodeURIComponent(jsonString);
-      let sep = entityQuery.resourceName.includes("?") ? "&" : "?";
-      return entityQuery.resourceName + sep + urlBody;
+      return appendQueryStringParameter(entityQuery.resourceName, urlBody);
     } else {
       return entityQuery.resourceName;
     }
