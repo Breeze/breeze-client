@@ -1,5 +1,5 @@
 ﻿import * as breeze from 'breeze-client';
-import { appendQueryStringParameters } from "./adapter-core";
+import { appendQueryStringParameter } from './adapter-core';
 
 export class UriBuilderODataAdapter implements breeze.UriBuilderAdapter {
 
@@ -44,9 +44,9 @@ export class UriBuilderODataAdapter implements breeze.UriBuilderAdapter {
       queryOptions["$inlinecount"] = "allpages";
     }
 
-    let qoText = toQueryOptionsString(queryOptions as breeze.QueryOptions);
+    const qoText = toQueryOptionsString(queryOptions as breeze.QueryOptions);
 
-    return appendQueryStringParameters(qoText, entityQuery.resourceName);
+    return appendQueryStringParameter(entityQuery.resourceName, qoText);
 
     // private methods to this func.
 

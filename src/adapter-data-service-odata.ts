@@ -1,4 +1,5 @@
 ﻿import * as breeze from 'breeze-client';
+import { appendQueryStringParameter } from './adapter-core';
 
 let core = breeze.core;
 
@@ -124,8 +125,7 @@ export class DataServiceODataAdapter extends breeze.AbstractDataServiceAdapter {
     let query = mappingContext.query as breeze.EntityQuery;
     if (!core.isEmpty(query.parameters)) {
       let paramString = toQueryString(query.parameters);
-      let sep = url.indexOf("?") < 0 ? "?" : "&";
-      url = url + sep + paramString;
+      url = appendQueryStringParameter(url, paramString);
     }
 
     let promise = new Promise<breeze.QueryResult>((resolve, reject) => {

@@ -1,4 +1,5 @@
 ﻿import * as breeze from 'breeze-client';
+import { appendQueryStringParameter, encodeParams } from './adapter-core';
 
 let core = breeze.core;
 
@@ -63,8 +64,7 @@ export class AjaxAngularjsAdapter implements breeze.AjaxAdapter {
       // Hack: because of the way that Angular handles writing parameters out to the url.
       // so this approach takes over the url param writing completely.
       // See: http://victorblog.com/2012/12/20/make-angularjs-http-service-behave-like-jquery-ajax/
-      let delim = (ngConfig.url.indexOf("?") >= 0) ? "&" : "?";
-      ngConfig.url = ngConfig.url + delim + encodeParams(config.params);
+      ngConfig.url = appendQueryStringParameter(ngConfig.url, encodeParams(config.params));
     }
 
     if (config.data) {
@@ -151,38 +151,3 @@ export class AjaxAngularjsAdapter implements breeze.AjaxAdapter {
 }
 
 breeze.config.registerAdapter("ajax", AjaxAngularjsAdapter);
-
-function encodeParams(obj: Object) {
-  let query = '';
-  let subValue: any, innerObj: Object, fullSubName: string;
-
-  for (let name in obj) {
-    let value = obj[name];
-
-    if (value instanceof Array) {
-      for (let i = 0; i < value.length; ++i) {
-        subValue = value[i];
-        fullSubName = name + '[' + i + ']';
-        innerObj = {};
-        innerObj[fullSubName] = subValue;
-        query += encodeParams(innerObj) + '&';
-      }
-    } else if (value && value.toISOString) { // a feature of Date-like things
-      query += encodeURIComponent(name) + '=' + encodeURIComponent(value.toISOString()) + '&';
-    } else if (value instanceof Object) {
-      for (let subName in value) {
-        subValue = value[subName];
-        fullSubName = name + '[' + subName + ']';
-        innerObj = {};
-        innerObj[fullSubName] = subValue;
-        query += encodeParams(innerObj) + '&';
-      }
-    } else if (value === null) {
-      query += encodeURIComponent(name) + '=&';
-    } else if (value !== undefined) {
-      query += encodeURIComponent(name) + '=' + encodeURIComponent(value) + '&';
-    }
-  }
-
-  return query.length ? query.substr(0, query.length - 1) : query;
-}
