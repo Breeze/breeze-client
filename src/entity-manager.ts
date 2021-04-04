@@ -73,6 +73,7 @@ export interface EntityErrorFromServer {
   errorName: string;
   errorMessage: string;
   propertyName: string;
+  custom?: any;
 }
 
 /** Shape of an error on a specific entity.  Part of a [[ISaveError]] */
@@ -82,6 +83,7 @@ export interface EntityError {
   errorMessage: string;
   propertyName: string;
   isServerError: boolean;
+  custom?: any;
 }
 
 /** The shape of the Promise returned by an [[EntityManager.executeQuery]] call. */
@@ -1668,7 +1670,7 @@ function createEntityErrors(entities: Entity[]) {
       let cfg = core.extend({
         entity: entity,
         errorName: ve.validator.name
-      }, ve, ["errorMessage", "propertyName", "isServerError"]) as EntityError;
+      }, ve, ["errorMessage", "propertyName", "isServerError", "custom"]) as EntityError;
       entityErrors.push(cfg);
     });
   });
@@ -1708,7 +1710,7 @@ function processServerErrors(saveContext: SaveContext, saveError: SaveErrorFromS
     let entityError = core.extend({
       entity: entity,
       isServerError: true
-    }, serr, ["errorName", "errorMessage", "propertyName"]) as EntityError;
+    }, serr, ["errorName", "errorMessage", "propertyName", "custom"]) as EntityError;
     return entityError;
   });
   // converting ISaveErrorFromServer -> ISaveError 

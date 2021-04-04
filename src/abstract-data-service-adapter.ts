@@ -308,7 +308,8 @@ function createError(httpResponse: HttpResponse) {
         entityTypeName: MetadataStore.normalizeTypeName(e.EntityTypeName),
         keyValues: e.KeyValues,
         propertyName: e.PropertyName,
-        errorMessage: e.ErrorMessage
+        errorMessage: e.ErrorMessage,
+        custom: e.Custom
       };
     });
   }
