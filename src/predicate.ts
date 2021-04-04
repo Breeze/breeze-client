@@ -1374,6 +1374,9 @@ function combine(j1: Object, j2: Object) {
       if (combine(j1[key], j2[key]) == null) {
         return false;
       }
+    } else if (typeof (j1) !== 'object') {
+      // cannot assign to j1[key]
+      return false;
     } else {
       j1[key] = j2[key];
     }
