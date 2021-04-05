@@ -105,3 +105,11 @@ The `breeze.debug.js` file is a UMD module containing the main breeze-client cod
 That will create (or overwrite!) `../breeze.js/test/breeze/breeze.debug.js`.
 
 Then you can launch the server, navigate to the test page, and run the test suite.
+
+<hr>
+
+If you have discover a bug or missing feature, please create an issue in the [breeze-client github repo](https://github.com/Breeze/breeze-client).
+
+If you have questions about using Breeze, please ask on [Stack Overflow](https://stackoverflow.com/questions/tagged/breeze).
+
+If you need help developing your application, please contact us at [IdeaBlade](mailto:info@ideablade.com).

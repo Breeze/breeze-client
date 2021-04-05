@@ -52,3 +52,10 @@ For apps that use global JavaScript libraries, the UMD versions are still availa
     <script src="node_modules/breeze-client/bundles/breeze-client-adapter-data-service-webapi.umd.js"></script>
     <script src="node_modules/breeze-client/bundles/breeze-client-adapter-ajax-angularjs.umd.js"></script>
 
+<hr>
+
+If you have discover a bug or missing feature, please create an issue in the [breeze-client github repo](https://github.com/Breeze/breeze-client).
+
+If you have questions about using Breeze, please ask on [Stack Overflow](https://stackoverflow.com/questions/tagged/breeze).
+
+If you need help developing your application, please contact us at [IdeaBlade](mailto:info@ideablade.com).

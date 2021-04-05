@@ -34,3 +34,11 @@ See the [UPGRADE](./UPGRADE.md) document for information on upgrading from Breez
 ## Building Breeze
 
 See the [BUILD](./BUILD.md) document for instructions on building the Breeze and its API docs.
+
+<hr>
+
+If you have discover a bug or missing feature, please create an issue in the [breeze-client github repo](https://github.com/Breeze/breeze-client).
+
+If you have questions about using Breeze, please ask on [Stack Overflow](https://stackoverflow.com/questions/tagged/breeze).
+
+If you need help developing your application, please contact us at [IdeaBlade](mailto:info@ideablade.com).
