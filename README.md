@@ -29,11 +29,11 @@ See some [examples](https://github.com/Breeze/northwind-demo) of how to use bree
 
 ## Upgrading Breeze
 
-See the [UPGRADE](./UPGRADE.md) document for information on upgrading from Breeze 1.x to 2.x.
+See the [UPGRADE](https://github.com/Breeze/breeze-client/blob/master/UPGRADE.md) document for information on upgrading from Breeze 1.x to 2.x.
 
 ## Building Breeze
 
-See the [BUILD](./BUILD.md) document for instructions on building the Breeze and its API docs.
+See the [BUILD](https://github.com/Breeze/breeze-client/blob/master/BUILD.md) document for instructions on building the Breeze and its API docs.
 
 <hr>
 
