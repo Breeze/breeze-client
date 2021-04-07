@@ -25,7 +25,7 @@
     "build": "npm run clean && npm run packagr && npm pack ./dist && npm run install-to-spec",
     "clean": "rimraf temp && rimraf src/*.js* && rimraf src/*.d.ts && rimraf ./*.d.ts && rimraf dist && rimraf node_modules/breeze-client.js",
     "install-to-spec": "cd spec && npm install ../breeze-client-2.0.9.tgz",
-    "publish": "npm publish --tag latest ./dist",
+    "publish": "node tools/unprivate.js && npm publish --tag latest ./dist",
     "tsc": "tsc",
     "watch-tsc": "tsc -w",
     "typedoc": "typedoc --out ./temp/docs/ --exclude xx  --excludePrivate --excludeNotExported  --tsConfig ./tsconfig.typedoc.json --mode file --readme ./readme.doc.md ./src/breeze.ts && node tools/copyIfDifferent.js temp/docs docs ",
@@ -47,6 +47,10 @@
     "Steve Schmitt",
     "Marcel Good",
     "Ward Bell"
+  ],
+  "keywords": [
+    "breeze", "breezejs", "spa", "data binding", "change tracking", "query", "linq", "cache", "graph", "graphql", "angular", "angularjs",
+    "react", "vue", "aurelia", "relational", "orm", "entity", "model"
   ],
   "license": "MIT",
   "bugs": {
