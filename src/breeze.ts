@@ -171,8 +171,8 @@ export const breeze = {
 // breeze.assertConfig = assertConfig as any;
 // breeze.assertParam = assertParam as any;
 
-// no-op for backward compatibility with breeze-bridge2-angular
 export namespace promises {
+  /** no-op for backward compatibility with breeze-bridge2-angular */
   export interface IPromiseService {}
 }
 

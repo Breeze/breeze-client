@@ -9,7 +9,7 @@ See <a href="http://breeze.github.io/doc-js/release-notes.html" target="_blank">
 
 ## Introduction
 
-If this is your first time browsing the API, you might want to start with the <a href="/api-docs/classes/entitymanager.html">EntityManager</a> as this is the core class in Breeze.
+If this is your first time browsing the API, you might want to start with the <a href="/doc-js/api-docs/classes/entitymanager.html">EntityManager</a> as this is the core class in Breeze.
 
 <a href="http://breeze.github.io/doc-samples/">Sample applications</a>, <a href="http://www.youtube.com/playlist?list=PL88C2B43249433416&feature=plcp" target="_blank">videos</a>, and <a href="http://breeze.github.io/doc-js">additional documentation</a> are also available.
 
