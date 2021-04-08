@@ -1,6 +1,6 @@
 {
   "name": "breeze-client",
-  "version": "2.0.10",
+  "version": "2.0.11",
   "private": true,
   "description": "Breeze data management for JavaScript clients",
   "repository": "https://github.com/Breeze/breeze-client.git",
@@ -25,7 +25,7 @@
   "scripts": {
     "build": "npm run clean && npm run packagr && rimraf dist/spec && npm run downlevel-dts && npm pack ./dist && npm run install-to-spec",
     "clean": "rimraf temp && rimraf src/*.js* && rimraf src/*.d.ts && rimraf ./*.d.ts && rimraf dist && rimraf node_modules/breeze-client.js",
-    "install-to-spec": "cd spec && npm install ../breeze-client-2.0.10.tgz",
+    "install-to-spec": "cd spec && npm install ../breeze-client-2.0.11.tgz",
     "publish": "node tools/unprivate.js && npm publish --tag latest ./dist",
     "tsc": "tsc",
     "watch-tsc": "tsc -w",
