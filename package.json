@@ -12,22 +12,24 @@
     "@angular/core": "~9.1.0",
     "@types/node": "^12.12.26",
     "canonical-path": "^1.0.0",
+    "downlevel-dts": "^0.7.0",
     "fs-extra": "^9.0.1",
     "ng-packagr": "^9.1.5",
     "rimraf": "^3.0.2",
     "rxjs": "^6.6.6",
+    "tslib": "^1.10",
     "tslint": "^6.1.3",
     "typedoc": "^0.18.0",
-    "typescript": "~3.8",
-    "tslib": "^1.10"
+    "typescript": "~3.8"
   },
   "scripts": {
-    "build": "npm run clean && npm run packagr && rimraf dist/spec && npm pack ./dist && npm run install-to-spec",
+    "build": "npm run clean && npm run packagr && rimraf dist/spec && npm run downlevel-dts && npm pack ./dist && npm run install-to-spec",
     "clean": "rimraf temp && rimraf src/*.js* && rimraf src/*.d.ts && rimraf ./*.d.ts && rimraf dist && rimraf node_modules/breeze-client.js",
     "install-to-spec": "cd spec && npm install ../breeze-client-2.0.10.tgz",
     "publish": "node tools/unprivate.js && npm publish --tag latest ./dist",
     "tsc": "tsc",
     "watch-tsc": "tsc -w",
+    "downlevel-dts": "downlevel-dts ./dist ./dist",
     "typedoc": "typedoc --out ./temp/docs/ --exclude xx  --excludePrivate --excludeNotExported  --tsConfig ./tsconfig.typedoc.json --mode file --readme ./readme.doc.md ./src/breeze.ts && node tools/copyIfDifferent.js temp/docs docs ",
     "packagr": "ng-packagr -p package.json",
     "copy-to-breezejs": "node tools/copy-to-breezejs.js"
@@ -49,8 +51,25 @@
     "Ward Bell"
   ],
   "keywords": [
-    "breeze", "breezejs", "spa", "data binding", "change tracking", "query", "linq", "cache", "graph", "graphql", "angular", "angularjs",
-    "react", "vue", "aurelia", "relational", "orm", "entity", "model"
+    "breeze",
+    "breezejs",
+    "spa",
+    "data binding",
+    "change tracking",
+    "query",
+    "linq",
+    "cache",
+    "graph",
+    "graphql",
+    "angular",
+    "angularjs",
+    "react",
+    "vue",
+    "aurelia",
+    "relational",
+    "orm",
+    "entity",
+    "model"
   ],
   "license": "MIT",
   "bugs": {
