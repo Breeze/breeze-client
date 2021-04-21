@@ -1316,7 +1316,7 @@ let toJSONVisitor = {
     let json: Object | undefined;
     // normalizeAnd clauses if possible.
     // passthru predicate will appear as string and their 'ands' can't be 'normalized'
-    if (this.op!.key === 'and' && predVals.length === 2 && !predVals.some((v) => typeof(v) === 'string')) {
+    if (this.op!.key === 'and' && predVals.length === 2 && !predVals.some((v) => v.or || typeof(v) === 'string')) {
       // normalize 'and' clauses - will return null if can't be combined.
       json = predVals.reduce(combine);
     }
