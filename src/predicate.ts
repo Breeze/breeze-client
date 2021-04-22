@@ -218,6 +218,12 @@ export class Predicate {
   //   }
   // };
 
+  static extendFuncMap (funcMap: {[key: string]: {fn: (...args: any[]) => any, dataType: DataType}}): void {
+    for (let func in (funcMap || {})) {
+      let config = funcMap[func];
+      FnExpr._funcMap[func] = config;
+    }
+  };
 
   /**
   'And's this Predicate with one or more other Predicates and returns a new 'composite' Predicate
