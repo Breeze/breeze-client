@@ -15,6 +15,7 @@ export interface InterfaceRegistryConfig {
     uriBuilder?: InterfaceDef<UriBuilderAdapter>;
 }
 
+/** Registers adapters used by Breeze */
 export class InterfaceRegistry {
     ajax = new InterfaceDef<AjaxAdapter>("ajax");
     modelLibrary = new InterfaceDef<ModelLibraryAdapter>("modelLibrary");
@@ -76,7 +77,9 @@ config.initializeAdapterInstances = function (irConfig: InterfaceRegistryConfig)
 /** DataServiceAdapter Ajax request configuration */
 export interface AjaxConfig {
     url: string;
+    /** GET, POST, etc. */
     type?: string;
+    /** json, etc. */
     dataType?: string;
     contentType?: string;
     crossDomain?: string | boolean;
@@ -87,10 +90,31 @@ export interface AjaxConfig {
     error: (res: (HttpResponse | Error)) => void;
 }
 
-export interface AjaxAdapter extends BaseAdapter {
-    ajax(config: AjaxConfig): void;
+/** Request sent by AjaxAdapter */
+export interface AjaxRequest {
+    /** AjaxAdapter that initiated the request */
+    adapter: AjaxAdapter;
+    /** Request configuration */
+    config: RequestInit;
+    /** config from the DataServiceAdapter that called the AjaxAdapter */
+    dsaConfig: AjaxConfig;
+    /** Function called on response error */
+    error: (status: number, statusText: string, body: string, response: Response, errorThrown: any) => void;
+    /** Function called on response success */
+    success: (data: any, statusText: string, response: Response) => void;
 }
 
+/** Handles AJAX requests to server */
+export interface AjaxAdapter extends BaseAdapter {
+    /** Function that performs the ajax request and calls the success or error function */
+    ajax(config: AjaxConfig): void;
+    /** Container for headers to be added to each request */
+    defaultSettings: { headers?: { [name: string]: string } };
+    /** Function to allow manipulating the request before sending */
+    requestInterceptor?: (req: AjaxRequest) => void;
+}
+
+/** Adapts breeze change-tracking to the UI framework */
 export interface ModelLibraryAdapter extends BaseAdapter {
     getTrackablePropertyNames: (entity: any) => string[];
     initializeEntityPrototype(proto: Object): void;
@@ -98,6 +122,7 @@ export interface ModelLibraryAdapter extends BaseAdapter {
     createCtor?: Function;
 }
 
+/** Reshapes data moving between breeze and server */
 export interface DataServiceAdapter extends BaseAdapter {
     fetchMetadata(metadataStore: MetadataStore, dataService: DataService): Promise<any>;  // result of Promise is either rawMetadata or a string explaining why not.
     executeQuery(mappingContext: MappingContext): Promise<QueryResult>;   // result of executeQuery will get passed to JsonResultsAdapter extractResults method
@@ -106,8 +131,14 @@ export interface DataServiceAdapter extends BaseAdapter {
     jsonResultsAdapter: JsonResultsAdapter;
 }
 
+/** Function called by AjaxAdapter before sending request */
+export interface AjaxRequestInterceptor {
+    (req: AjaxRequest) : void;
+    /** Whether to remove the interceptor after it is called */
+    oneTime: boolean;
+}
 
-
+/** Builds URI for performing queries.  Serializes the EntityQuery according to the URI syntax. */
 export interface UriBuilderAdapter extends BaseAdapter {
     buildUri(query: EntityQuery, metadataStore: MetadataStore): string;
 }
@@ -118,6 +149,7 @@ export interface ChangeRequestInterceptorCtor {
     new (saveContext: SaveContext, saveBundle: SaveBundle): ChangeRequestInterceptor;
 }
 
+/** Allows manipulating data in DataServiceAdapter before sending to server */
 export interface ChangeRequestInterceptor {
     oneTime?: boolean;
     /**

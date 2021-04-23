@@ -1,12 +1,11 @@
-﻿import * as breeze from 'breeze-client';
+﻿import { AjaxAdapter, AjaxConfig, AjaxRequestInterceptor, BreezeConfig, config, core } from 'breeze-client';
 
 declare var jQuery: any;
-let core = breeze.core;
 
-export class AjaxJQueryAdapter implements breeze.AjaxAdapter {
+export class AjaxJQueryAdapter implements AjaxAdapter {
   name: string;
-  defaultSettings: { headers?: any };
-  requestInterceptor?: (() => breeze.ChangeRequestInterceptor) | breeze.ChangeRequestInterceptor;
+  defaultSettings: { headers?: { [name: string]: string } };
+  requestInterceptor?: AjaxRequestInterceptor;
   jQuery: any;
 
   constructor() {
@@ -15,10 +14,10 @@ export class AjaxJQueryAdapter implements breeze.AjaxAdapter {
     this.requestInterceptor = undefined;
   }
 
-  static register(config?: breeze.BreezeConfig) {
-    config = config || breeze.config;
-    config.registerAdapter("ajax", AjaxJQueryAdapter);
-    return config.initializeAdapterInstance("ajax", "jQuery", true) as AjaxJQueryAdapter;
+  static register(breezeConfig?: BreezeConfig) {
+    breezeConfig = breezeConfig || config;
+    breezeConfig.registerAdapter("ajax", AjaxJQueryAdapter);
+    return breezeConfig.initializeAdapterInstance("ajax", "jQuery", true) as AjaxJQueryAdapter;
   }
 
   initialize() {
@@ -29,7 +28,7 @@ export class AjaxJQueryAdapter implements breeze.AjaxAdapter {
     }
   }
 
-  ajax(config: breeze.AjaxConfig) {
+  ajax(config: AjaxConfig) {
     if (!this.jQuery) {
       throw new Error("Unable to locate jQuery");
     }
@@ -104,7 +103,7 @@ export class AjaxJQueryAdapter implements breeze.AjaxAdapter {
   }
 }
 
-breeze.config.registerAdapter("ajax", AjaxJQueryAdapter);
+config.registerAdapter("ajax", AjaxJQueryAdapter);
 
 function getHeadersFn(jqXHR: XMLHttpRequest): any {
   if (jqXHR.status === 0) { // timeout or abort; no headers

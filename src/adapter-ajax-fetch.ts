@@ -1,16 +1,14 @@
-﻿import * as breeze from 'breeze-client';
+﻿import { AjaxAdapter, AjaxConfig, AjaxRequestInterceptor, BreezeConfig, config, core } from 'breeze-client';
 import { appendQueryStringParameter, encodeParams } from './adapter-core';
-
-let core = breeze.core;
 
 /** Breeze AJAX adapter using fetch API 
  * See https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
 */
-export class AjaxFetchAdapter implements breeze.AjaxAdapter {
+export class AjaxFetchAdapter implements AjaxAdapter {
   static adapterName = "fetch";
   name: string;
-  defaultSettings: { headers?: any };
-  requestInterceptor?: (() => breeze.ChangeRequestInterceptor) | breeze.ChangeRequestInterceptor;
+  defaultSettings: { headers?: { [name: string]: string } };
+  requestInterceptor?: AjaxRequestInterceptor;
 
   constructor() {
     this.name = AjaxFetchAdapter.adapterName;
@@ -18,16 +16,16 @@ export class AjaxFetchAdapter implements breeze.AjaxAdapter {
     this.requestInterceptor = undefined;
   }
 
-  static register(config?: breeze.BreezeConfig) {
-    config = config || breeze.config;
-    config.registerAdapter("ajax", AjaxFetchAdapter);
-    return config.initializeAdapterInstance("ajax", AjaxFetchAdapter.adapterName, true) as AjaxFetchAdapter;
+  static register(breezeConfig?: BreezeConfig) {
+    breezeConfig = breezeConfig || config;
+    breezeConfig.registerAdapter("ajax", AjaxFetchAdapter);
+    return breezeConfig.initializeAdapterInstance("ajax", AjaxFetchAdapter.adapterName, true) as AjaxFetchAdapter;
   }
 
   initialize() {
   }
 
-  ajax(config: breeze.AjaxConfig) {
+  ajax(config: AjaxConfig) {
     if (!fetch) {
       throw new Error("fetch API not supported in this browser");
     }
@@ -127,7 +125,7 @@ export class AjaxFetchAdapter implements breeze.AjaxAdapter {
   }
 }
 
-breeze.config.registerAdapter("ajax", AjaxFetchAdapter);
+config.registerAdapter("ajax", AjaxFetchAdapter);
 
 function getHeadersFn(response: Response): any {
   if (!response || response.status === 0) { // timeout or abort; no headers

@@ -1,12 +1,10 @@
-﻿import * as breeze from 'breeze-client';
+﻿import { AjaxAdapter, AjaxRequestInterceptor, BreezeConfig, config, core } from 'breeze-client';
 import { appendQueryStringParameter, encodeParams } from './adapter-core';
 
-let core = breeze.core;
-
-export class AjaxAngularjsAdapter implements breeze.AjaxAdapter {
+export class AjaxAngularjsAdapter implements AjaxAdapter {
   name: string;
-  defaultSettings: { headers?: any };
-  requestInterceptor?: (() => breeze.ChangeRequestInterceptor) | breeze.ChangeRequestInterceptor;
+  defaultSettings: { headers?: { [name: string]: string } };
+  requestInterceptor?: AjaxRequestInterceptor;
   $http: any;
   $rootScope: any;
   constructor() {
@@ -18,15 +16,15 @@ export class AjaxAngularjsAdapter implements breeze.AjaxAdapter {
     //   this.$rootScope;
   }
 
-  static register(config?: breeze.BreezeConfig) {
-    config = config || breeze.config;
-    config.registerAdapter("ajax", AjaxAngularjsAdapter);
-    return config.initializeAdapterInstance("ajax", "angularjs", true) as AjaxAngularjsAdapter;
+  static register(breezeConfig?: BreezeConfig) {
+    breezeConfig = breezeConfig || config;
+    breezeConfig.registerAdapter("ajax", AjaxAngularjsAdapter);
+    return breezeConfig.initializeAdapterInstance("ajax", "angularjs", true) as AjaxAngularjsAdapter;
   }
 
   initialize() {
 
-    let ng = breeze.core.requireLib("angular");
+    let ng = core.requireLib("angular");
     if (ng) {
       let $injector = ng.injector(['ng']);
       let http: any, rootScope: any;
@@ -150,4 +148,4 @@ export class AjaxAngularjsAdapter implements breeze.AjaxAdapter {
   }
 }
 
-breeze.config.registerAdapter("ajax", AjaxAngularjsAdapter);
+config.registerAdapter("ajax", AjaxAngularjsAdapter);

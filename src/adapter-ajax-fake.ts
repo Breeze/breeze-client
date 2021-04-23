@@ -1,29 +1,28 @@
-import * as breeze from 'breeze-client';
-
-let core = breeze.core;
+import { AjaxAdapter, AjaxConfig, AjaxRequestInterceptor, BreezeConfig, config, core } from 'breeze-client';
 
 /** Simulates sending ajax to server and getting empty response.  For testing. */
-export class AjaxFakeAdapter implements breeze.AjaxAdapter {
+export class AjaxFakeAdapter implements AjaxAdapter {
   name: string;
-  requestInterceptor?: (() => breeze.ChangeRequestInterceptor) | breeze.ChangeRequestInterceptor;
+  defaultSettings: { headers?: { [name: string]: string } };
+  requestInterceptor?: AjaxRequestInterceptor;
   /** Provides return values for requests.  Used for testing. */
-  responseFn: (ajaxConfig: breeze.AjaxConfig) => any;
+  responseFn: (ajaxConfig: AjaxConfig) => any;
 
   constructor() {
     this.name = "ajaxfake";
     this.requestInterceptor = undefined;
   }
 
-  static register(config?: breeze.BreezeConfig) {
-    config = config || breeze.config;
-    config.registerAdapter("ajax", AjaxFakeAdapter);
-    return config.initializeAdapterInstance("ajax", "ajaxfake", true) as AjaxFakeAdapter;
+  static register(breezeConfig?: BreezeConfig) {
+    breezeConfig = breezeConfig || config;
+    breezeConfig.registerAdapter("ajax", AjaxFakeAdapter);
+    return breezeConfig.initializeAdapterInstance("ajax", "ajaxfake", true) as AjaxFakeAdapter;
   }
 
   initialize() {
   }
 
-  ajax(config: breeze.AjaxConfig) {
+  ajax(config: AjaxConfig) {
     let responseFn = this.responseFn;
 
     let requestInfo = {
@@ -96,7 +95,7 @@ export class AjaxFakeAdapter implements breeze.AjaxAdapter {
   }
 }
 
-breeze.config.registerAdapter("ajax", AjaxFakeAdapter);
+config.registerAdapter("ajax", AjaxFakeAdapter);
 
 function getHeadersFn(xhr: XMLHttpRequest): any {
   return function (headerName: string) {

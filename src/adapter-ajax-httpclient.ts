@@ -1,13 +1,13 @@
 ﻿import { HttpClient, HttpErrorResponse, HttpEvent, HttpHeaders, HttpRequest, HttpResponse } from "@angular/common/http";
-import { AjaxConfig, config, core, HttpResponse as BreezeHttpResponse, BreezeConfig } from "breeze-client";
+import { AjaxConfig, config, core, HttpResponse as BreezeHttpResponse, BreezeConfig, AjaxRequestInterceptor, AjaxAdapter } from "breeze-client";
 import { filter, map } from "rxjs/operators";
 import { appendQueryStringParameter, encodeParams } from "./adapter-core";
 
-export class AjaxHttpClientAdapter {
+export class AjaxHttpClientAdapter implements AjaxAdapter {
   static adapterName = 'httpclient';
   name = AjaxHttpClientAdapter.adapterName;
   defaultSettings = {};
-  requestInterceptor: (info: {}) => {};
+  requestInterceptor: AjaxRequestInterceptor;
 
   constructor(public http: HttpClient) { }
 
@@ -62,7 +62,7 @@ export class AjaxHttpClientAdapter {
     };
 
     if (core.isFunction(this.requestInterceptor)) {
-      this.requestInterceptor(requestInfo);
+      this.requestInterceptor(requestInfo as any);
       if (this.requestInterceptor['oneTime']) {
         this.requestInterceptor = null;
       }
