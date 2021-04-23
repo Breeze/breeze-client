@@ -1,6 +1,8 @@
 ﻿import { core } from './core';
 import { assertParam } from './assert-param';
 import { config } from './config';
+import { NavigationProperty, DataProperty } from './entity-metadata';
+import { Entity } from './entity-aspect';
 
 export const INT16_MIN = -32768;
 export const INT16_MAX = 32767;
@@ -11,14 +13,25 @@ export const INT32_MAX = 2147483647;
 export const BYTE_MIN = 0;
 export const BYTE_MAX = 255;
 
+/** Passed to ValidationFn */
 export interface ValidationContext {
-  property?: any;
+  entity?: Entity;
+  property?: DataProperty | NavigationProperty;
   propertyName?: string;
   value?: any;
 }
 
+/** Used by Validator to compose messages */
+export interface ValidationMessageContext extends ValidationContext {
+  name: string;
+  displayName: string;
+  messageTemplate: string;
+  message?: string | ((vc: ValidationContext) => string);
+}
+
+/** Function called to validate an entity or property */
 export interface ValidationFn {
-    (value: any, context?: any): boolean;
+    (value: any, context?: ValidationContext): boolean;
 }
 
 // add common props and methods for every validator 'context' here.
@@ -174,15 +187,15 @@ export class Validator {
 
   name: string;
   valFn: ValidationFn;
-  context: ValidationContext;
-  currentContext: any;
-  private _baseContext: any;
+  context: ValidationMessageContext;
+  currentContext: ValidationMessageContext;
+  private _baseContext: ValidationMessageContext;
 
-  constructor(name: string, valFn: ValidationFn, context?: any) {
+  constructor(name: string, valFn: ValidationFn, context?: ValidationMessageContext) {
     // _baseContext is what will get serialized
-    this._baseContext = context || {};
+    this._baseContext = context || {} as ValidationMessageContext;
     this._baseContext.name = name;
-    context = core.extend(Object.create(rootContext), this._baseContext);
+    context = core.extend(Object.create(rootContext), this._baseContext) as ValidationMessageContext;
     context.messageTemplate = context.messageTemplate || Validator.messageTemplates[name];
     this.name = name;
     this.valFn = valFn;
@@ -229,10 +242,10 @@ export class Validator {
   can make use of.
   @return {ValidationError|null} A ValidationError if validation fails, null otherwise
   **/
-  validate(value: any, additionalContext?: any) {
-    let currentContext: ValidationContext; // { value?: Object };
+  validate(value: any, additionalContext?: ValidationMessageContext) {
+    let currentContext: ValidationMessageContext; // { value?: Object };
     if (additionalContext) {
-      currentContext = core.extend(Object.create(this.context), additionalContext);
+      currentContext = core.extend(Object.create(this.context), additionalContext) as ValidationMessageContext;
     } else {
       currentContext = this.context;
     }
@@ -947,7 +960,7 @@ export class ValidationError {
   propertyName: string;
   isServerError: boolean;
 
-  constructor(validator: Validator | null, context: any, errorMessage: string, key?: string) {
+  constructor(validator: Validator | null, context: ValidationContext, errorMessage: string, key?: string) {
     // Error is with isInstanceOf(Validator)
     assertParam(validator, "validator").isOptional().isInstanceOf(Validator).check();
     assertParam(errorMessage, "errorMessage").isNonEmptyString().check();
