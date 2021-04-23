@@ -13,7 +13,7 @@ import { EntityKey } from './entity-key';
 import { EntityManager, EntityManagerConfig, EntityError, EntityChangedEventArgs, SaveContext, SaveBundle, HttpResponse, KeyMapping, ServerError, SaveResult, QueryResult, ValidationErrorsChangedEventArgs, HasChangesChangedEventArgs } from './entity-manager';
 import { EntityQuery, FilterQueryOp, BooleanQueryOp, OrderByClause, ExpandClause, SelectClause } from './entity-query';
 import { EntityState } from './entity-state';
-import { InterfaceRegistry, AjaxAdapter, AjaxConfig, DataServiceAdapter, ModelLibraryAdapter, ChangeRequestInterceptor, UriBuilderAdapter, InterfaceRegistryConfig } from './interface-registry';
+import { InterfaceRegistry, AjaxAdapter, AjaxConfig, DataServiceAdapter, ModelLibraryAdapter, ChangeRequestInterceptor, UriBuilderAdapter, InterfaceRegistryConfig, AjaxRequestInterceptor } from './interface-registry';
 import { KeyGenerator } from './key-generator';
 import { LocalQueryComparisonOptions } from './local-query-comparison-options';
 import { MappingContext } from './mapping-context';
@@ -37,6 +37,7 @@ export {
   AbstractDataServiceAdapter,
   AjaxAdapter,
   AjaxConfig,
+  AjaxRequestInterceptor,
   AndOrPredicate,
   AnyAllPredicate,
   ArrayChangedArgs,

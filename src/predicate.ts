@@ -1355,6 +1355,10 @@ let toJSONVisitor = {
 
   propExpr: function (this: PropExpr, context: VisitContext) {
     if (context.toNameOnServer) {
+      if (!context.entityType) {
+        console.warn(`No EntityType for propertyPath "${this.propertyPath}".  ${core.strings.TO_TYPE}`);
+        return this.propertyPath;
+      }
       return context.entityType!.clientPropertyPathToServer(this.propertyPath);
     } else {
       return this.propertyPath;

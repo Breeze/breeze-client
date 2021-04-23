@@ -682,6 +682,12 @@ if (!Object.create) {
     };
 }
 
+// strings for error messages
+
+const strings = {
+    "TO_TYPE": "Add 'EntityQuery.toType()' to your query, or call 'MetadataStore.setEntityTypeForResourceName()' to register an EntityType for this resourceName."
+}
+
 // // not all methods above are exported
 export const core = {
     isES5Supported: isES5Supported,
@@ -739,6 +745,8 @@ export const core = {
     toJson: toJson,
     toJSONSafe: toJSONSafe,
     toJSONSafeReplacer: toJSONSafeReplacer,
+
+    strings: strings
 };
 
 export interface ErrorCallback {
