@@ -2119,8 +2119,11 @@ export class DataProperty {
           this.defaultValue = "AAAAAAAAJ3U="; // hack for all binary fields but value is specifically valid for timestamp fields - arbitrary valid 8 byte base64 value.
         } else {
           this.defaultValue = (this.dataType as any).defaultValue;
-          if (this.defaultValue == null) {
-            throw new Error("A nonnullable DataProperty cannot have a null defaultValue. Name: " + (this.name || this.nameOnServer));
+          const msg = "A nonnullable DataProperty cannot have a null defaultValue. Name: " + (this.name || this.nameOnServer);
+          if (this.defaultValue === null) {
+            throw new Error(msg);  // if defaultValue is explicity set to null, that's an error
+          } else {
+            console.warn(msg);  // if defaultValue is not set, that's a warning
           }
         }
       }
