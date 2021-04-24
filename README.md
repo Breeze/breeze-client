@@ -19,6 +19,8 @@ Client-side querying, caching, dynamic object graphs, change tracking and notifi
 
 See the [docs](http://breeze.github.io/doc-js/features.html) for more info about what Breeze does and how to use it.
 
+Set the [release notes](http://breeze.github.io/doc-js/release-notes.html) for changes in the latest version.
+
 ## Install from npm
 
     npm install breeze-client

@@ -2122,7 +2122,7 @@ export class DataProperty {
           const msg = "A nonnullable DataProperty cannot have a null defaultValue. Name: " + (this.name || this.nameOnServer);
           if (this.defaultValue === null) {
             throw new Error(msg);  // if defaultValue is explicity set to null, that's an error
-          } else {
+          } else if (this.defaultValue == null) {
             console.warn(msg);  // if defaultValue is not set, that's a warning
           }
         }
