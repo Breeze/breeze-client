@@ -2299,7 +2299,9 @@ export class NavigationProperty {
   /** The server side names of the foreign key DataProperties associated with this NavigationProperty. There will usually only be a single DataProperty associated
   with a Navigation property except in the case of entities with multipart keys. __Read Only__ */
   foreignKeyNamesOnServer: string[];
+  /** The names of the foreign key DataProperties at the other end of the relationship. __Read Only__ */
   invForeignKeyNames: string[];
+  /** The server side names of the foreign key DataProperties at the other end of the relationship. __Read Only__ */
   invForeignKeyNamesOnServer: string[];
   /** The 'foreign key' DataProperties associated with this NavigationProperty. There will usually only be a single DataProperty associated
   with a Navigation property except in the case of entities with multipart keys. __Read Only__ */
