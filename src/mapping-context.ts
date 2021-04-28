@@ -259,7 +259,7 @@ function mergeEntity(mc: MappingContext, node: any, meta: NodeMeta) {
   let isSaving = mc.query == null;
 
   let entityKey = entityType.getEntityKeyFromRawEntity(node, mc.rawValueFn);
-  let targetEntity = em.findEntityByKey(entityKey);
+  let targetEntity = em.getEntityByKey(entityKey);
   if (targetEntity) {
     if (isSaving && targetEntity.entityAspect.entityState.isDeleted()) {
       em.detachEntity(targetEntity);

@@ -1128,7 +1128,7 @@ export class EntityManager {
       deletedKeys.forEach(key => {
         let entityType = em.metadataStore._getStructuralType(key.entityTypeName) as EntityType;
         let ekey = new EntityKey(entityType, key.keyValues);
-        let entity = em.findEntityByKey(ekey);
+        let entity = em.getEntityByKey(ekey);
         if (entity) {
           entity.entityAspect.setDetached();
         }
@@ -1588,7 +1588,7 @@ export class EntityManager {
           // check for empty keys - meaning that parent id's are not yet set.
           if (parentKey._isEmpty()) return;
           // if a child - look for parent in the em cache
-          let parent = em.findEntityByKey(parentKey);
+          let parent = em.getEntityByKey(parentKey);
           if (parent) {
             // if found hook it up
             entity.setProperty(np.name, parent);
@@ -1606,7 +1606,7 @@ export class EntityManager {
         // unidirectional fk props only
         let fkValue = entity.getProperty(fkProp.name);
         let parentKey = new EntityKey(invNp.parentType, [fkValue]);
-        let parent = em.findEntityByKey(parentKey);
+        let parent = em.getEntityByKey(parentKey);
 
         if (parent) {
           if (invNp.isScalar) {
@@ -1690,7 +1690,7 @@ function processServerErrors(saveContext: SaveContext, saveError: SaveErrorFromS
     if (serr.keyValues) {
       entityType = metadataStore._getStructuralType(serr.entityTypeName) as EntityType;
       let ekey = new EntityKey(entityType, serr.keyValues);
-      entity = entityManager.findEntityByKey(ekey);
+      entity = entityManager.getEntityByKey(ekey);
     }
 
     if (entityType && entity) {
