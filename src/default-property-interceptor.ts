@@ -4,6 +4,7 @@ import { EntityKey } from './entity-key';
 import { EntityAspect, ComplexAspect, Entity, StructuralObject } from './entity-aspect';
 import { EntityState } from './entity-state';
 import { EntityAction } from './entity-action';
+import { EntityQuery } from './entity-query';
 
 /** @hidden @internal */
 export function defaultPropertyInterceptor(this: StructuralObject, property: EntityProperty, newValue: any, rawAccessorFn: Function) {
@@ -130,7 +131,7 @@ function setDpValueSimple(context: IContext, rawAccessorFn: any) {
       }
     });
     let newKey = new EntityKey(entityType, values);
-    if (entityManager.findEntityByKey(newKey)) {
+    if (entityManager.getEntityByKey(newKey)) {
       throw new Error("An entity with this key is already in the cache: " + newKey.toString());
     }
     let oldKey = (parent as Entity).entityAspect.getKey();
@@ -154,14 +155,29 @@ function setDpValueSimple(context: IContext, rawAccessorFn: any) {
     //    ==> (see set navProp above)
 
     if (newValue != null) {
-      let key = new EntityKey(relatedNavProp.entityType, [newValue]);
-      let relatedEntity = entityManager.findEntityByKey(key);
+      let relatedEntity: Entity;
+      let key: EntityKey;
+      if (relatedNavProp.invForeignKeyNames.length) {
+        // property is related by field which is not the PK
+        const query = new EntityQuery(relatedNavProp.entityType.defaultResourceName).where(relatedNavProp.invForeignKeyNames[0], 'eq', newValue);
+        const qresult = entityManager.executeQueryLocally(query);
+        if (qresult.length === 1) {
+          relatedEntity = qresult[0];
+        }
+      } else {
+        // property is related by the PK
+        key = new EntityKey(relatedNavProp.entityType, [newValue]);
+        relatedEntity = entityManager.getEntityByKey(key);
+      }
 
       if (relatedEntity) {
         parent.setProperty(relatedNavProp.name, relatedEntity);
       } else {
         // it may not have been fetched yet in which case we want to add it as an unattachedChild.
-        entityManager._unattachedChildrenMap.addChild(key, relatedNavProp, parent as Entity);
+        if (key) {
+          // TODO currently _linkRelatedentities only works with PK relations, so we only add those.
+          entityManager._unattachedChildrenMap.addChild(key, relatedNavProp, parent as Entity);
+        }
         parent.setProperty(relatedNavProp.name, null);
       }
     } else {
@@ -188,7 +204,7 @@ function setDpValueSimple(context: IContext, rawAccessorFn: any) {
 
     if (oldValue != null) {
       let key = new EntityKey(invNavProp.parentType, [oldValue]);
-      let relatedEntity = entityManager.findEntityByKey(key);
+      let relatedEntity = entityManager.getEntityByKey(key);
       if (relatedEntity) {
         if (invNavProp.isScalar) {
           relatedEntity.setProperty(invNavProp.name, null);
@@ -203,7 +219,7 @@ function setDpValueSimple(context: IContext, rawAccessorFn: any) {
 
     if (newValue != null) {
       let key = new EntityKey(invNavProp.parentType, [newValue]);
-      let relatedEntity = entityManager.findEntityByKey(key);
+      let relatedEntity = entityManager.getEntityByKey(key);
 
       if (relatedEntity) {
         if (invNavProp.isScalar) {
@@ -421,12 +437,18 @@ function setNpValue(context: IContext, rawAccessorFn: Function) {
     // if either side of nav prop is detached don't clear fks. Note: oldValue in next line cannot be null so no check is needed.
     if (newValue == null && (entityState.isDetached() || oldValue.entityAspect.entityState.isDetached())) return;
     if (entityState.isDeleted()) return;
-    let inverseKeyProps = property.entityType.keyProperties;
+
+    // we may have inverse props indicating the related prop on the other entity, if it is not the other entity's PK
+    let inverseKeyProps = property.invForeignKeyNames;
+    if (!(inverseKeyProps && inverseKeyProps.length)) {
+      // otherwise, this prop is related to the other entity's PK
+      inverseKeyProps = property.entityType.keyProperties.map(k => k.name);
+    }
     inverseKeyProps.forEach(function (keyProp, i) {
       let relatedDataProp = property.relatedDataProperties[i];
       // Do not trash related property if it is part of that entity's key
       if (newValue || !relatedDataProp.isPartOfKey) {
-        let relatedValue = newValue ? newValue.getProperty(keyProp.name) : relatedDataProp.defaultValue;
+        let relatedValue = newValue ? newValue.getProperty(keyProp) : relatedDataProp.defaultValue;
         parent.setProperty(relatedDataProp.name, relatedValue);
       }
     });

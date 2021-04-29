@@ -1128,7 +1128,7 @@ export class EntityManager {
       deletedKeys.forEach(key => {
         let entityType = em.metadataStore._getStructuralType(key.entityTypeName) as EntityType;
         let ekey = new EntityKey(entityType, key.keyValues);
-        let entity = em.findEntityByKey(ekey);
+        let entity = em.getEntityByKey(ekey);
         if (entity) {
           entity.entityAspect.setDetached();
         }
@@ -1588,14 +1588,33 @@ export class EntityManager {
           // check for empty keys - meaning that parent id's are not yet set.
           if (parentKey._isEmpty()) return;
           // if a child - look for parent in the em cache
-          let parent = em.findEntityByKey(parentKey);
-          if (parent) {
-            // if found hook it up
-            entity.setProperty(np.name, parent);
+          if (np.invForeignKeyNames.length) {
+            // np relates to non-PK property of parent entity
+            const query = new EntityQuery(parentKey.entityType.defaultResourceName).where(np.invForeignKeyNames[0], 'eq', parentKey.values[0]);
+            const qresult = em.executeQueryLocally(query);
+            if (qresult.length === 1) {
+              let parent = qresult[0];
+              entity.setProperty(np.name, parent);
+            }
           } else {
-            // else add parent to unresolvedParentMap;
-            unattachedMap.addChild(parentKey, np, entity);
+            // np relates to PK of parent entity
+            let parent = em.getEntityByKey(parentKey);
+            if (parent) {
+              // if found hook it up
+              entity.setProperty(np.name, parent);
+            } else {
+              // else add parent to unresolvedParentMap;
+              unattachedMap.addChild(parentKey, np, entity);
+            }
           }
+        } else if (np.inverse && np.inverse.invForeignKeyNames.length) {
+          // np relates to non-PK property of parent entity; query entities by FK
+          const akValue = entity.getProperty(np.inverse.invForeignKeyNames[0]);
+          const query = new EntityQuery(np.entityType.defaultResourceName).where(np.invForeignKeyNames[0], 'eq', akValue);
+          const qresult = em.executeQueryLocally(query);
+          qresult.forEach((child: Entity) => {
+            child.setProperty(np.inverse.name, entity);
+          });
         }
       });
 
@@ -1606,7 +1625,7 @@ export class EntityManager {
         // unidirectional fk props only
         let fkValue = entity.getProperty(fkProp.name);
         let parentKey = new EntityKey(invNp.parentType, [fkValue]);
-        let parent = em.findEntityByKey(parentKey);
+        let parent = em.getEntityByKey(parentKey);
 
         if (parent) {
           if (invNp.isScalar) {
@@ -1690,7 +1709,7 @@ function processServerErrors(saveContext: SaveContext, saveError: SaveErrorFromS
     if (serr.keyValues) {
       entityType = metadataStore._getStructuralType(serr.entityTypeName) as EntityType;
       let ekey = new EntityKey(entityType, serr.keyValues);
-      entity = entityManager.findEntityByKey(ekey);
+      entity = entityManager.getEntityByKey(ekey);
     }
 
     if (entityType && entity) {
