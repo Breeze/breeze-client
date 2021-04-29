@@ -1588,14 +1588,33 @@ export class EntityManager {
           // check for empty keys - meaning that parent id's are not yet set.
           if (parentKey._isEmpty()) return;
           // if a child - look for parent in the em cache
-          let parent = em.getEntityByKey(parentKey);
-          if (parent) {
-            // if found hook it up
-            entity.setProperty(np.name, parent);
+          if (np.invForeignKeyNames.length) {
+            // np relates to non-PK property of parent entity
+            const query = new EntityQuery(parentKey.entityType.defaultResourceName).where(np.invForeignKeyNames[0], 'eq', parentKey.values[0]);
+            const qresult = em.executeQueryLocally(query);
+            if (qresult.length === 1) {
+              let parent = qresult[0];
+              entity.setProperty(np.name, parent);
+            }
           } else {
-            // else add parent to unresolvedParentMap;
-            unattachedMap.addChild(parentKey, np, entity);
+            // np relates to PK of parent entity
+            let parent = em.getEntityByKey(parentKey);
+            if (parent) {
+              // if found hook it up
+              entity.setProperty(np.name, parent);
+            } else {
+              // else add parent to unresolvedParentMap;
+              unattachedMap.addChild(parentKey, np, entity);
+            }
           }
+        } else if (np.inverse && np.inverse.invForeignKeyNames.length) {
+          // np relates to non-PK property of parent entity; query entities by FK
+          const akValue = entity.getProperty(np.inverse.invForeignKeyNames[0]);
+          const query = new EntityQuery(np.entityType.defaultResourceName).where(np.invForeignKeyNames[0], 'eq', akValue);
+          const qresult = em.executeQueryLocally(query);
+          qresult.forEach((child: Entity) => {
+            child.setProperty(np.inverse.name, entity);
+          });
         }
       });
 
