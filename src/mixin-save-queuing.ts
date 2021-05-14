@@ -258,7 +258,7 @@ class Deferred<T> {
 
 ////////// QueuedSaveFailedError /////////
 // Error sub-class thrown when rejecting queued saves.
-class QueuedSaveFailedError extends Error {
+export class QueuedSaveFailedError extends Error {
   name = "QueuedSaveFailedError";
   innerError: Error;
   message: string;
@@ -286,8 +286,8 @@ class QueuedSaveFailedError extends Error {
 //   queuedChanges: entities that are queued for save but
 //                  are not currently being saved
 class SaveMemo {
-  entityMemos: any;
-  queuedChanges: any[];
+  entityMemos: { [key: string]: EntityMemo };
+  queuedChanges: Entity[];
   constructor() {
     this.entityMemos = {};
     this.queuedChanges = [];
@@ -354,7 +354,7 @@ class SaveMemo {
 
       let key = this.makeEntityMemoKey(change);
       let entityMemo = entityMemos[key] || (entityMemos[key] = new EntityMemo(change));
-      entityMemo.update(change);
+      entityMemo.update();
     });
   }
 
