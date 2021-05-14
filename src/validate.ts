@@ -23,10 +23,11 @@ export interface ValidationContext {
 
 /** Used by Validator to compose messages */
 export interface ValidationMessageContext extends ValidationContext {
-  name: string;
-  displayName: string;
-  messageTemplate: string;
+  name?: string;
+  displayName?: string;
+  messageTemplate?: string;
   message?: string | ((vc: ValidationContext) => string);
+  [key:string]: any;
 }
 
 /** Function called to validate an entity or property */
