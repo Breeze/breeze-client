@@ -15,7 +15,7 @@ interface IEnd {
   role: string;
 }
 
-const RX_COLLECTION =  /Collection\((?<type>.*)\)/;
+const RX_COLLECTION =  /Collection\((.*)\)/;
 
 function parse(metadataStore: MetadataStore, schemas: any, altMetadata: any) {
 
@@ -407,7 +407,7 @@ function parseTypeNameWithSchema(entityTypeName: string, schema: any) {
 
 function getCollectionType(propertyType: string): string {
   const match = propertyType.match(RX_COLLECTION);
-  return match ? match["groups"].type : null;
+  return match ? match[1] : null;
 }
 
 function getNamespaceFor(shortName: string, schema: any) {
