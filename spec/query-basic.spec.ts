@@ -72,7 +72,7 @@ describe("Query Basics", () => {
   });
 
 
-  test("where with 'in' clause", async () => {
+  test("where with 'in' clause (strings)", async () => {
     expect.assertions(3);
     const em1 = TestFns.newEntityManager();
 
@@ -87,6 +87,24 @@ describe("Query Basics", () => {
       return countries.indexOf(cust.getProperty("country")) >= 0;
     });
     expect(isOk).toBe(true);
+
+    const r2 = em1.executeQueryLocally(query);
+    expect(r2.length).toBe(r.length);
+  });
+
+  test("where with 'in' clause (integers)", async () => {
+    expect.assertions(3);
+    const em1 = TestFns.newEntityManager();
+
+    var empIds = [1,3,5,8]
+    var query = EntityQuery.from("Employees")
+      .where("employeeID", 'in', empIds);
+
+    const qr1 = await em1.executeQuery(query);
+    const r = qr1.results;
+    
+    expect(r.length).toBeGreaterThan(0);
+    expect(r.length).toBe(4);
 
     const r2 = em1.executeQueryLocally(query);
     expect(r2.length).toBe(r.length);
