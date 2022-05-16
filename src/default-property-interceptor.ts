@@ -12,6 +12,7 @@ export function defaultPropertyInterceptor(this: StructuralObject, property: Ent
 
   if (newValue === undefined) newValue = null; // remove? to allow assignment to undefined in Babel constructors?
   let oldValue = rawAccessorFn();
+  if (oldValue === undefined) oldValue = null; // remove? to allow assignment to undefined in Babel constructors?
 
   let dataType = (property as any).dataType;
   if (dataType && dataType.parse) {
