@@ -469,6 +469,9 @@ function requireLibCore(libName: string) {
 
 /** Execute fn while obj has tempValue for property */
 function using(obj: Object, property: string, tempValue: any, fn: () => any) {
+    if (!obj) {
+        return fn();
+    }
     let originalValue = obj[property];
     if (tempValue === originalValue) {
         return fn();

@@ -717,6 +717,21 @@ describe("Entity operations - no server", () => {
 
   });
 
+  test("rejectChanges twice on Added entity", () => {
+    const em = TestFns.newEntityManager(); // new empty EntityManager
+    const cust = em.createEntity("Customer", { companyName: "Acme" });
+    const aspect = cust.entityAspect;
+
+    cust.setProperty("companyName", "TestCo");
+    aspect.rejectChanges();
+    cust.setProperty("companyName", "TestCo2");
+
+    // prior to Breeze v2.1.3, second rejectChanges() throws error in core.using() because entityAspect.entityManager is null
+    // now it properly throws "You cannot set the 'entityState' of an entity when it is detached"
+    expect(() => aspect.rejectChanges()).toThrow(/detached/);
+  });
+
+
   test("detached entity - setting another EntityState on a detached entity throws exception",
     () => {
       const em = TestFns.newEntityManager(); // new empty EntityManager

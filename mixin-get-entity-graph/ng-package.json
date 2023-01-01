@@ -1,0 +1,5 @@
+{
+  "lib": {
+    "entryFile": "../src/mixin-get-entity-graph.ts"
+  }
+}

@@ -1,8 +1,0 @@
-{
-  "name": "adapter-data-service-webapi",
-  "ngPackage": {
-    "lib": {
-        "entryFile": "../src/adapter-data-service-webapi.ts"
-      }
-  }
-}

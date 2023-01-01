@@ -1,6 +1,6 @@
 {
   "name": "breeze-client",
-  "version": "2.1.2",
+  "version": "2.1.3",
   "private": true,
   "description": "Breeze data management for JavaScript clients",
   "repository": "https://github.com/Breeze/breeze-client.git",
@@ -11,7 +11,7 @@
     "@angular/core": "~9.1.0",
     "@types/node": "^12.12.26",
     "canonical-path": "^1.0.0",
-    "downlevel-dts": "^0.7.0",
+    "downlevel-dts": "^0.11.0",
     "fs-extra": "^9.0.1",
     "ng-packagr": "^9.1.5",
     "rimraf": "^3.0.2",
@@ -24,19 +24,15 @@
   "scripts": {
     "build": "npm run clean && npm run packagr && rimraf dist/spec && npm run downlevel-dts && npm pack ./dist && npm run install-to-spec",
     "clean": "rimraf temp && rimraf src/*.js* && rimraf src/*.d.ts && rimraf ./*.d.ts && rimraf dist && rimraf node_modules/breeze-client.js",
-    "install-to-spec": "cd spec && npm install ../breeze-client-2.1.2.tgz",
+    "install-to-spec": "cd spec && npm install ../breeze-client-2.1.3.tgz",
     "publish": "node tools/unprivate.js && npm publish --tag latest ./dist",
     "tsc": "tsc",
     "watch-tsc": "tsc -w",
     "downlevel-dts": "downlevel-dts ./dist ./dist",
+    "remove-dup-name": "node tools/remove-dup-name.js",
     "typedoc": "typedoc --out ./temp/docs/ --exclude xx  --excludePrivate --excludeNotExported  --tsConfig ./tsconfig.typedoc.json --mode file --readme ./readme.doc.md ./src/breeze.ts && node tools/copyIfDifferent.js temp/docs docs ",
-    "packagr": "ng-packagr -p package.json",
+    "packagr": "ng-packagr -p ng-package.json",
     "copy-to-breezejs": "node tools/copy-to-breezejs.js"
-  },
-  "ngPackage": {
-    "lib": {
-      "entryFile": "public_api.ts"
-    }
   },
   "author": {
     "name": "IdeaBlade",

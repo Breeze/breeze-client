@@ -166,7 +166,7 @@ export const breeze = {
   ValidationError: ValidationError,
   ValidationOptions: ValidationOptions,
   Validator: Validator,
-  version: "2.1.2"
+  version: "2.1.3"
 };
 
 // breeze.assertConfig = assertConfig as any;

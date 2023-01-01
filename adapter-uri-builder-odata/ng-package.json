@@ -1,0 +1,5 @@
+{
+  "lib": {
+    "entryFile": "../src/adapter-uri-builder-odata.ts"
+  }
+}

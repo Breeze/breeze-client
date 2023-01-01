@@ -71,7 +71,7 @@ export class TestFns extends UtilFns {
     TestFns.initAdapters();
 
     if (TestFns.isAspCoreServer) {
-      TestFns.defaultServiceName = 'http://localhost:61552/breeze/NorthwindIBModel';
+      TestFns.defaultServiceName = 'http://localhost:34377/breeze/NorthwindIBModel';
     } else if (TestFns.isSequelizeServer) {
       TestFns.defaultServiceName = 'http://localhost:3000/breeze/NorthwindIBModel';
     } else if (TestFns.isAspWebApiServer) {

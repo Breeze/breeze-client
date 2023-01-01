@@ -53,6 +53,20 @@ function replaceInFile(filename, search, replace) {
     });
 }
 
+/** remove the first line of a file */
+function removeFirstLine(filename) {
+  fs.readFile(filename, 'utf8', function (err,data) {
+    if (err) {
+        return console.log(err);
+    }
+    var result = data.split("\n").slice(1).join("\n");
+    fs.writeFile(filename, result, 'utf8', function (err) {
+        if (err) return console.log(err);
+    });
+    console.log("removeFirstLine: changed file " + filename);
+  });
+}
+
 /** Get single command line argument, and show usage method if its incorrect */
 function getArg() {
   var args = process.argv.slice(2);
@@ -68,5 +82,6 @@ module.exports = {
   getFileSize: getFileSize,
   run: run,
   replaceInFile: replaceInFile,
+  removeFirstLine: removeFirstLine,
   getArg: getArg
 }

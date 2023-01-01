@@ -5,7 +5,9 @@ let core = breeze.core;
 /** Simulates sending ajax to server and getting empty response.  For testing. */
 export class AjaxFakeAdapter implements breeze.AjaxAdapter {
   name: string;
-  requestInterceptor?: (() => breeze.ChangeRequestInterceptor) | breeze.ChangeRequestInterceptor;
+  defaultSettings: {};
+  // requestInterceptor?: (() => breeze.ChangeRequestInterceptor) | breeze.ChangeRequestInterceptor;
+  requestInterceptor?: (req: any) => void;
   /** Provides return values for requests.  Used for testing. */
   responseFn: (ajaxConfig: breeze.AjaxConfig) => any;
 

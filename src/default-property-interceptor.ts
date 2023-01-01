@@ -26,7 +26,8 @@ export function defaultPropertyInterceptor(this: StructuralObject, property: Ent
   }
 
   // exit if no change - extra cruft is because dateTimes don't compare cleanly.
-  if (newValue === oldValue || (dataType && dataType.normalize && newValue && oldValue && dataType.normalize(newValue) === dataType.normalize(oldValue))) {
+  if (newValue === oldValue || (newValue === null && oldValue === undefined) || 
+    (dataType && dataType.normalize && newValue && oldValue && dataType.normalize(newValue) === dataType.normalize(oldValue))) {
     return;
   }
 
