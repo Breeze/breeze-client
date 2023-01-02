@@ -15,19 +15,32 @@ Client-side querying, caching, dynamic object graphs, change tracking and notifi
 - save all changes in a single transaction
 - use the same entity model on the server and client
 
+## Install from npm
+
+    npm install breeze-client@mjs
+or 
+
+    npm install breeze-client
+
+The version tagged `mjs` uses updated [Angular Package Format](https://docs.google.com/document/d/1CZC2rcpxffTDfRDs6p1cfbmKNLA6x5O-NtkJglDaBVs/preview) and ES2020 .mjs modules.  It has `esm2020` and `fesm2020` folders, but no UMD `bundles` folder.  
+
+If you want the latest module format, and don't care about UMD bundles, use `breeze-client@mjs`.
+
 ## Documentation 
 
 See the [docs](http://breeze.github.io/doc-js/features.html) for more info about what Breeze does and how to use it.
 
 Set the [release notes](http://breeze.github.io/doc-js/release-notes.html) for changes in the latest version.
 
-## Install from npm
-
-    npm install breeze-client
-
 ## Examples
 
 See some [examples](https://github.com/Breeze/northwind-demo) of how to use breeze with Angular, Aurelia, React, and Vue in the [Northwind-Demo](https://github.com/Breeze/northwind-demo).
+
+See the [TempHire](https://github.com/Breeze/temphire.angular) application for a richer example showing proper architectural patterns.
+
+## Sources
+
+The sources for this package are in the [breeze-client](https://github.com/Breeze/breeze-client) repo.  Please file issues and pull requests against that repo.
 
 ## Upgrading Breeze
 
@@ -39,7 +52,7 @@ See the [BUILD](https://github.com/Breeze/breeze-client/blob/master/BUILD.md) do
 
 <hr>
 
-If you have discover a bug or missing feature, please create an issue in the [breeze-client github repo](https://github.com/Breeze/breeze-client).
+If you have discovered a bug or missing feature, please create an issue in the [breeze-client github repo](https://github.com/Breeze/breeze-client).
 
 If you have questions about using Breeze, please ask on [Stack Overflow](https://stackoverflow.com/questions/tagged/breeze).
 

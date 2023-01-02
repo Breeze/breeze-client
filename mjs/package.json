@@ -1,0 +1,63 @@
+{
+  "name": "breeze-client",
+  "version": "2.1.4-mjs",
+  "private": true,
+  "description": "Breeze data management for JavaScript clients",
+  "repository": "https://github.com/Breeze/breeze-client.git",
+  "devDependencies": {
+    "@angular/common": "~15.0.4",
+    "@angular/compiler": "~15.0.4",
+    "@angular/compiler-cli": "~15.0.4",
+    "@angular/core": "~15.0.4",
+    "@types/node": "^18.11.18",
+    "ng-packagr": "^15.0.3",
+    "rimraf": "^3.0.2",
+    "rxjs": "^7.8.0",
+    "tslib": "^2.4.1",
+    "typescript": "~4.8.0"
+  },
+  "scripts": {
+    "build": "npm run clean && npm run packagr && npm run vermjs && npm pack ../dist",
+    "clean": "rimraf temp && rimraf ../src/*.js* && rimraf ../src/*.d.ts && rimraf ../*.d.ts && rimraf ../dist",
+    "vermjs": "cd ../dist && npm --no-git-tag-version version 2.1.4-mjs",
+    "publish": "node ../tools/unprivate.js && npm publish --tag mjs ../dist",
+    "packagr": "ng-packagr -p ../ng-package.json"
+  },
+  "author": {
+    "name": "IdeaBlade",
+    "email": "jayt@ideablade.com",
+    "url": "https://www.ideablade.com/"
+  },
+  "contributors": [
+    "Jay Traband",
+    "Steve Schmitt",
+    "Marcel Good",
+    "Ward Bell"
+  ],
+  "keywords": [
+    "breeze",
+    "breezejs",
+    "spa",
+    "data binding",
+    "change tracking",
+    "query",
+    "linq",
+    "cache",
+    "graph",
+    "graphql",
+    "angular",
+    "angularjs",
+    "react",
+    "vue",
+    "aurelia",
+    "relational",
+    "orm",
+    "entity",
+    "model"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Breeze/breeze-client/issues"
+  },
+  "homepage": "https://github.com/Breeze/breeze-client#readme"
+}

@@ -9,20 +9,21 @@ Run `npm run build`.  This will create files in the '\dist' dir.  The directory 
     esm2015/                  Breeze and adapter libraries as ES6 modules (separate source files)
     fesm5/                    Breeze and adapter libraries as ES5 modules (combined source files)
     fesm2015/                 Breeze and adapter libraries as ES6 modules (combined source files)
-    spec/                     TypeScript definition files (.d.ts) for tests
+    mixin-*/                  Breeze mixin definitions (*.d.ts) for getEntityGraph, save queuing
     src/                      TypeScript definition files (.d.ts) for source
     breeze-client.d.ts        TypeScript definition file (links to the files in src/) 
     breeze-client.metadata.json      Metadata for Angular AOT
     index.d.ts                Main entry point
     LICENSE                   MIT
     package.json              Package metadata
-    public_api.d.ts           Main entry point
-
+    README.md                 Readme file
 
 It will also create `breeze-client-{version}.tgz` in the main directory.  This file can then be installed in a project using
 
     npm install ..\{path}\breeze-client-{version}.tgz
 
+> NOTE: the `mjs` folder publishes `breeze-client@2.x.x-mjs`, which is tagged `mjs` in npm.  This version does not have the `bundles` or `esm5` or `fesm5` folders shown above.  It has `esm2020` and `fesm2020` folders with .mjs files.  It is suitable
+for newer Angular applications.
 
 ## Build API Docs
 Run `npm run typedoc`.  This will create a '\docs' dir. click on the 'index.html' in this folder to see the docs.
@@ -46,6 +47,8 @@ so this convention only affects typescript consumers of the api.  Pure javascrip
 Note that it is still acceptable for api calls to return a null to indicate that nothing was found.  i.e. like getEntityType().  
 
 ## Jasmine tests 
+
+> NOTE: We now use Jest
 
 The tests are found in the `spec` directory.  There are three ways to run them.
 
