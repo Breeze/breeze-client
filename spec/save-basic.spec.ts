@@ -1186,7 +1186,7 @@ describe("Save Basics", () => {
     } catch (e) {
       const msg = e.message;
       if (TestFns.isAspCoreServer) {
-        expect(msg).toMatch(/Data may have been modified or/);
+        expect(msg).toMatch(/Data may have been modified or/i);
       } else if (TestFns.isAspWebApiServer) {
         expect(msg).toMatch(/Store update, insert/);
       } else if (TestFns.isHibernateServer) {

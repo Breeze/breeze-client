@@ -248,7 +248,7 @@ describe("Query Select clause", () => {
       throw new Error('should not get here');
     } catch (e) {
       if (TestFns.isAspCoreServer) {
-        expect(e.message).toMatch(/Include path/);
+        expect(e.message).toMatch(/Unable to cast/);
       } else {
         expect(e.message).toMatch(/expand/);
       }

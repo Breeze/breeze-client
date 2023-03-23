@@ -20,9 +20,9 @@ TestResults
 src/**/*.d.ts
 src/**/*.js
 src/**/*.js.map
-spec/**/*.d.ts
-spec/**/*.js
-spec/**/*.js.map
+spec/**/*.spec.d.ts
+spec/**/*.spec.js
+spec/**/*.spec.js.map
 build/**/*
 temp/**/*
 docs/**/*

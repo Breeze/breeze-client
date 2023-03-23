@@ -22,7 +22,7 @@ describe("Save exception handling", () => {
   });
 
 
-  test("should throw when delete saved added entity (store-gen key) before server save response", async function (done) {
+  test("should throw when delete saved added entity (store-gen key) before server save response", function (done) {
     expect.assertions(7);
     // Fails D#2649 "Internal Error in key fixup - unable to locate entity"
     const em = TestFns.newEntityManager();
@@ -54,7 +54,7 @@ describe("Save exception handling", () => {
     }
   });
 
-  test("should throw when detach saved added entity (store-gen key) before server save response", async function (done) {
+  test("should throw when detach saved added entity (store-gen key) before server save response", function (done) {
     expect.assertions(7);
     // Fails D#2650 fixupKeys: "Internal Error in key fixup - unable to locate entity"
     const em = TestFns.newEntityManager();
@@ -85,7 +85,7 @@ describe("Save exception handling", () => {
     }
   });
 
-  test("should throw when call rejectChanges for saved added entity (store-gen key) before server save response", async function (done) {
+  test("should throw when call rejectChanges for saved added entity (store-gen key) before server save response", function (done) {
     expect.assertions(7);
     // Fails D#2649 fixupKeys: "Internal Error in key fixup - unable to locate entity"
     const em = TestFns.newEntityManager();
@@ -116,7 +116,7 @@ describe("Save exception handling", () => {
     }
   });
 
-  test("should throw when clear manager before server save response of saved added entity (store-gen key)", async function (done) {
+  test("should throw when clear manager before server save response of saved added entity (store-gen key)", function (done) {
     expect.assertions(3);
     // Fails D#2650 fixupKeys: "Unable to locate the following fully qualified EntityType..."
     const em = TestFns.newEntityManager();
@@ -237,7 +237,7 @@ describe("Save exception handling", () => {
   });
 
 
-  test("manager.hasChanges() is true after save if manager other changes were made during save", async function (done) {
+  test("manager.hasChanges() is true after save if manager other changes were made during save", function (done) {
     expect.hasAssertions();
     // D#2651
     expect(2);
