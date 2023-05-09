@@ -297,7 +297,7 @@ function setDpValueComplex(context: IContext, rawAccessorFn: Function) {
   let dataType = property.dataType as ComplexType;
   if (property.isScalar) {
     if (!newValue) {
-      throw new Error(core.formatString("You cannot set the '%1' property to null because it's datatype is the ComplexType: '%2'", property.name, property.dataType.name));
+      throw new Error(core.formatString("You cannot set the '%1' property to null because its datatype is the ComplexType: '%2'", property.name, property.dataType.name));
     }
 
     if (!oldValue) {

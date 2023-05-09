@@ -365,6 +365,31 @@ describe("Query Basics", () => {
     expect(r.length).toBe(0);
   });
 
+  test("where with two fields & contains property", async () => {
+    expect.hasAssertions();
+    const em1 = TestFns.newEntityManager();
+    const q = EntityQuery.from("Employees")
+      .where("notes", "contains", { value: "firstName", isProperty: true })
+      // .where("lastName", "startsWith", "firstName", true)
+      .take(5);
+
+    const qr1 = await em1.executeQuery(q);
+    const r = qr1.results;
+    expect(r.length).toBe(5);
+  });
+
+  test("where with number field & equals literal forced", async () => {
+    expect.hasAssertions();
+    const em1 = TestFns.newEntityManager();
+    const q = EntityQuery.from("Products")
+      .where("unitsInStock", "eq", { value: "35", isProperty: false, dataType: "Int32" });
+      // .take(5);
+
+    const qr1 = await em1.executeQuery(q);
+    const r = qr1.results;
+    expect(r.length).toBe(1);
+  });
+
 
   test("where with empty predicates", async () => {
     const em1 = TestFns.newEntityManager();

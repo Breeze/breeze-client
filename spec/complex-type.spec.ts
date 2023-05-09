@@ -148,4 +148,34 @@ skipDescribeIf(TestFns.isSequelizeServer, 'ComplexType', () => {
       expect(err).toBeUndefined();
     }
   });
+
+  test('should modify entity when complex property changes', () => {
+    let em = new EntityManager('test');
+    let ms = em.metadataStore;
+    ms.importMetadata(metadata);
+
+    let cust = em.createEntity('Customer', { CompanyName: 'ACME' });
+    expect(cust).toBeTruthy();
+    cust.entityAspect.acceptChanges();
+    expect(cust.entityAspect.entityState.isModified()).toBe(false);
+
+    const location = cust.getProperty("Location");
+
+    location.setProperty('City', 'Foo');
+    expect(cust.entityAspect.entityState.isModified()).toBe(true);
+
+    cust.entityAspect.rejectChanges();
+    expect(cust.entityAspect.entityState.isModified()).toBe(false);
+
+    location.City = 'Foo2';
+    expect(cust.entityAspect.entityState.isModified()).toBe(true);
+
+    cust.entityAspect.rejectChanges();
+    expect(cust.entityAspect.entityState.isModified()).toBe(false);
+
+    (cust as any).Location.City = 'Foo3';
+    expect(cust.entityAspect.entityState.isModified()).toBe(true);
+
+  });
+
 });

@@ -1,11 +1,11 @@
 {
   "name": "breeze-tests",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "private": true,
   "description": "Breeze tests",
   "repository": "https://github.com/Breeze/breeze-client.git",
   "dependencies": {
-    "breeze-client": "file:../breeze-client-2.1.4.tgz",
+    "breeze-client": "file:../breeze-client-2.1.5.tgz",
     "node-fetch": "^2.6.0"
   },
   "devDependencies": {

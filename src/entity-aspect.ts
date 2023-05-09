@@ -27,8 +27,8 @@ export interface Entity {
 export interface ComplexObject {
   complexAspect: ComplexAspect;
   complexType: ComplexType;
-  getProperty(prop: string): any;
-  setProperty(prop: any, value: any): void;
+  getProperty?(prop: string): any;
+  setProperty?(prop: any, value: any): void;
   /** @hidden @internal */
   prototype?: { _$typeName: string };
 }

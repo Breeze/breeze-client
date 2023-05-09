@@ -1,6 +1,6 @@
 {
   "name": "breeze-client",
-  "version": "2.1.4-mjs",
+  "version": "2.1.5-mjs",
   "private": true,
   "description": "Breeze data management for JavaScript clients",
   "repository": "https://github.com/Breeze/breeze-client.git",
@@ -19,7 +19,7 @@
   "scripts": {
     "build": "npm run clean && npm run packagr && npm run vermjs && npm pack ../dist",
     "clean": "rimraf temp && rimraf ../src/*.js* && rimraf ../src/*.d.ts && rimraf ../*.d.ts && rimraf ../dist",
-    "vermjs": "cd ../dist && npm --no-git-tag-version version 2.1.4-mjs",
+    "vermjs": "cd ../dist && npm --no-git-tag-version version 2.1.5-mjs",
     "publish": "node ../tools/unprivate.js && npm publish --tag mjs ../dist",
     "packagr": "ng-packagr -p ../ng-package.json"
   },
