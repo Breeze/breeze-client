@@ -889,6 +889,11 @@ export class FnExpr extends PredicateExpression {
         return source.getMinutes();
       }, dataType: DataType.Int32
     },
+    hour: {
+      fn: function (source: Date) {
+        return source.getHours();
+      }, dataType: DataType.Int32
+    },
     day: {
       fn: function (source: Date) {
         return source.getDate();
