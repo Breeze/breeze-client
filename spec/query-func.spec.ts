@@ -47,6 +47,21 @@ skipDescribeIf(TestFns.isHibernateServer, "Query Functions", () => {
     expect(emps2.length).toBe(qr1.results.length);
   });
 
+  // skipIfHibFuncExpr.
+  // skipTestIf("mongo", "does not support 'hour' odata predicate").
+  test("function expr - date(hour) function", async () => {
+    expect.hasAssertions();
+    const em1 = TestFns.newEntityManager();
+    const p = Predicate.create("hour(shippedDate)", ">", 10).and("hour(shippedDate)", "<", 22);
+    const query = EntityQuery
+      .from("Orders")
+      .where(p);
+    // Note that server may interpret hour as UTC hour, while client uses local time.
+    const qr1 = await em1.executeQuery(query);
+    expect(qr1.results.length).toBeGreaterThan(0);
+    const emps2 = em1.executeQueryLocally(query);
+    expect(emps2.length).toBe(qr1.results.length);
+  });
 
   test("function expr - toLower", async function () {
     expect.hasAssertions();

@@ -688,6 +688,14 @@ describe("Unusual Datatypes", () => {
     expect(val).toBe(3.4);
   });
 
-
+  test("datatype fromValue - Guid", () => {
+    expect(DataType.fromValue("foo")).toBe(DataType.String);
+    expect(DataType.fromValue("f16fb858-1e02-46fb-8467-a5fb45a7067f")).toBe(
+      DataType.Guid
+    );
+    expect(DataType.fromValue("foo-f16fb858-1e02-46fb-8467-a5fb45a7067f")).toBe(
+      DataType.String
+    );
+  });
 
 });

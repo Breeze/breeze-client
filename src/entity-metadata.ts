@@ -1991,7 +1991,7 @@ export interface DataPropertyConfig {
   maxLength?: number;
   validators?: Validator[];
   displayName?: string;
-  enumType?: any;
+  enumType?: string;
   rawTypeName?: string;  // occurs with undefined datatypes
   custom?: Object;
 }
@@ -2042,8 +2042,8 @@ export class DataProperty {
   validators: Validator[];
   /** The display name of this property. __Read Only__ */
   displayName: string;
-  // TODO: doc this
-  enumType?: any;
+  /** The full name of the enum type */
+  enumType?: string;
   /** The raw type name of this property. will only be defined for properties with a DataType of 'Undefined' */
   rawTypeName?: string;  // occurs with undefined datatypes
   /**  A free form object that can be used to define any custom metadata for this DataProperty. __Read Only__ */

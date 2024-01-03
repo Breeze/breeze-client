@@ -522,21 +522,24 @@ function memoize(fn: any): any {
     };
 }
 
+const uuidrex = /[xy]/g;
 function getUuid(): string {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(uuidrex, function (c) {
         // tslint:disable-next-line
         let r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
         return v.toString(16);
     });
 }
 
+const durationrex = /^P((\d+Y)?(\d+M)?(\d+D)?)?(T(\d+H)?(\d+M)?(\d+S)?)?$/;
+const lettersrex = /[A-Za-z]+/g;
 function durationToSeconds(duration: string) {
     // basic algorithm from https://github.com/nezasa/iso8601-js-period
     if (typeof duration !== "string") throw new Error("Invalid ISO8601 duration '" + duration + "'");
 
     // regex splits as follows - grp0, grp1, y, m, d, grp2, h, m, s
     //                           0     1     2  3  4  5     6  7  8
-    let struct = /^P((\d+Y)?(\d+M)?(\d+D)?)?(T(\d+H)?(\d+M)?(\d+S)?)?$/.exec(duration);
+    let struct = durationrex.exec(duration);
     if (!struct) throw new Error("Invalid ISO8601 duration '" + duration + "'");
 
     let ymdhmsIndexes = [2, 3, 4, 6, 7, 8]; // -> grp1,y,m,d,grp2,h,m,s
@@ -551,7 +554,7 @@ function durationToSeconds(duration: string) {
     for (let i = 0; i < 6; i++) {
         let digit = struct[ymdhmsIndexes[i]];
         // remove letters, replace by 0 if not defined
-        digit = <any>(digit ? +digit.replace(/[A-Za-z]+/g, '') : 0);
+        digit = <any>(digit ? +digit.replace(lettersrex, '') : 0);
         seconds += <any>digit * factors[i];
     }
     return seconds;
@@ -582,10 +585,10 @@ function isDate(o: any) {
     return classof(o) === "date" && !isNaN(o.getTime());
 }
 
+const isdaterex = /^((\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z))|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d([+-][0-2]\d:[0-5]\d|Z))|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d([+-][0-2]\d:[0-5]\d|Z)))$/;
 function isDateString(s: string) {
     // let rx = /^(\d{4}|[+\-]\d{6})(?:-(\d{2})(?:-(\d{2}))?)?(?:T(\d{2}):(\d{2})(?::(\d{2})(?:\.(\d{3}))?)?(?:(Z)|([+\-])(\d{2})(?::(\d{2}))?)?)?$/;
-    let rx = /^((\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z))|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d([+-][0-2]\d:[0-5]\d|Z))|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d([+-][0-2]\d:[0-5]\d|Z)))$/;
-    return (typeof s === "string") && rx.test(s);
+    return (typeof s === "string") && isdaterex.test(s);
 }
 
 function isFunction(o: any) {
@@ -600,12 +603,14 @@ function isFunction(o: any) {
 //     return (typeof o === "object");
 // }
 
+const isguidrex = /^[a-fA-F\d]{8}-(?:[a-fA-F\d]{4}-){3}[a-fA-F\d]{12}$/;
 function isGuid(value: any) {
-    return (typeof value === "string") && /[a-fA-F\d]{8}-(?:[a-fA-F\d]{4}-){3}[a-fA-F\d]{12}/.test(value);
+    return (typeof value === "string") && isguidrex.test(value);
 }
 
+const isdurationrex = /^(-|)?P[T]?[\d\.,\-]+[YMDTHS]/;
 function isDuration(value: any) {
-    return (typeof value === "string") && /^(-|)?P[T]?[\d\.,\-]+[YMDTHS]/.test(value);
+    return (typeof value === "string") && isdurationrex.test(value);
 }
 
 function isEmpty(obj: any) {
@@ -656,7 +661,7 @@ function formatString(str: string, ...params: any[]) {
 
 // See http://stackoverflow.com/questions/7225407/convert-camelcasetext-to-camel-case-text
 /** Change text to title case with spaces, e.g. 'myPropertyName12' to 'My Property Name 12' */
-let camelEdges = /([A-Z](?=[A-Z][a-z])|[^A-Z](?=[A-Z])|[a-zA-Z](?=[^a-zA-Z]))/g;
+const camelEdges = /([A-Z](?=[A-Z][a-z])|[^A-Z](?=[A-Z])|[a-zA-Z](?=[^a-zA-Z]))/g;
 function titleCaseSpace(text: string) {
     text = text.replace(camelEdges, '$1 ');
     text = text.charAt(0).toUpperCase() + text.slice(1);
