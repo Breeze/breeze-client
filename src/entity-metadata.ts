@@ -58,7 +58,7 @@ explicit MetadataStore, the MetadataStore from the MetadataStore.defaultInstance
 **/
 export class MetadataStore {
   /** @hidden @internal */
-  _$typeName: string; // on proto
+  declare _$typeName: string; // on proto
 
   /** @hidden @internal */
   static __id = 0;
@@ -881,7 +881,7 @@ export interface EntityTypeSetConfig {
 **/
 export class EntityType {
   /** @hidden @internal */
-  _$typeName: string; // on proto
+  declare _$typeName: string; // on proto
   /** @hidden @internal */
   static __nextAnonIx = 0;
   /** Always false for an EntityType. **/
@@ -1822,7 +1822,7 @@ export interface ComplexTypeConfig {
 **/
 export class ComplexType {
   /** @hidden @internal */
-  _$typeName: string; // on proto
+  declare _$typeName: string; // on proto
   /** For polymorphic purpose only - always true here */
   isComplexType = true;
 
@@ -2004,59 +2004,59 @@ directly via the constructor.
 **/
 export class DataProperty {
   /** @hidden @internal */
-  _$typeName: string; // on proto
+  declare _$typeName: string; // on proto
   /** Is this a DataProperty? - always true here. Allows polymorphic treatment of DataProperties and NavigationProperties. __Read Only__ */
   isDataProperty = true;
   /** Is this a NavigationProperty? - always false here.  Allows polymorphic treatment of DataProperties and NavigationProperties. __Read Only__ */
   isNavigationProperty = false;
   /** The name of this property. __Read Only__  **/
-  name: string;
+  declare name: string;
   /** The name of this property on the server. __Read Only__ **/
-  nameOnServer: string;
+  declare nameOnServer: string;
   /** The [[DataType]] of this property. __Read Only__ */
-  dataType: DataType | ComplexType; // this will be a complexType when dp is a complexProperty
+  declare dataType: DataType | ComplexType; // this will be a complexType when dp is a complexProperty
   /** The name of the [[ComplexType]] associated with this property; may be null. __Read Only__ */
-  complexTypeName: string;
+  declare complexTypeName: string;
   /** The [[ComplexType]] associated with this property; may be undefined. __Read Only__ */
-  complexType?: ComplexType;
+  declare complexType?: ComplexType;
   /**  Whether the contents of this property is an instance of a [[ComplexType]]. __Read Only__ */
-  isComplexProperty: boolean;
+  declare isComplexProperty: boolean;
   /** Whether this property is nullable. __Read Only__ */
-  isNullable: boolean;
+  declare isNullable: boolean;
   /**  Whether this property is scalar (i.e., returns a single value as opposed to an array). __Read Only__ */
-  isScalar: boolean; // will be false for some NoSQL databases.
+  declare isScalar: boolean; // will be false for some NoSQL databases.
   /** The default value for this property. __Read Only__ */
-  defaultValue: any;
+  declare defaultValue: any;
   /**  Whether this property is a 'key' property. __Read Only__ */
-  isPartOfKey: boolean;
+  declare isPartOfKey: boolean;
   /** Whether this property is an 'unmapped' property. __Read Only__ */
-  isUnmapped: boolean;
+  declare isUnmapped: boolean;
   /** Whether this property is 'settable'. __Read Only__ */
-  isSettable: boolean;
+  declare isSettable: boolean;
   // TODO: doc this
-  concurrencyMode: string;
+  declare concurrencyMode: string;
   /**  The maximum length for the value of this property. Only meaningful for strings. __Read Only__ */
-  maxLength?: number;
+  declare maxLength?: number;
   /** The [[Validator]] instances that are associated with this property. Validators can be added and
   removed from this collection. __Read Only__ */
-  validators: Validator[];
+  declare validators: Validator[];
   /** The display name of this property. __Read Only__ */
-  displayName: string;
+  declare displayName: string;
   /** The full name of the enum type */
-  enumType?: string;
+  declare enumType?: string;
   /** The raw type name of this property. will only be defined for properties with a DataType of 'Undefined' */
-  rawTypeName?: string;  // occurs with undefined datatypes
+  declare rawTypeName?: string;  // occurs with undefined datatypes
   /**  A free form object that can be used to define any custom metadata for this DataProperty. __Read Only__ */
-  custom?: Object;
+  declare custom?: Object;
   // TODO: doc this
-  inverseNavigationProperty?: NavigationProperty;
+  declare inverseNavigationProperty?: NavigationProperty;
   /**
   The navigation property related to this property.  Will only be set if this is a foreign key property. __Read Only__ */
-  relatedNavigationProperty?: NavigationProperty;
+  declare relatedNavigationProperty?: NavigationProperty;
   /** The parent type that this property belongs to - will be either a [[EntityType]] or a [[ComplexType]]. __Read Only__ */
-  parentType: StructuralType;
+  declare parentType: StructuralType;
   /** Property on the base type that this property is inherited from. Will be null if the property is not on the base type. __Read Only__ */
-  baseProperty?: DataProperty;
+  declare baseProperty?: DataProperty;
 
   /** DataProperty constructor
   >      let lastNameProp = new DataProperty( {
@@ -2258,7 +2258,7 @@ directly via the constructor.
 **/
 export class NavigationProperty {
   /** @hidden @internal */
-  _$typeName: string;
+  declare _$typeName: string;
   /** Is this a DataProperty? - always false here 
   Allows polymorphic treatment of DataProperties and NavigationProperties. __Read Only__ */
   isDataProperty = false;
@@ -2271,49 +2271,49 @@ export class NavigationProperty {
   resolveProperty = DataProperty.prototype.resolveProperty;
 
   /** The [[EntityType]] returned by this property. __Read Only__ */
-  entityType: EntityType;
+  declare entityType: EntityType;
   /** The name of the [[EntityType]] returned by this property. __Read Only__ */
-  entityTypeName: string;
+  declare entityTypeName: string;
   /** The [[EntityType]] that this property belongs to. ( same as entityType). __Read Only__ */
-  parentType: EntityType; // ?? same as entityType
+  declare parentType: EntityType; // ?? same as entityType
   /** The [[EntityType]] that this property belongs to. ( same as entityType). __Read Only__ */
-  parentEntityType: EntityType; // ?? same as above
+  declare parentEntityType: EntityType; // ?? same as above
   /** Property on the base type that this property is inherited from. Will be null if the property is not on the base type. __Read Only__ */
-  baseProperty?: NavigationProperty;
+  declare baseProperty?: NavigationProperty;
   /** The inverse of this NavigationProperty.  The NavigationProperty that represents a navigation in the opposite direction
   to this NavigationProperty. May be undefined for a undirectional NavigationProperty. __Read Only__ */
-  private _inverse?: NavigationProperty;
+  declare private _inverse?: NavigationProperty;
   /** The name of this property. __Read Only__ */
-  name: string;
+  declare name: string;
   /** The name of this property on the server. __Read Only__ */
-  nameOnServer: string;
+  declare nameOnServer: string;
   /**
   Whether this property returns a single entity as opposed to  an array of entities. __Read Only__ */
-  isScalar: boolean;
+  declare isScalar: boolean;
   /** The name of the association to which that this property belongs.  This associationName will be shared with this
   properties 'inverse'. __Read Only__ */
-  associationName: string;
+  declare associationName: string;
   /** The names of the foreign key DataProperties associated with this NavigationProperty. There will usually only be a single DataProperty associated
   with a Navigation property except in the case of entities with multipart keys. __Read Only__ */
-  foreignKeyNames: string[];
+  declare foreignKeyNames: string[];
   /** The server side names of the foreign key DataProperties associated with this NavigationProperty. There will usually only be a single DataProperty associated
   with a Navigation property except in the case of entities with multipart keys. __Read Only__ */
-  foreignKeyNamesOnServer: string[];
+  declare foreignKeyNamesOnServer: string[];
   /** The names of the foreign key DataProperties at the other end of the relationship. __Read Only__ */
-  invForeignKeyNames: string[];
+  declare invForeignKeyNames: string[];
   /** The server side names of the foreign key DataProperties at the other end of the relationship. __Read Only__ */
-  invForeignKeyNamesOnServer: string[];
+  declare invForeignKeyNamesOnServer: string[];
   /** The 'foreign key' DataProperties associated with this NavigationProperty. There will usually only be a single DataProperty associated
   with a Navigation property except in the case of entities with multipart keys. __Read Only__ */
-  relatedDataProperties: DataProperty[];
+  declare relatedDataProperties: DataProperty[];
   /** The [[Validator]] instances that are associated with this property. Validators can be added and
   removed from this collection. __Read Only__ */
-  validators: Validator[];
+  declare validators: Validator[];
   /** The display name of this property. __Read Only__ */
-  displayName: string;
-  isUnmapped: boolean;
+  declare displayName: string;
+  declare isUnmapped: boolean;
   /** A free form object that can be used to define any custom metadata for this NavigationProperty.   **/
-  custom: Object;
+  declare custom: Object;
 
   /** NavigationProperty constructor
   >      let homeAddressProp = new NavigationProperty( {

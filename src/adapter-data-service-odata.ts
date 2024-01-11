@@ -15,7 +15,6 @@ interface ODataSaveContext extends breeze.SaveContext {
 
 /** @hidden */
 export class DataServiceODataAdapter extends breeze.AbstractDataServiceAdapter {
-  name: string;
   relativeUrl: boolean | ((ds: breeze.DataService, url: string) => string);
   // _catchNoConnectionError = abstractDsaProto._catchNoConnectionError;
   // changeRequestInterceptor = abstractDsaProto.changeRequestInterceptor;

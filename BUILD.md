@@ -48,7 +48,7 @@ Note that it is still acceptable for api calls to return a null to indicate that
 
 ## Jasmine tests 
 
-> NOTE: We now use Jest
+> NOTE: We now use Jest.  See the [spec README](./spec/README.md).
 
 The tests are found in the `spec` directory.  There are three ways to run them.
 

@@ -28,43 +28,43 @@ EntityQueries can be 'modified' without affecting any current instances.
 **/
 export class EntityQuery {
   /** @hidden @internal */
-  _$typeName: string; // actually placed on prototype
+  declare _$typeName: string; // actually placed on prototype
   // top = this.take; // TODO: consider
   /** The resource name used by this query. __Read Only__ */
-  resourceName?: string;
+  declare resourceName?: string;
   /** The [[EntityType]] that is associated with the 'from' clause ( resourceName) of the query.  This is only guaranteed to be be set AFTER the query
   has been executed because it depends on the [[MetadataStore]] associated with the [[EntityManager]] that the query was executed against.
   This value may be null if the entityType cannot be associated with a resourceName. __Read Only__ */
-  fromEntityType?: EntityType;
+  declare fromEntityType?: EntityType;
   /** The 'where' [[Predicate]] used by this query. __Read Only__ */
-  wherePredicate: Predicate; // TODO
+  declare wherePredicate: Predicate; // TODO
   /** The [[OrderByClause]] used by this query. __Read Only__ */
-  orderByClause?: OrderByClause;
+  declare orderByClause?: OrderByClause;
   /** The [[ExpandClause]] used by this query. __Read Only__ */
-  expandClause?: ExpandClause;
+  declare expandClause?: ExpandClause;
   /** The [[SelectClause]] used by this query. __Read Only__ */
-  selectClause?: SelectClause;
+  declare selectClause?: SelectClause;
   /** The number of entities to 'skip' for this query. __Read Only__ */
-  skipCount?: number;
+  declare skipCount?: number;
   /** The number of entities to 'take' for this query. __Read Only__ */
-  takeCount?: number;
+  declare takeCount?: number;
   /** Any additional parameters that were added to the query via the 'withParameters' method. __Read Only__ */
-  parameters: Object;
+  declare parameters: Object;
   /** Whether an inline count is returned for this query. __Read Only__ */
-  inlineCountEnabled: boolean;
+  declare inlineCountEnabled: boolean;
   /** Whether entity tracking has been disabled for this query. __Read Only__ */
-  noTrackingEnabled: boolean;
+  declare noTrackingEnabled: boolean;
   /** The [[QueryOptions]] for this query. __Read Only__  **/
   // default is to get queryOptions and dataService from the entityManager.
-  queryOptions?: QueryOptions;
+  declare queryOptions?: QueryOptions;
   /** The [[DataService]] for this query. __Read Only__  **/
-  dataService?: DataService;
+  declare dataService?: DataService;
   /** The [[EntityManager]] for this query. This may be null and can be set via the 'using' method.  **/
-  entityManager?: EntityManager;
+  declare entityManager?: EntityManager;
   /**  The entityType that will be returned by this query. 
   This property will only be set if the 'toType' method was called. __Read Only__ */
-  resultEntityType: EntityType | string;
-  usesNameOnServer?: boolean;
+  declare resultEntityType: EntityType | string;
+  declare usesNameOnServer?: boolean;
 
   /** Constructor
   >    let query = new EntityQuery("Customers")
@@ -885,7 +885,7 @@ filter operators for an [[EntityQuery]].
 **/
 export class FilterQueryOp extends BreezeEnum implements QueryOp {
   /** The operator for this enum. */
-  operator: string;
+  declare operator: string;
 
   /** Aliases: "eq", "==" **/
   static Equals = new FilterQueryOp({ operator: "eq" });
@@ -924,7 +924,7 @@ operators for an [[EntityQuery]].
 **/
 export class BooleanQueryOp extends BreezeEnum implements QueryOp {
   /** The operator for this enum. */
-  operator: string;
+  declare operator: string;
 
   static And = new BooleanQueryOp({ operator: "and" });
   static Or = new BooleanQueryOp({ operator: "or" });

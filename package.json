@@ -1,6 +1,6 @@
 {
   "name": "breeze-client",
-  "version": "2.1.5",
+  "version": "2.1.6",
   "private": true,
   "description": "Breeze data management for JavaScript clients",
   "repository": "https://github.com/Breeze/breeze-client.git",

@@ -38,11 +38,11 @@ export class EntityAction extends BreezeEnum {
   static Clear = new EntityAction({ _isDetach: true});
 
   /** @hidden @internal */
-  _isAttach?: boolean;
+  declare _isAttach?: boolean;
   /** @hidden @internal */
-  _isDetach?: boolean;
+  declare _isDetach?: boolean;
   /** @hidden @internal */
-  _isModification: boolean;
+  declare _isModification: boolean;
   /** Is this an 'attach' operation? ( Attach, AttachOnQuery or AttachOnImport) */
   isAttach() {
     return !!this._isAttach;

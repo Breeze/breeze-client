@@ -14,15 +14,11 @@ import { MetadataStore } from './entity-metadata';
 */
 export abstract class AbstractDataServiceAdapter implements DataServiceAdapter {
   /** @hidden @internal */
-  _$impl?: any;
+  declare _$impl?: any;
   /** The name of this adapter. */
-  name: string;
+  declare name: string;
   /** The [[IAjaxAdapter]] used by this [[IDataServiceAdapter]]. */
-  ajaxImpl: AjaxAdapter;
-
-  constructor() {
-  }
-
+  declare ajaxImpl: AjaxAdapter;
 
   // TODO use interface
   checkForRecomposition(interfaceInitializedArgs: any) {

@@ -10,13 +10,14 @@ DataType is an 'Enum' containing all of the supported data types.
 **/
 export class DataType extends BreezeEnum {
   /** The default value of this DataType. __Read Only__ **/
-  defaultValue?: any;
+  declare defaultValue?: any;
   /** Whether this is a 'numeric' DataType. __Read Only__ **/
-  isNumeric?: boolean;
+  declare isNumeric?: boolean;
   /** Whether this is an 'integer' DataType. __Read Only__ **/
-  isInteger?: boolean;
+  declare isInteger?: boolean;
   /** Whether to quote the json value when formatting this DataType for OData. */
-  quoteJsonOData?: boolean;
+  declare quoteJsonOData?: boolean;
+
   /** The constructor function to create a [[Validator]] to be used in validating instances of this DataType. */
   validatorCtor?(context?: any): Validator;
   /** 

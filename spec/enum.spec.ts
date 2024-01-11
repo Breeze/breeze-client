@@ -3,8 +3,8 @@ import { BreezeEnum, EntityAction, EntityState, assertParam } from 'breeze-clien
 
 
 class DayOfWeek extends BreezeEnum {
-  dayIndex: number;
-  isWeekend?: boolean;
+  declare dayIndex: number;
+  declare isWeekend?: boolean;
   nextDay() {
       let nextIndex = (this.dayIndex + 1) % 7;
       return DayOfWeek.getSymbols()[nextIndex];

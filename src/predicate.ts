@@ -53,12 +53,12 @@ Used to define a 'where' predicate for an [[EntityQuery]].  Predicates are immut
 method that would modify a Predicate actually returns a new Predicate.
 **/
 export class Predicate {
-  op: Op;
+  declare op: Op;
   /** @hidden @internal */
-  _entityType?: EntityType;
+  declare _entityType?: EntityType;
   /** @hidden @internal */
-  aliasMap: OpMap;
-  visitorMethodName: string;
+  declare aliasMap: OpMap;
+  declare visitorMethodName: string;
 
 
   /**
@@ -489,7 +489,6 @@ Error['x'] = PassthruPredicate.prototype._initialize('passthruPredicate');
 @hidden 
 */
 export class UnaryPredicate extends Predicate {
-  op: Op;
   pred: Predicate;
   constructor(op: string | QueryOp, ...args: any[]) {
     super();
@@ -511,7 +510,6 @@ Error['x'] = UnaryPredicate.prototype._initialize('unaryPredicate', {
 @hidden 
 */
 export class BinaryPredicate extends Predicate {
-  op: Op;
   expr1Source: any;
   expr2Source: any;
   expr1?: PredicateExpression;
@@ -594,7 +592,6 @@ Error['x'] = BinaryPredicate.prototype._initialize('binaryPredicate', {
 @hidden
 */
 export class AndOrPredicate extends Predicate {
-  op: Op;
   preds: Predicate[];
   constructor(op: string | QueryOp, preds: any[]) {
     super();
@@ -634,7 +631,6 @@ Error['x'] = AndOrPredicate.prototype._initialize("andOrPredicate", {
 @hidden 
 */
 export class AnyAllPredicate extends Predicate {
-  op: Op;
   /** @internal */
   expr: PredicateExpression;
   exprSource: string;
@@ -687,7 +683,6 @@ export class PredicateExpression {
 */
 export class LitExpr extends PredicateExpression {
   value: any;
-  dataType: DataType;
   hasExplicitDataType: boolean;
   // 2 public props: value, dataType
   constructor(value: any, dataType: string | DataType | undefined, hasExplicitDataType?: boolean) {
@@ -740,7 +735,6 @@ function resolveDataType(dataType?: DataType | string) {
 */
 export class PropExpr extends PredicateExpression {
   propertyPath: string;
-  dataType: DataType | StructuralType;
   // two public props: propertyPath, dateType
   constructor(propertyPath: string) {
     super('propExpr');
@@ -781,7 +775,6 @@ export class FnExpr extends PredicateExpression {
   fnName: string;
   exprs: PredicateExpression[];
   localFn: any; // TODO:
-  dataType: DataType;
   constructor(fnName: string, exprs: PredicateExpression[]) {
     super('fnExpr');
     // 4 public props: fnName, exprs, localFn, dataType

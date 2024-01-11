@@ -50,9 +50,9 @@ Note that we have Error['x'] = ... in some places in the code to prevent Terser 
 export class BreezeEnum {
   // // TODO: think about CompositeEnum (flags impl).
   /** The name of this symbol */
-  name: string;
+  declare name: string;
   /** Type of the enum; set in prototype of each enum */
-  _$typeName: string;
+  declare _$typeName: string;
   /** @hidden @internal */
   static _resolvedNamesAndSymbols: { name: string, symbol: BreezeEnum }[];
 

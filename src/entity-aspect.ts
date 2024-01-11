@@ -176,9 +176,11 @@ export class EntityAspect {
     // in case this is the NULL entityAspect. - used with ComplexAspects that have no parent.
 
     if (entity != null) {
-      // remove properties that should be on prototype but placed on class by Babel
-      if (!entity.entityType) { delete(entity.entityType); }
-      if (!entity.entityAspect) { delete(entity.entityAspect); }
+      // remove properties that should be on prototype but placed on instance by Babel
+      if (entity.hasOwnProperty('entityType')) {
+        // throw new Error("Entity instance has entityType property; should only be on prototype");
+        delete(entity.entityType);
+      }
       entity.entityAspect = this;
 
       // entityType should already be on the entity from 'watch'
@@ -191,7 +193,7 @@ export class EntityAspect {
           throw new Error("Metadata for this entityType has not yet been resolved: " + typeName);
         }
       }
-      let entityCtor = entityType.getEntityCtor();
+      let entityCtor = entityType.getCtor();
       config.interfaceRegistry.modelLibrary.getDefaultInstance().startTracking(entity, entityCtor.prototype);
     }
   }
