@@ -131,6 +131,17 @@ export class DataType extends BreezeEnum {
     getNext: getNextNumber
   });
 
+  static DateOnly = new DataType({
+    defaultValue: new Date(1900, 0, 1),
+    isDate: true,
+    parse: coerceToDate,
+    parseRawValue: parseRawDate,
+    normalize: function (value: any) { return value && value.getTime && (new Date(value.getYear(), value.getMonth(), value.getDate())).getTime(); }, // dates don't perform equality comparisons properly
+    fmtOData: fmtDateTime,
+    getNext: getNextDateTime,
+    getConcurrencyValue: getConcurrencyDateTime
+  });
+
   static DateTime = new DataType({
     defaultValue: new Date(1900, 0, 1),
     isDate: true,
@@ -528,5 +539,3 @@ function parseRawBinary(val: any) {
 //  var timePart = source.substring(ix+1);
 //  return  timePart.indexOf("-") >= 0 || timePart.indexOf("+") >= 0 || timePart.indexOf("Z");
 //}
-
-
