@@ -268,6 +268,20 @@ describe("Unusual Datatypes", () => {
     expect(qr1.results.length).toBeGreaterThan(0);
   });
 
+  // sequelize,hibernate,odata: "does not have these datatypes").
+  skipTestIf(TestFns.isSequelizeServer || TestFns.isHibernateServer || TestFns.isODataServer,
+    "where dateOnly & timeOnly", async function () {
+    expect.hasAssertions();
+    const em = TestFns.newEntityManager();
+    const dt1 = new Date(2001, 1, 1); // 2001-02-01
+    const tm1 = "01:23:45.678";
+    const p1 = Predicate.create("dateOnly", "==", dt1).or("timeOnly", "==", tm1);
+    const query = EntityQuery.from("UnusualDates").where(p1);
+    debugger;
+    const qr1 = await em.executeQuery(query);
+    expect(qr1.results.length).toBeGreaterThan(0);
+  });
+
   // testFns.skipIf("mongo,sequelize,hibernate,odata", "does not have these datatypes").
   skipTestIf(TestFns.isSequelizeServer || TestFns.isHibernateServer || TestFns.isODataServer,
     "export/import dateTimeOffset with nulls", async function () {

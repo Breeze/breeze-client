@@ -1344,10 +1344,12 @@ let toJSONVisitor = {
   },
 
   litExpr: function (this: LitExpr, context: VisitContext) {
+    // special handling for DateOnly because it serializes improperly
+    const value = (this.dataType === DataType.DateOnly) ? DataType.toDateOnlyString(this.value) : this.value;
     if (this.hasExplicitDataType || context.useExplicitDataType) {
-      return { value: this.value, dataType: this.dataType.name };
+      return { value: value, dataType: this.dataType.name };
     } else {
-      return this.value;
+      return value;
     }
   },
 
