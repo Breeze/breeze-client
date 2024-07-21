@@ -2276,6 +2276,12 @@
           ]
         },
         {
+          "name": "dateOnly",
+          "dataType": "DateOnly",
+          "isNullable": true,
+          "validators": []
+        },
+        {
           "name": "modificationDate",
           "dataType": "DateTime",
           "isNullable": false,
@@ -2306,6 +2312,12 @@
               "name": "date"
             }
           ]
+        },
+        {
+          "name": "timeOnly",
+          "dataType": "TimeOnly",
+          "isNullable": true,
+          "validators": []
         }
       ]
     }

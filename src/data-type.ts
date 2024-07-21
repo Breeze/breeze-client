@@ -134,10 +134,10 @@ export class DataType extends BreezeEnum {
   static DateOnly = new DataType({
     defaultValue: new Date(1900, 0, 1),
     isDate: true,
-    parse: coerceToDate,
-    parseRawValue: parseRawDate,
+    parse: coerceToDateOnly,
+    parseRawValue: parseRawDateOnly,
     normalize: function (value: any) { return value && value.getTime && (new Date(value.getYear(), value.getMonth(), value.getDate())).getTime(); }, // dates don't perform equality comparisons properly
-    fmtOData: fmtDateTime,
+    fmtOData: fmtDateOnly,
     getNext: getNextDateTime,
     getConcurrencyValue: getConcurrencyDateTime
   });
@@ -276,6 +276,21 @@ export class DataType extends BreezeEnum {
     return source;
   }
 
+  /** Parse as UTC then shift to local time */
+  static parseDateAsLocal(source: string) {
+    var dt = DataType.parseDateAsUTC(source);
+    if (core.isDate(dt)) {
+        dt = new Date(dt.getTime() + dt.getTimezoneOffset()*60000);
+    }
+    return dt;
+  };
+
+  /** if val is a Date, return a date-only string e.g. '2023-12-31' */
+  static toDateOnlyString(val: any) {
+    // DateOnly types should not have time component, but JSON.stringify makes a full ISO string.
+    // We convert it to string here to prevent that, and shift the time zone because toISOString converts to UTC.
+    return val && val.getTime && new Date(val.getTime() - val.getTimezoneOffset()*60000).toISOString().substring(0, 10) || val;
+  }
 
   /** Returns a raw value converted to the specified DataType */
   static parseRawValue(val: any, dataType?: DataType) {
@@ -299,16 +314,6 @@ export class DataType extends BreezeEnum {
     };
   }
 
-  // NOT YET NEEDED --------------------------------------------------
-  // var _utcOffsetMs = (new Date()).getTimezoneOffset() * 60000;
-
-  //DataType.parseDateAsLocal = function (source) {
-  //    var dt = DataType.parseDatesAsUTC(source);
-  //    if (__isDate(dt)) {
-  //        dt = new Date(dt.getTime() + _utcOffsetMs);
-  //    }
-  //    return dt;
-  //};
 }
 DataType.prototype._$typeName = "DataType";
 Error['x'] = DataType._resetConstants();
@@ -430,6 +435,20 @@ function coerceToDate(source: any, sourceTypeName: string) {
   return source;
 }
 
+/** Trim off time portion before parse if source is string */
+function coerceToDateOnly(source: any, sourceTypeName: string) {
+  let val: any;
+  if (sourceTypeName === "string") {
+    let src = source.trim() as string;
+    val = DataType.parseDateAsLocal(val);
+    return core.isDate(val) ? val : source;
+  } else if (sourceTypeName === "number") {
+    val = new Date(source);
+    return core.isDate(val) ? val : source;
+  }
+  return source;
+}
+
 function coerceToBool(source: any, sourceTypeName: string) {
   if (sourceTypeName === "string") {
     let src = source.trim().toLowerCase();
@@ -466,6 +485,15 @@ function fmtDateTime(val: Date) {
   if (val == null) return null;
   try {
     return "datetime'" + val.toISOString() + "'";
+  } catch (e) {
+    throwError("'%1' is not a valid dateTime", val);
+  }
+}
+
+function fmtDateOnly(val: Date) {
+  if (val == null) return null;
+  try {
+    return "date'" + val.toISOString().substring(0, 10) + "'";
   } catch (e) {
     throwError("'%1' is not a valid dateTime", val);
   }
@@ -523,6 +551,17 @@ function throwError(msg: string, val: any) {
 function parseRawDate(val: any) {
   if (!core.isDate(val)) {
     val = DataType.parseDateFromServer(val);
+  }
+  return val;
+}
+
+/** Trim off time portion before parse */
+function parseRawDateOnly(val: any) {
+  if (typeof val === 'string') {
+    if (val.length > 10) {
+      val = val.substring(0, 10);
+    }
+    val = DataType.parseDateAsLocal(val);
   }
   return val;
 }

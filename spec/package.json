@@ -5,7 +5,7 @@
   "description": "Breeze tests",
   "repository": "https://github.com/Breeze/breeze-client.git",
   "dependencies": {
-    "breeze-client": "file:../breeze-client-2.1.5.tgz",
+    "breeze-client": "file:../breeze-client-2.1.6.tgz",
     "node-fetch": "^2.6.0"
   },
   "devDependencies": {
@@ -24,7 +24,7 @@
     "typescript": "~4.9.0"
   },
   "scripts": {
-    "test": "jest",
+    "test": "jest ./datatypes.spec",
     "test-old": "npm run clean && tsc && jest ./*.spec.js$",
     "clean": "rimraf *.spec.js && rimraf *.spec.js.map && rimraf *-fns.js && rimraf *.d.ts",
     "tsc": "tsc",

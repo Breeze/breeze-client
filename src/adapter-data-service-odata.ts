@@ -327,12 +327,15 @@ function toQueryString(obj: Object) {
   return parts.join("&");
 }
 
+/** Transform data properties while unwrapping entities */
 function transformValue(prop: breeze.DataProperty, val: any) {
   if (prop.isUnmapped) return undefined;
   if (prop.dataType === breeze.DataType.DateTimeOffset) {
     // The datajs lib tries to treat client dateTimes that are defined as DateTimeOffset on the server differently
     // from other dateTimes. This fix compensates before the save.
     val = val && new Date(val.getTime() - (val.getTimezoneOffset() * 60000));
+  } else if (prop.dataType === breeze.DataType.DateOnly) {
+    val = breeze.DataType.toDateOnlyString(val);
   } else if ((prop.dataType as breeze.DataType).quoteJsonOData) {
     val = val != null ? val.toString() : val;
   }

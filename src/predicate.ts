@@ -555,10 +555,10 @@ export class BinaryPredicate extends Predicate {
 
 Error['x'] = BinaryPredicate.prototype._initialize('binaryPredicate', {
   'eq': {
-    aliases: ["==", "equals"]
+    aliases: ["==", "equals", "equal"]
   },
   'ne': {
-    aliases: ["!=", "~=", "notequals"]
+    aliases: ["!=", "~=", "notequals", "notequal"]
   },
   'lt': {
     aliases: ["<", "lessthan"]

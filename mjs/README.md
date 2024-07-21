@@ -1,6 +1,6 @@
 # Readme - mjs
 
-This folder is for building the `mjs` tagged package.  It uses the latest (v15 as of this writing) version of [ng-packagr](https://github.com/ng-packagr/ng-packagr) to build the npm package.  
+This folder is for building the `mjs` tagged package.  It uses the latest (v16 as of this writing) version of [ng-packagr](https://github.com/ng-packagr/ng-packagr) to build the npm package.  
 
 The root directory uses v9 of ng-packagr to maintain backward compatibility with older projects that depend on older ES versions
 and/or UMD modules.

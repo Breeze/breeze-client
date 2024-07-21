@@ -151,6 +151,25 @@ describe("Unusual Datatypes", () => {
     }
   });
 
+  test("dateOnly w/invalid value", async function () {
+    expect.hasAssertions();
+    const em = TestFns.newEntityManager();
+    const query = new EntityQuery("UnusualDates").take(1);
+
+    try {
+      const data = await em.executeQuery(query);
+      const ud = data.results[0];
+      const oldDate = ud.getProperty("dateOnly");
+      ud.setProperty("dateOnly", "whatever");
+      expect(ud.getProperty("dateOnly")).toEqual("whatever");
+      const sr = await em.saveChanges();
+      throw new Error('should not get here');
+    } catch (err) {
+      // expect(err.message).toEqual("Client side validation errors encountered - see the entityErrors collection on this object for more detail");
+      expect(err.message).toInclude("Error converting value");
+    }
+  });
+
   // sequelize,hibernate,odata", "does not have these datatypes").
   skipTestIf(TestFns.isSequelizeServer || TestFns.isHibernateServer || TestFns.isODataServer,
     "dateTimeOffset & dateTime2 w/save", async function () {
@@ -191,6 +210,49 @@ describe("Unusual Datatypes", () => {
     const modDt3 = tlimit3.getProperty("modificationDate");
     expect(crtnDt3.getTime()).toBe(crtnDt2.getTime());
     expect(modDt3.getTime()).toBe(modDt2.getTime());
+
+  });
+
+  // sequelize,hibernate,odata", "does not have these datatypes").
+  skipTestIf(TestFns.isSequelizeServer || TestFns.isHibernateServer || TestFns.isODataServer,
+    "dateOnly & timeOnly w/save", async function () {
+    expect.hasAssertions();
+    const em = TestFns.newEntityManager();
+    const query = new EntityQuery("UnusualDates").take(10);
+    const tlimitType = em.metadataStore.getEntityType("UnusualDate") as EntityType;
+    const date0 = new Date(2001, 1, 1);
+    const time0 = "01:23:45.678"; // TODO TimeOnly type is string on client, for now
+    const date2 = new Date(2003, 3, 3);
+    const time2 = "13:45:59.000";
+    const tlimit = tlimitType.createEntity();
+    tlimit.setProperty("dateOnly", date0);
+    tlimit.setProperty("timeOnly", time0);
+    em.addEntity(tlimit);
+
+    const sr0 = await em.saveChanges();
+    const sr0Ents = sr0.entities;
+    expect(sr0Ents.length).toBe(1);
+    const tlimit2 = sr0Ents[0];
+    const q = EntityQuery.fromEntities(tlimit2);
+    const qr1 = await em.executeQuery(q);
+    const r1 = qr1.results;
+    const tlimit1 = r1[0];
+    const date1 = tlimit1.getProperty("dateOnly");
+    const time1 = tlimit1.getProperty("timeOnly");
+    expect(date1.getTime()).toBe(date0.getTime());
+    expect(time1).toEqual(time0);
+    // change and save again
+    tlimit1.setProperty("dateOnly", date2);
+    tlimit1.setProperty("timeOnly", time2);
+    tlimit1.entityAspect.originalValues.dateOnly = "2001-02-01";
+    tlimit1.entityAspect.setDeleted();
+    const sr1 = await em.saveChanges();
+    const sr1Ents = sr1.entities;
+    const tlimit3 = sr1Ents[0];
+    const crtnDt3 = tlimit3.getProperty("dateOnly");
+    const modDt3 = tlimit3.getProperty("timeOnly");
+    expect(crtnDt3.getTime()).toBe(date2.getTime());
+    expect(modDt3).toEqual(time2);
 
   });
 
