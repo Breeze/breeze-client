@@ -6,7 +6,9 @@ import { AjaxFetchAdapter } from 'breeze-client/adapter-ajax-fetch';
 import { DataServiceWebApiAdapter } from 'breeze-client/adapter-data-service-webapi';
 import { UtilFns } from './util-fns';
 
-const northwindIBMetadata = require('./support/NorthwindIBMetadata.json');  
+// Choose whether to use EmployeeTerritoriesNoPayload join table
+// const northwindIBMetadata = require('./support/NorthwindIBMetadata.json');
+const northwindIBMetadata = require('./support/NorthwindIBMetadata_ETNOPAYLOAD.json');
 
 export class TestFns extends UtilFns {
   // Uncomment just one

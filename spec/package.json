@@ -24,7 +24,7 @@
     "typescript": "~4.9.0"
   },
   "scripts": {
-    "test": "jest ./datatypes.spec",
+    "test": "jest",
     "test-old": "npm run clean && tsc && jest ./*.spec.js$",
     "clean": "rimraf *.spec.js && rimraf *.spec.js.map && rimraf *-fns.js && rimraf *.d.ts",
     "tsc": "tsc",

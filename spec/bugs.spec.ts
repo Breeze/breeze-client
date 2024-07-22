@@ -350,6 +350,34 @@ describe("Old Fixed Bugs", () => {
   });
 
 
+  // See https://github.com/Breeze/breeze-client/issues/83
+  test("bug updating keys with many-to-many no payload", async () => {
+    const em1 = TestFns.newEntityManager();
+
+    const employee = em1.createEntity('Employee', {
+      lastName: 'Doe',
+      firstName: 'John',
+      title: 'VP',
+      hireDate: new Date(1974,1,1),
+      reportsToEmployeeID: 4, // known existing value
+    }) as any;
+
+    const empter = em1.createEntity('EmployeeTerritory', {
+      employeeID: employee.employeeID,
+      territoryID: 3049 // known existing value
+    }) as any;
+
+    expect(employee.employeeID).toBeLessThan(0);
+
+    const sr = await em1.saveChanges();
+
+    expect(employee.employeeID).toBeGreaterThan(0);
+
+    expect(empter.employeeID).toEqual(employee.employeeID);
+
+  });
+
+
   // const Customer = function () {
   //   this.miscData = "asdf";
   //   this.getNameLength = function () {
