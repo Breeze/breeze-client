@@ -47,7 +47,7 @@ export class MappingContext {
   mergeOptions: MergeOptions;
   adapter: DataServiceAdapter;  // assigned in the AbstractDataServiceAdapter.
 
-  refMap: Object; // TODO
+  refMap: Record<string, any>; // TODO
   deferredFns: Function[]; // TODO
   jsonResultsAdapter: JsonResultsAdapter;
   metadataStore: MetadataStore;
@@ -165,7 +165,7 @@ function processMeta(mc: MappingContext, node: any, meta: NodeMeta, assignFn?: (
 }
 
 function processNoMerge(mc: MappingContext, stype: StructuralType, node: any) {
-  let result = {};
+  let result = {} as Record<string, any>;
 
   stype.dataProperties.forEach(function (dp) {
     if (dp.isComplexProperty) {
@@ -198,7 +198,7 @@ function processAnonType(mc: MappingContext, node: any) {
   return result;
 }
 
-function visitNode(node: any, mc: MappingContext, nodeContext: NodeContext, result: Object, key: string) {
+function visitNode(node: any, mc: MappingContext, nodeContext: NodeContext, result: Record<string, any>, key: string) {
   let jra = mc.jsonResultsAdapter;
   let meta = jra.visitNode(node, mc, nodeContext) || {};
   // allows visitNode to change the value;

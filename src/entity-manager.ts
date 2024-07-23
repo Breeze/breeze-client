@@ -2396,7 +2396,7 @@ function unwrapOriginalValues(target: StructuralObject, metadataStore: MetadataS
   let stype = EntityAspect.isEntity(target) ? target.entityType : target.complexType;
   let aspect = EntityAspect.isEntity(target) ? target.entityAspect : target.complexAspect;
   let fn = metadataStore.namingConvention.clientPropertyNameToServer;
-  let result = {};
+  let result = {} as Record<string, any>;
   core.objectForEach(aspect.originalValues, function (propName, val) {
     let prop = stype.getProperty(propName) as DataProperty;
     val = transformFn ? transformFn(prop, val) : val;
@@ -2425,7 +2425,7 @@ function unwrapChangedValues(entity: Entity, metadataStore: MetadataStore, trans
   let stype = entity.entityType;
   let serializerFn = getSerializerFn(stype);
   let fn = metadataStore.namingConvention.clientPropertyNameToServer;
-  let result = {};
+  let result = {} as Record<string, any>;
   core.objectForEach(entity.entityAspect.originalValues, function (propName, value) {
     let prop = stype.getProperty(propName) as DataProperty;
     let val = entity.getProperty(propName);

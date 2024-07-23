@@ -14,9 +14,9 @@ import { EntityQuery } from './entity-query';
 export interface Entity {
   entityAspect: EntityAspect;
   entityType: EntityType;
-  /** @internal */
+  /** Get the property with the given name */
   getProperty?(prop: string): any;
-  /** @internal */
+  /** Set the property with the given name */
   setProperty?(prop: any, value: any): void;
   /** @hidden @internal */
   prototype?: { _$typeName: string };
@@ -77,7 +77,7 @@ export class EntityAspect {
   isBeingSaved: boolean;
   /** The 'original values' of this entity where they are different from the 'current values'.
   This is a map where the key is a property name and the value is the 'original value' of the property. */
-  originalValues: {};
+  originalValues: Record<string, any>;
   /**  Whether this entity has any validation errors. __Read Only__ */
   hasValidationErrors: boolean;
   /** Whether this entity has a temporary [[EntityKey]]. */
@@ -900,7 +900,7 @@ export class ComplexAspect {
   /** The 'original values' of this complex object where they are different from the 'current values'.
   This is a map where the key is a property name and the value is the 'original value' of the property.
   __Read Only__ */
-  originalValues: {};
+  originalValues: Record<string, any>;
   /** The parent object that to which this aspect belongs; this will either be an entity or another complex object. __Read Only__ */
   parent?: StructuralObject;
   /** The [[DataProperty]] on the 'parent' that contains this complex object. __Read Only__ */

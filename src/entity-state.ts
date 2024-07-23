@@ -78,6 +78,11 @@ export class EntityState extends BreezeEnum {
     return this === EntityState.Detached;
   }
 
+  /** Return true if EntityState is Deleted or Detached */
+  isDeletedOrDetached() {
+    return this === EntityState.Detached || this === EntityState.Detached;
+  }
+
   /**
   Returns whether an entityState instance is EntityState.Unchanged or EntityState.Modified.
   >     var es = anEntity.entityAspect.entityState;
@@ -88,6 +93,11 @@ export class EntityState extends BreezeEnum {
   **/
   isUnchangedOrModified() {
     return this === EntityState.Unchanged || this === EntityState.Modified;
+  }
+
+  /** Return true if EntityStatis is Added or Modified */
+  isAddedOrModified() {
+    return this === EntityState.Added || this === EntityState.Modified;
   }
 
   /** Returns whether an entityState instance is EntityState.Added or EntityState.Modified or EntityState.Deleted.

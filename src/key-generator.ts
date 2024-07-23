@@ -5,7 +5,7 @@ import { config } from './config';
 interface IPropEntry {
   entityType: EntityType;
   propertyName: string;
-  keyMap: Object;
+  keyMap: Record<string, any>;
 }
 
 interface ITempIdMap {
