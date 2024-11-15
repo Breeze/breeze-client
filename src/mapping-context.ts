@@ -1,4 +1,4 @@
-﻿import { DataServiceAdapter } from './interface-registry';
+import { DataServiceAdapter } from './interface-registry';
 import { core } from './core';
 import { DataType  } from './data-type';
 import { DataService, JsonResultsAdapter, NodeContext, NodeMeta } from './data-service';
@@ -304,8 +304,8 @@ function mergeEntity(mc: MappingContext, node: any, meta: NodeMeta) {
     if (meta.extraMetadata) {
       targetEntity.entityAspect.extraMetadata = meta.extraMetadata;
     }
-    // em._attachEntityCore(targetEntity, EntityState.Unchanged, MergeStrategy.Disallowed);
-    em._attachEntityCore(targetEntity, EntityState.Unchanged, mergeStrategy);
+    // return value === targetEntity EXCEPT in the case of a merge with a self reference.
+    targetEntity = em._attachEntityCore(targetEntity, EntityState.Unchanged, mergeStrategy);
     targetEntity.entityAspect.wasLoaded = true;
     em.entityChanged.publish({ entityAction: EntityAction.AttachOnQuery, entity: targetEntity });
   }
