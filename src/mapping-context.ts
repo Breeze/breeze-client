@@ -395,6 +395,13 @@ function mergeRelatedEntityCore(mc: MappingContext, rawEntity: any, navigationPr
   let relatedRawEntity = rawEntity[navigationProperty.nameOnServer];
   if (!relatedRawEntity) return null;
 
+  if (rawEntity.$type === relatedRawEntity.$type) {
+	  if (navigationProperty.parentType.keyProperties.every(kp => rawEntity[kp.nameOnServer] === relatedRawEntity[kp.nameOnServer])) {
+		  //the related entity is a duplicate of the parent entity, ignore it
+		  return null;
+	  }
+  }
+
   let relatedEntity = mc.visitAndMerge(relatedRawEntity, { nodeType: "navProp", navigationProperty: navigationProperty });
   return relatedEntity;
 }
