@@ -350,7 +350,7 @@ export class EntityAspect {
 
   /**
   Sets the entity to an EntityState of 'Deleted'.  This both marks the entity as being scheduled for deletion during the next 'Save' call
-  but also removes the entity from all of its related entities.
+  but also removes the entity from all of its related entities.  If the current entityState is 'Added', then `setDeleted()` will mark it 'Detached'
   The same operation can be performed by calling [[EntityAspect.setEntityState]].
   >      // assume order is an order entity attached to an EntityManager.
   >      order.entityAspect.setDeleted();

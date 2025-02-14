@@ -34,6 +34,27 @@ describe("Query Misc", () => {
     expect(ents.length).toBe(qr1.results.length);
   });
 
+  // For https://github.com/Breeze/breeze.server.net/issues/198
+  test("nullable int with in", async () => {
+    expect.hasAssertions();
+    const em1 = TestFns.newEntityManager();
+    const query = breeze.EntityQuery.from("Orders").where("employeeID", "in", [1,2,null]);
+    const qr1 = await em1.executeQuery(query);
+    expect(qr1.results.length).toBeGreaterThan(0);
+    const ents = em1.getEntities();
+    expect(ents.length).toBe(qr1.results.length);
+  });
+
+  // For https://github.com/Breeze/breeze.server.net/issues/199
+  test("enums with in", async () => {
+    expect.hasAssertions();
+    const em1 = TestFns.newEntityManager();
+    const query = breeze.EntityQuery.from("Roles").where("roleType", "in", [0,1,null]);
+    const qr1 = await em1.executeQuery(query);
+    expect(qr1.results.length).toBeGreaterThan(0);
+    const ents = em1.getEntities();
+    expect(ents.length).toBe(qr1.results.length);
+  });
 
 
   test("query results include query obj", async () => {
