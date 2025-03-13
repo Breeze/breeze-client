@@ -909,7 +909,7 @@ export class FnExpr extends PredicateExpression {
 // TODO: add dataTypes for the args next - will help to infer other dataTypes.
 
 
-let RX_IDENTIFIER = /^[a-z_][\w.$]*$/i;
+let RX_IDENTIFIER = /^[a-z_](?:\/?[\w.$])*$/i;
 // comma delimited expressions ignoring commas inside of both single and double quotes.
 let RX_COMMA_DELIM1 = /('[^']*'|[^,]+)/g;
 let RX_COMMA_DELIM2 = /("[^"]*"|[^,]+)/g;
