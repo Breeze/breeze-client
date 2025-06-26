@@ -198,6 +198,50 @@ describe("Query Misc", () => {
     expect(true).toBe(true);
   });
   
+  test("merge into deleted entity", async () => {
+    expect.hasAssertions();
+    const em1 = TestFns.newEntityManager();
+    let alfred, alfredsID;
+    {
+      const query = EntityQuery.from("Customers").where("companyName", "startsWith", "Alfreds");
+      const qr1 = await em1.executeQuery(query);
+      expect(qr1.results.length).toEqual(1);
+      alfred = qr1.results[0];
+      alfredsID = alfred.getProperty(TestFns.wellKnownData.keyNames.customer).toLowerCase();
+      expect(alfredsID).toEqual(TestFns.wellKnownData.alfredsID);
+      alfred.entityAspect.setDeleted();
+    }
 
+    const query2 = EntityQuery.from("Customers").where("companyName", "startsWith", "Alfreds");
+    const qr2 = await em1.executeQuery(query2);
+    // when entity is deleted, Breeze does not return it from a query (this is consistent with query locally)
+    expect(qr2.results.length).toEqual(0);
+    expect(qr2.retrievedEntities.length).toEqual(0);
+  });
+
+  test("merge into deleted entity - OverwriteChanges", async () => {
+    expect.hasAssertions();
+    const em1 = TestFns.newEntityManager();
+    let alfred, alfredsID;
+    {
+      const query = EntityQuery.from("Customers").where("companyName", "startsWith", "Alfreds");
+      const qr1 = await em1.executeQuery(query);
+      expect(qr1.results.length).toEqual(1);
+      alfred = qr1.results[0];
+      alfredsID = alfred.getProperty(TestFns.wellKnownData.keyNames.customer).toLowerCase();
+      expect(alfredsID).toEqual(TestFns.wellKnownData.alfredsID);
+      alfred.entityAspect.setDeleted();
+    }
+
+    const query2 = EntityQuery.from("Customers").where("companyName", "startsWith", "Alfreds").using(MergeStrategy.OverwriteChanges);
+    const qr2 = await em1.executeQuery(query2);
+    expect(qr2.results.length).toEqual(1);
+    expect(qr2.retrievedEntities.length).toEqual(1);
+    const alfred2 = qr2.results[0];
+    const alfredsID2 = alfred2.getProperty(TestFns.wellKnownData.keyNames.customer).toLowerCase();
+    expect(alfredsID2).toEqual(alfredsID);
+    // Not deleted on server, so entity is now unchanged
+    expect(alfred2.entityAspect.entityState.isUnchanged()).toBeTrue();
+  });
 
 });
