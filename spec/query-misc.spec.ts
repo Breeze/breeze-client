@@ -244,4 +244,71 @@ describe("Query Misc", () => {
     expect(alfred2.entityAspect.entityState.isUnchanged()).toBeTrue();
   });
 
+  test.("merge into deleted entity - Many-to-Many", async () => {
+    expect.hasAssertions();
+    const em1 = TestFns.newEntityManager();
+    {
+      const q1 = EntityQuery.from("Employees").where("employeeID", "eq", 2);
+      const qr1 = await em1.executeQuery(q1);
+      expect(qr1.results.length).toEqual(1);
+    } 
+    {
+      const q2 = EntityQuery.from("EmployeeTerritories").where("employeeID", "eq", 2).expand("territory");
+      const qr2 = await em1.executeQuery(q2);
+      expect(qr2.results.length).toBeGreaterThan(2);
+
+      qr2.results[0].entityAspect.setDeleted();
+    }
+
+    // Inconsistent query results processing when 1st EmployeeTerritory has been deleted.
+    // If we expand "territory" only, this test will pass
+    // If we expand "territory.region", qr3.results[0] is undefined, qr3.results[n>=1] is a resolveEntityRef function instead of an entity.
+    const q3 = EntityQuery.from("EmployeeTerritories").where("employeeID", "eq", 2).expand("territory.region");
+    const qr3 = await em1.executeQuery(q3);
+    expect(qr3.results.length).toBeGreaterThan(2);
+    // console.log(qr3.results);
+    // result[0] is undefined because the entity was deleted in cache
+    const et0 = qr3.results[0];
+    expect(et0).toBeUndefined();
+    // result[1] is normal
+    const et1 = qr3.results[1];
+    expect(et1.entityAspect).toBeTruthy();
+  });
+
+  test("merge into deleted entity - Many-to-Many, delete 2nd entity", async () => {
+    expect.hasAssertions();
+    const em1 = TestFns.newEntityManager();
+    {
+      const q1 = EntityQuery.from("Employees").where("employeeID", "eq", 2);
+      const qr1 = await em1.executeQuery(q1);
+      expect(qr1.results.length).toEqual(1);
+    } 
+    {
+      const q2 = EntityQuery.from("EmployeeTerritories").where("employeeID", "eq", 2).take(2).expand(["territory.region"]);
+      const qr2 = await em1.executeQuery(q2);
+      expect(qr2.results.length).toEqual(2);
+
+      // delete the 2nd entity
+      qr2.results[1].entityAspect.setDeleted();
+    }
+
+    // Inconsistent query results processing when 2nd EmployeeTerritory has been deleted.
+    // If we have no expands, or we expand "territory" only, we get results.length == 1; no entry in results for deleted entity
+    // If we expand "territory.region", we get results.length == 2, and 2nd result is a resolveEntityRef function instead of an entity
+    const q3 = EntityQuery.from("EmployeeTerritories").where("employeeID", "eq", 2).take(2).expand(["territory.region"]);
+    const qr3 = await em1.executeQuery(q3);
+    expect(qr3.results.length).toEqual(2);
+    // console.log(qr3.results);
+
+    // result[0] is normal
+    const et0 = qr3.results[0];
+    expect(et0.entityAspect).toBeTruthy();
+
+    // result[1] is undefined because the entity was deleted in cache
+    const et1 = qr3.results[1];
+    console.log(et1);
+    expect(et1).toBeUndefined();
+
+  });
+
 });
