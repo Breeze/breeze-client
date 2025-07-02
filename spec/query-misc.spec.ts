@@ -319,4 +319,37 @@ describe("Query Misc", () => {
 
   });
 
+  // test for issue #
+  test.only("self-referencing entity", async () => {
+    expect.hasAssertions();
+    const em1 = TestFns.newEntityManager();
+    let empId;
+    {
+      // get an employee outside the known range.  Should be at least one.
+      const q1 = EntityQuery.from("Employees").where("employeeID", "gt", 10).take(1);
+      const qr1 = await em1.executeQuery(q1);
+      expect(qr1.results.length).toEqual(1);
+      const emp1 = qr1.results[0];
+      empId = emp1.getProperty("employeeID");
+      emp1.setProperty("reportsToEmployeeID", empId);
+      if (em1.hasChanges()) {
+        const sr = await em1.saveChanges();
+        console.log(sr);
+        expect(sr.entities.length).toEqual(1);
+      }
+    } 
+    {
+      const q2 = EntityQuery.from("EmployeesNoTracking").where("employeeID", "eq", empId).expand("manager");
+      const qr2 = await em1.executeQuery(q2);
+      expect(qr2.results.length).toEqual(1);
+      const emp2 = qr2.results[0];
+      expect(emp2.entityAspect.entityState).toEqual(EntityState.Unchanged);
+      const relId = emp2.getProperty("reportsToEmployeeID");
+      expect(relId).toEqual(empId);
+      const mgr = emp2.getProperty("manager");
+      expect(mgr).toEqual(emp2);
+    }
+
+  });
+
 });
