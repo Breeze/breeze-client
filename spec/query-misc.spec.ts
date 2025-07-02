@@ -320,7 +320,7 @@ describe("Query Misc", () => {
   });
 
   // test for issue #
-  test.only("self-referencing entity", async () => {
+  test("self-referencing entity", async () => {
     expect.hasAssertions();
     const em1 = TestFns.newEntityManager();
     let empId;
