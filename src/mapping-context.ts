@@ -87,7 +87,7 @@ export class MappingContext {
     let jra = this.jsonResultsAdapter;
     nodeContext = nodeContext || {};
     let that = this;
-    return core.map(nodes, function (node) {
+    let result = core.map(nodes, function (node) {
       if (query == null && node.entityAspect) {
         // don't bother merging a result from a save that was not returned from the server.
         if (node.entityAspect.entityState.isDeleted()) {
@@ -105,6 +105,13 @@ export class MappingContext {
       }
       return processMeta(that, node, meta);
     }, this.mergeOptions.includeDeleted);
+
+    if (result.filter && !this.mergeOptions.includeDeleted) {
+      // result may have deleted entities because related nodes were processed
+      result = result.filter((x: any) => x && (!x.entityAspect || !x.entityAspect.entityState.isDeleted()));
+    }
+
+    return result;
   }
 
   processDeferred() {
@@ -290,10 +297,11 @@ function mergeEntity(mc: MappingContext, node: any, meta: NodeMeta) {
           em._notifyStateChange(targetEntity, false);
         }
       } else {
+        // process targetEntity (even if deleted) to ensure related nodes are handled
+        updateEntityNoMerge(mc, targetEntity, node);
         if (targetEntityState === EntityState.Deleted && !mc.mergeOptions.includeDeleted) {
           return null;
         }
-        updateEntityNoMerge(mc, targetEntity, node);
       }
     }
   } else {

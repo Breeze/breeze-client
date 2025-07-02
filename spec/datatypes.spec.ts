@@ -277,7 +277,6 @@ describe("Unusual Datatypes", () => {
     const tm1 = "01:23:45.678";
     const p1 = Predicate.create("dateOnly", "==", dt1).or("timeOnly", "==", tm1);
     const query = EntityQuery.from("UnusualDates").where(p1);
-    debugger;
     const qr1 = await em.executeQuery(query);
     expect(qr1.results.length).toBeGreaterThan(0);
   });

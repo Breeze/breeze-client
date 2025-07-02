@@ -214,9 +214,11 @@ describe("Query Misc", () => {
 
     const query2 = EntityQuery.from("Customers").where("companyName", "startsWith", "Alfreds");
     const qr2 = await em1.executeQuery(query2);
-    // when entity is deleted, Breeze does not return it from a query (this is consistent with query locally)
+    // when entity is deleted, Breeze does not return it in qr.results (this is consistent with query locally)
     expect(qr2.results.length).toEqual(0);
-    expect(qr2.retrievedEntities.length).toEqual(0);
+    // ...but it does appear in retrievedEntities
+    expect(qr2.retrievedEntities.length).toEqual(1);
+    expect(qr2.retrievedEntities[0].entityAspect.entityState).toEqual(EntityState.Deleted);
   });
 
   test("merge into deleted entity - OverwriteChanges", async () => {
@@ -244,7 +246,7 @@ describe("Query Misc", () => {
     expect(alfred2.entityAspect.entityState.isUnchanged()).toBeTrue();
   });
 
-  test.("merge into deleted entity - Many-to-Many", async () => {
+  test("merge into deleted entity - Many-to-Many", async () => {
     expect.hasAssertions();
     const em1 = TestFns.newEntityManager();
     {
@@ -253,26 +255,33 @@ describe("Query Misc", () => {
       expect(qr1.results.length).toEqual(1);
     } 
     {
-      const q2 = EntityQuery.from("EmployeeTerritories").where("employeeID", "eq", 2).expand("territory");
+      const q2 = EntityQuery.from("EmployeeTerritories").where("employeeID", "eq", 2).take(3).expand("territory");
       const qr2 = await em1.executeQuery(q2);
-      expect(qr2.results.length).toBeGreaterThan(2);
+      expect(qr2.results.length).toEqual(3);
 
       qr2.results[0].entityAspect.setDeleted();
     }
 
-    // Inconsistent query results processing when 1st EmployeeTerritory has been deleted.
-    // If we expand "territory" only, this test will pass
-    // If we expand "territory.region", qr3.results[0] is undefined, qr3.results[n>=1] is a resolveEntityRef function instead of an entity.
-    const q3 = EntityQuery.from("EmployeeTerritories").where("employeeID", "eq", 2).expand("territory.region");
+    const q3 = EntityQuery.from("EmployeeTerritories").where("employeeID", "eq", 2).take(3).expand("territory.region");
     const qr3 = await em1.executeQuery(q3);
-    expect(qr3.results.length).toBeGreaterThan(2);
-    // console.log(qr3.results);
-    // result[0] is undefined because the entity was deleted in cache
+
+    // Deleted entity does not appear in the results, so length is now 2 instead of 3
+    expect(qr3.results.length).toEqual(2);
+
+    // result[0] is first unchanged entity
     const et0 = qr3.results[0];
-    expect(et0).toBeUndefined();
-    // result[1] is normal
+    expect(et0.entityAspect).toBeTruthy();
+    expect(et0.entityAspect.entityState).toEqual(EntityState.Unchanged);
+    // result[1] is second unchanged entity
     const et1 = qr3.results[1];
     expect(et1.entityAspect).toBeTruthy();
+    expect(et1.entityAspect.entityState).toEqual(EntityState.Unchanged);
+
+    // Deleted entities appear in qr.retrievedEntities but not in qr.results
+    const ret0 = qr3.retrievedEntities[0];
+    expect(ret0.entityAspect).toBeTruthy();
+    expect(ret0.entityAspect.entityState).toEqual(EntityState.Deleted);
+
   });
 
   test("merge into deleted entity - Many-to-Many, delete 2nd entity", async () => {
@@ -292,22 +301,21 @@ describe("Query Misc", () => {
       qr2.results[1].entityAspect.setDeleted();
     }
 
-    // Inconsistent query results processing when 2nd EmployeeTerritory has been deleted.
-    // If we have no expands, or we expand "territory" only, we get results.length == 1; no entry in results for deleted entity
-    // If we expand "territory.region", we get results.length == 2, and 2nd result is a resolveEntityRef function instead of an entity
     const q3 = EntityQuery.from("EmployeeTerritories").where("employeeID", "eq", 2).take(2).expand(["territory.region"]);
     const qr3 = await em1.executeQuery(q3);
-    expect(qr3.results.length).toEqual(2);
-    // console.log(qr3.results);
 
-    // result[0] is normal
+    // Deleted entity does not appear in the results, so length is now 1 instead of 2
+    expect(qr3.results.length).toEqual(1);
+
+    // result[0] is first unchanged entity
     const et0 = qr3.results[0];
     expect(et0.entityAspect).toBeTruthy();
+    expect(et0.entityAspect.entityState).toEqual(EntityState.Unchanged);
 
-    // result[1] is undefined because the entity was deleted in cache
-    const et1 = qr3.results[1];
-    console.log(et1);
-    expect(et1).toBeUndefined();
+    // Deleted entities appear in qr.retrievedEntities but not in qr.results
+    const ret0 = qr3.retrievedEntities[qr3.retrievedEntities.length - 1];  // brittle; depends on order of processing from the server
+    expect(ret0.entityAspect).toBeTruthy();
+    expect(ret0.entityAspect.entityState).toEqual(EntityState.Deleted);
 
   });
 

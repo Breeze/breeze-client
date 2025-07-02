@@ -95,6 +95,7 @@ describe("Query Navigation", () => {
     expect.hasAssertions();
     const em = TestFns.newEntityManager();
     const query = EntityQuery.from("Employees")
+      .where("employeeID", "le", 10)
       .where("reportsToEmployeeID", "!=", null);
     const qr1 = await query.using(em).execute();
     const emps = qr1.results;

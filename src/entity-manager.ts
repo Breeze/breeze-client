@@ -88,7 +88,7 @@ export interface EntityError {
 
 /** The shape of the Promise returned by an [[EntityManager.executeQuery]] call. */
 export interface QueryResult {
-  /** Top level entities returned */
+  /** Top level entities returned.  Excludes entities that are Deleted. */
   results: any[];
   /** Query that was executed */
   query: EntityQuery | string;
@@ -96,7 +96,7 @@ export interface QueryResult {
   entityManager?: EntityManager;
   /** Total number of results available on the server */
   inlineCount?: number;
-  /** All entities returned by the query.  Differs from results when an expand is used. */
+  /** All entities returned by the query.  Differs from `results` when an expand is used.  Includes entities that are Deleted. */
   retrievedEntities?: Entity[];
     /** Raw response from the server */
   httpResponse?: HttpResponse;
