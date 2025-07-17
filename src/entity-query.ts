@@ -54,6 +54,8 @@ export class EntityQuery {
   declare inlineCountEnabled: boolean;
   /** Whether entity tracking has been disabled for this query. __Read Only__ */
   declare noTrackingEnabled: boolean;
+  /** Whether to send query as the body of a POST request.  (Server needs to accomodate POST). __Read Only__ */
+  declare usePostEnabled: boolean;
   /** The [[QueryOptions]] for this query. __Read Only__  **/
   // default is to get queryOptions and dataService from the entityManager.
   declare queryOptions?: QueryOptions;
@@ -91,6 +93,7 @@ export class EntityQuery {
     this.parameters = {};
     this.inlineCountEnabled = false;
     this.noTrackingEnabled = false;
+    this.usePostEnabled = false;
     // default is to get queryOptions and dataService from the entityManager.
     // this.queryOptions = new QueryOptions();
     // this.dataService = new DataService();
@@ -389,7 +392,7 @@ export class EntityQuery {
   }
 
   /**
-  Returns a query with the 'inlineCount' capability either enabled or disabled.  With 'inlineCount' enabled, an additional 'inlineCount' property
+  Returns a query with the `inlineCount` capability either enabled or disabled.  With `inlineCount` enabled, an additional 'inlineCount' property
   will be returned with the query results that will contain the number of entities that would have been returned by this
   query with only the 'where'/'filter' clauses applied, i.e. without any 'skip'/'take' operators applied. For local queries this clause is ignored.
   >     let query = new EntityQuery("Customers")
@@ -397,7 +400,7 @@ export class EntityQuery {
   >        .orderBy("CompanyName")
   >        .inlineCount(true);
 
-  will return the first 20 customers as well as a count of all of the customers in the remote store.
+  will return the first 20 customers as well as a count of _all_ of the customers in the remote store.
   @param enabled - (default = true) Whether or not inlineCount capability should be enabled. If this parameter is omitted, true is assumed.
   **/
   inlineCount(enabled?: boolean) {
@@ -413,7 +416,7 @@ export class EntityQuery {
   }
 
   /**
-  Returns a query with the 'noTracking' capability either enabled or disabled.  With 'noTracking' enabled, the results of this query
+  Returns a query with the `noTracking` capability either enabled or disabled.  With `noTracking` enabled, the results of this query
   will not be coerced into entities but will instead look like raw javascript projections. i.e. simple javascript objects.
   >     let query = new EntityQuery("Customers")
   >         .take(20)
@@ -425,6 +428,23 @@ export class EntityQuery {
     assertParam(enabled, "enabled").isBoolean().isOptional().check();
     enabled = (enabled === undefined) ? true : !!enabled;
     return clone(this, "noTrackingEnabled", enabled);
+  }
+
+  /**
+  Returns a query with the `usePost` capability either enabled or disabled.  With `usePost` enabled, the query is sent
+  as a POST request (instead of GET) and the query expression will be sent as JSON in the body of the post.
+  Note that the server must be able to parse the body of the request; otherwise the query expression will be ignored.
+  >     let query = new EntityQuery("Customers")
+  >         .where("companyId", "eq", 1)
+  >         .usePost(true);
+  results in a POST request to `{host}/{path}/Customers`
+  with body `{"where": {"companyId":{"eq":1}}}`
+  @param enabled - (default = true) Whether or not usePost should be enabled. If this parameter is omitted, true is assumed.
+  **/
+  usePost(enabled?: boolean) {
+    assertParam(enabled, "enabled").isBoolean().isOptional().check();
+    enabled = (enabled === undefined) ? true : !!enabled;
+    return clone(this, "usePostEnabled", enabled);
   }
 
   using(obj: EntityManager): EntityQuery;
@@ -762,6 +782,7 @@ function fromJSON(eq: EntityQuery, json: Object) {
     },
     "inlineCountEnabled,inlineCount": false,
     "noTrackingEnabled,noTracking": false,
+    "usePostEnabled,usePost": false,
     queryOptions: function (v: any) {
       return v ? QueryOptions.fromJSON(v) : undefined;
     }
@@ -786,6 +807,7 @@ function clone(eq: EntityQuery, propName?: string, value?: any) {
     "expandClause",
     "inlineCountEnabled",
     "noTrackingEnabled",
+    "usePostEnabled",
     "usesNameOnServer",
     "queryOptions",
     "entityManager",

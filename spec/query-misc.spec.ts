@@ -172,10 +172,24 @@ describe("Query Misc", () => {
     const em1 = TestFns.newEntityManager();
     const query = EntityQuery.from("Customers").where("companyName", "startsWith", "Alfreds");
     const qr1 = await em1.executeQuery(query);
+    expect(qr1.results.length).toEqual(1);
     const alfred = qr1.results[0];
     const alfredsID = alfred.getProperty(TestFns.wellKnownData.keyNames.customer).toLowerCase();
     expect(alfredsID).toEqual(TestFns.wellKnownData.alfredsID);
   });
+
+  test("getAlfred - POST", async () => {
+    expect.hasAssertions();
+    const em1 = TestFns.newEntityManager();
+    let query = EntityQuery.from("Customers").where("companyName", "startsWith", "Alfreds");
+    query = query.usePost();
+    const qr1 = await em1.executeQuery(query);
+    expect(qr1.results.length).toEqual(1);
+    const alfred = qr1.results[0];
+    const alfredsID = alfred.getProperty(TestFns.wellKnownData.keyNames.customer).toLowerCase();
+    expect(alfredsID).toEqual(TestFns.wellKnownData.alfredsID);
+  }, 99000);
+
 
   // "odata", "has not yet implemented server side interception").
   skipTestIf(TestFns.isODataServer, "insure that query is Not a duration query even without type mapping", async function () {

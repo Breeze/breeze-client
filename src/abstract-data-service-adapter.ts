@@ -6,7 +6,7 @@ import { Entity } from './entity-aspect';
 import { MappingContext } from './mapping-context';
 import { DataService, JsonResultsAdapter } from './data-service';
 import { HttpResponse, SaveContext, SaveBundle, ServerError, SaveResult, SaveErrorFromServer, QueryResult } from './entity-manager';
-import { MetadataStore } from './entity-metadata';
+import { EntityType, MetadataStore } from './entity-metadata';
 
 /** For use by breeze plugin authors only.  The class is used as the base class for most [[IDataServiceAdapter]] implementations
 @adapter (see [[IDataServiceAdapter]])    
@@ -79,50 +79,84 @@ export abstract class AbstractDataServiceAdapter implements DataServiceAdapter {
     return promise;
   }
 
+  /** Execute the query in the mappingContext using the ajaxImpl. */
   executeQuery(mappingContext: MappingContext) {
     mappingContext.adapter = this;
+
+    const usePost = (mappingContext.query as EntityQuery).usePostEnabled;
+    const params = usePost ? this._makeQueryPostParams(mappingContext) : this._makeQueryGetParams(mappingContext) as any;
+
     let promise = new Promise<QueryResult>((resolve, reject) => {
-      let url = mappingContext.getUrl();
-
-      let params = {
-        type: "GET",
-        url: url,
-        params: (mappingContext.query as EntityQuery).parameters,
-        dataType: 'json',
-        success: function (httpResponse: HttpResponse) {
-          let data = httpResponse.data;
-          try {
-            let rData: QueryResult;
-            let results = data && (data.results || data.Results);
-            if (results) {
-              rData = { results: results, inlineCount: data.inlineCount || data.InlineCount, 
-                httpResponse: httpResponse, query: mappingContext.query };
-            } else {
-              rData = { results: data, httpResponse: httpResponse, query: mappingContext.query };
-            }
-
-            resolve(rData);
-          } catch (e) {
-            if (e instanceof Error) {
-              reject(e);
-            } else {
-              handleHttpError(reject, httpResponse);
-            }
+      params.success = function (httpResponse: HttpResponse) {
+        let data = httpResponse.data;
+        try {
+          let rData: QueryResult;
+          let results = data && (data.results || data.Results);
+          if (results) {
+            rData = { results: results, inlineCount: data.inlineCount || data.InlineCount, 
+              httpResponse: httpResponse, query: mappingContext.query };
+          } else {
+            rData = { results: data, httpResponse: httpResponse, query: mappingContext.query };
           }
 
-        },
-        error: function (httpResponse: HttpResponse) {
-          handleHttpError(reject, httpResponse);
-        },
-        crossDomain: false
+          resolve(rData);
+        } catch (e) {
+          if (e instanceof Error) {
+            reject(e);
+          } else {
+            handleHttpError(reject, httpResponse);
+          }
+        }
       };
-      if (mappingContext.dataService.useJsonp) {
-        params.dataType = 'jsonp';
-        params.crossDomain = true;
-      }
+      params.error = function (httpResponse: HttpResponse) {
+        handleHttpError(reject, httpResponse);
+      };
       this.ajaxImpl.ajax(params);
     });
     return promise;
+  }
+
+  /** Set up ajax parameters for query GET.  This puts the query into the request querystring in either JSON or OData-style syntax, depending upon the UriBuilder. */
+  _makeQueryGetParams(mappingContext: MappingContext) {
+    const url = mappingContext.getUrl();
+
+    const params = {
+      type: "GET",
+      url: url,
+      params: (mappingContext.query as EntityQuery).parameters,
+      dataType: 'json',
+      crossDomain: false,
+    };
+    if (mappingContext.dataService.useJsonp) {
+      params.dataType = 'jsonp';
+      params.crossDomain = true;
+    }
+    return params;
+  }
+
+  /** Set up ajax parameters for query POST.  This put the query into the request body as JSON. */
+  _makeQueryPostParams(mappingContext: MappingContext) {
+    const entityQuery = mappingContext.query as EntityQuery;
+    const metadataStore = mappingContext.entityManager.metadataStore;
+    const url = mappingContext.dataService.qualifyUrl(entityQuery.resourceName);
+
+    let entityType = entityQuery._getFromEntityType(metadataStore, false);
+    if (!entityType) { entityType = new EntityType(metadataStore); }
+    const json = entityQuery.toJSONExt({ entityType: entityType, toNameOnServer: true}) as any;
+    json.from = undefined;
+    json.queryOptions = undefined;
+
+    const params = {
+      type: "POST",
+      url: url,
+      params: (mappingContext.query as EntityQuery).parameters,
+      dataType: 'json',
+      processData: false, // don't let JQuery form-encode it
+      contentType: "application/json; charset=UTF-8",
+      data: JSON.stringify(json),
+      crossDomain: false,
+    };
+    return params;
   }
 
   saveChanges(saveContext: SaveContext, saveBundle: SaveBundle) {
