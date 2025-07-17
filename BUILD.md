@@ -22,8 +22,10 @@ It will also create `breeze-client-{version}.tgz` in the main directory.  This f
 
     npm install ..\{path}\breeze-client-{version}.tgz
 
-> NOTE: the `mjs` folder publishes `breeze-client@2.x.x-mjs`, which is tagged `mjs` in npm.  This version does not have the `bundles` or `esm5` or `fesm5` folders shown above.  It has `esm2020` and `fesm2020` folders with .mjs files.  It is suitable
-for newer Angular applications.
+> NOTE: this folder publishes `breeze-client@2.x.x-cjs`, which is tagged `cjs` in npm.  This version has the folder structure shown above.
+It is backward compatible with older applications.
+
+> NOTE: the `mjs` folder publishes `breeze-client@2.x.x`, which is tagged `mjs` in npm.  This version does not have the `bundles` or `esm5` or `fesm5` folders shown above.  It has `esm2022` and `fesm2022` folders with .mjs files.  It is suitable for newer Angular applications.
 
 ## Build API Docs
 Run `npm run typedoc`.  This will create a '\docs' dir. click on the 'index.html' in this folder to see the docs.

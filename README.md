@@ -17,14 +17,18 @@ Client-side querying, caching, dynamic object graphs, change tracking and notifi
 
 ## Install from npm
 
-    npm install breeze-client@mjs
+    npm install breeze-client
 or 
 
-    npm install breeze-client
+    npm install breeze-client@cjs
 
-The version tagged `mjs` uses updated [Angular Package Format](https://docs.google.com/document/d/1CZC2rcpxffTDfRDs6p1cfbmKNLA6x5O-NtkJglDaBVs/preview) and ES2020 .mjs modules.  It has `esm2020` and `fesm2020` folders, but no UMD `bundles` folder.  
+The version tagged `cjs` uses an older Angular Package Format, and includes ES5 and ES2015 versions, as well as UMD bundles.
 
-If you want the latest module format, and don't care about UMD bundles, use `breeze-client@mjs`.
+The version tagged `latest` (and `mjs`) uses updated [Angular Package Format](https://docs.google.com/document/d/1CZC2rcpxffTDfRDs6p1cfbmKNLA6x5O-NtkJglDaBVs/preview) and ES2022 .mjs modules.  It has `esm2022` and `fesm2022` folders, but no UMD `bundles` folder.
+
+If you want the latest module format, and don't care about UMD bundles, use `breeze-client`.
+
+If you need UMD bundles, or need backward compatibility with ES5 or ES2015, use `breeze-client@cjs`.
 
 ## Documentation 
 

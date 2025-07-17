@@ -425,7 +425,7 @@ function coerceToDate(source: any, sourceTypeName: string) {
   let val: any;
   if (sourceTypeName === "string") {
     let src = source.trim();
-    if (src === "") return null;
+    if (!source || !source.trim()) { return null; }
     val = new Date(Date.parse(src));
     return core.isDate(val) ? val : source;
   } else if (sourceTypeName === "number") {
@@ -439,7 +439,7 @@ function coerceToDate(source: any, sourceTypeName: string) {
 function coerceToDateOnly(source: any, sourceTypeName: string) {
   let val: any;
   if (sourceTypeName === "string") {
-    let src = source.trim() as string;
+    if (!source || !source.trim()) { return null; }
     val = DataType.parseDateAsLocal(val);
     return core.isDate(val) ? val : source;
   } else if (sourceTypeName === "number") {
