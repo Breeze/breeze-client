@@ -23,19 +23,19 @@ A ValidationOptions instance is used to specify the conditions under which valid
 */
 export class ValidationOptions implements ValidationOptionsConfig {
   /** @hidden @internal */
-  _$typeName: string; // on proto
+  declare _$typeName: string; // on proto
   /** Whether entity and property level validation should occur when entities are attached to the EntityManager 
   other than via a query. (default = true) __Read Only__ */
-  validateOnAttach: boolean;
+  declare validateOnAttach: boolean;
   /** Whether entity and property level validation should occur before entities are saved. 
   A failed validation will force the save to fail early. (default = true) __Read Only__ */
-  validateOnSave: boolean;
+  declare validateOnSave: boolean;
   /** Whether entity and property level validation should occur after entities are queried from a remote server.
   (default = false) __Read Only__  **/
-  validateOnQuery: boolean;
+  declare validateOnQuery: boolean;
   /** Whether property level validation should occur after entities are modified.
   (default = true) __Read Only__ **/
-  validateOnPropertyChange: boolean;
+  declare validateOnPropertyChange: boolean;
 
 
 

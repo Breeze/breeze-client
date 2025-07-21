@@ -206,26 +206,26 @@ Instances of the EntityManager contain and manage collections of entities, eithe
 **/
 export class EntityManager {
   /** @hidden @internal */
-  _$typeName: string; // actually defined on prototype
+  declare _$typeName: string; // actually defined on prototype
 
   /** The service name associated with this EntityManager. __Read Only__ **/
-  serviceName: string;
+  declare serviceName: string;
   /** The DataService associated with this EntityManager. __Read Only__ **/
-  dataService: DataService;
+  declare dataService: DataService;
   /** The [[QueryOptions]] associated with this EntityManager. __Read Only__ **/
-  queryOptions: QueryOptions;
+  declare queryOptions: QueryOptions;
   /** The [[SaveOptions]] associated with this EntityManager. __Read Only__ **/
-  saveOptions: SaveOptions;
+  declare saveOptions: SaveOptions;
   /** The [[ValidationOptions]] associated with this EntityManager. __Read Only__ **/
-  validationOptions: ValidationOptions;
+  declare validationOptions: ValidationOptions;
   /** The [[KeyGenerator]] associated with this EntityManager. __Read Only__ **/
-  keyGenerator: KeyGenerator;
+  declare keyGenerator: KeyGenerator;
   /** The [[KeyGenerator]] constructor associated with this EntityManager. __Read Only__ **/
-  keyGeneratorCtor: { new (): KeyGenerator }; // TODO: review this
+  declare keyGeneratorCtor: { new (): KeyGenerator }; // TODO: review this
   /** The [[MetadataStore]] associated with this EntityManager. __Read Only__ **/
-  metadataStore: MetadataStore;
-  isLoading: boolean;
-  isRejectingChanges: boolean;
+  declare metadataStore: MetadataStore;
+  declare isLoading: boolean;
+  declare isRejectingChanges: boolean;
 
   // events
   /**

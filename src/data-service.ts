@@ -37,23 +37,23 @@ anytime a MetadataStore.fetchMetadata call occurs with a new dataService ( or se
 **/
 export class DataService {
   /** @hidden @internal */
-  _$typeName: string; // actually put on prototype.
+  declare _$typeName: string; // actually put on prototype.
   /** The serviceName for this DataService. __Read Only__ **/
-  serviceName: string;
+  declare serviceName: string;
   /** The adapter name for the [[IDataServiceAdapter]] to be used with this service. __Read Only__  **/
-  adapterName: string;
+  declare adapterName: string;
   /**  The [[IDataServiceAdapter]] implementation instance associated with this EntityManager. __Read Only__  **/
-  adapterInstance?: DataServiceAdapter;
+  declare adapterInstance?: DataServiceAdapter;
   /** The adapter name for the [[IUriBuilderAdapter]] to be used with this service. __Read Only__  **/
-  uriBuilderName: string;
+  declare uriBuilderName: string;
   /**  The [[IUriBuilderAdapter]] implementation instance associated with this EntityManager. __Read Only__  **/
-  uriBuilder?: UriBuilderAdapter;
+  declare uriBuilder?: UriBuilderAdapter;
   /** Whether the server can provide metadata for this service. __Read Only__   **/
-  hasServerMetadata: boolean;
+  declare hasServerMetadata: boolean;
   /** The [[JsonResultsAdapter]] used to process the results of any query against this DataService. __Read Only__ **/
-  jsonResultsAdapter: JsonResultsAdapter;
+  declare jsonResultsAdapter: JsonResultsAdapter;
   /** Whether to use JSONP when performing a 'GET' request against this service. __Read Only__  **/
-  useJsonp: boolean;
+  declare useJsonp: boolean;
 
   /**   DataService constructor
   >     var dataService = new DataService({

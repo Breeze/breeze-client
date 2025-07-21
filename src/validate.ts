@@ -184,13 +184,13 @@ of additional properties that will be automatically added to this object if not 
 **/
 export class Validator {
   /** @hidden @internal */
-  _$typeName: string; // on proto
+  declare _$typeName: string; // on proto
 
-  name: string;
-  valFn: ValidationFn;
-  context: ValidationMessageContext;
-  currentContext: ValidationMessageContext;
-  private _baseContext: ValidationMessageContext;
+  declare name: string;
+  declare valFn: ValidationFn;
+  declare context: ValidationMessageContext;
+  declare currentContext: ValidationMessageContext;
+  declare private _baseContext: ValidationMessageContext;
 
   constructor(name: string, valFn: ValidationFn, context?: ValidationMessageContext) {
     // _baseContext is what will get serialized

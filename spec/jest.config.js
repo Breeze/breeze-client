@@ -4,5 +4,9 @@ module.exports = {
   testEnvironment: 'node',
   maxWorkers: 1,
   moduleFileExtensions: ['ts', 'tsx', 'js'],
-  setupFilesAfterEnv: ["jest-extended/all"]
+  setupFilesAfterEnv: ["jest-extended/all"],
+  transform: {
+      "^.+\\.m?js$": "ts-jest"
+    },  
+  transformIgnorePatterns: ['/node_modules/(?!breeze-client)']
 };

@@ -23,9 +23,9 @@ The default NamingConvention does not perform any translation, it simply passes 
 **/
 export class NamingConvention {
   /** @hidden @internal */
-  _$typeName: string;
+  declare _$typeName: string;
   /** The name of this NamingConvention. __Read Only__ */
-  name: string;
+  declare name: string;
   /** Function that takes a server property name add converts it into a client side property name.  __Read Only__ */
   serverPropertyNameToClient: (nm: string, context?: any) => string;
   /** Function that takes a client property name add converts it into a server side property name. __Read Only__ */

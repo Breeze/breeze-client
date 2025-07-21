@@ -37,20 +37,20 @@ For use by breeze plugin authors only. The class is for use in building a [[IDat
 */
 export class MappingContext {
   /** @hidden @internal */
-  _$typeName: string; // on prototype
+  declare _$typeName: string; // on prototype
 
   rawValueFn = DataProperty.getRawValueFromServer; // think about passing this in later.
 
-  dataService: DataService;
-  query: EntityQuery | string;
-  entityManager: EntityManager;
-  mergeOptions: MergeOptions;
-  adapter: DataServiceAdapter;  // assigned in the AbstractDataServiceAdapter.
+  declare dataService: DataService;
+  declare query: EntityQuery | string;
+  declare entityManager: EntityManager;
+  declare mergeOptions: MergeOptions;
+  declare adapter: DataServiceAdapter;  // assigned in the AbstractDataServiceAdapter.
 
-  refMap: Record<string, any>; // TODO
-  deferredFns: Function[]; // TODO
-  jsonResultsAdapter: JsonResultsAdapter;
-  metadataStore: MetadataStore;
+  declare refMap: Record<string, any>; // TODO
+  declare deferredFns: Function[]; // TODO
+  declare jsonResultsAdapter: JsonResultsAdapter;
+  declare metadataStore: MetadataStore;
 
   constructor(config: MappingContextConfig) {
 

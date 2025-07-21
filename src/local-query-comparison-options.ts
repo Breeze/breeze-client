@@ -25,15 +25,15 @@ length strings.
 **/
 export class LocalQueryComparisonOptions {
   /** @hidden @internal */
-  _$typeName: string; // on prototype
+  declare _$typeName: string; // on prototype
   /** The name for this instance. */
-  name: string;
+  declare name: string;
   /** Whether predicates that involve strings will be interpreted in a "caseSensitive" manner. (default = false).  */
-  isCaseSensitive: boolean;
+  declare isCaseSensitive: boolean;
   /* Whether or not to enforce the ANSI SQL standard
   of padding strings of unequal lengths before comparison with spaces. Note that per the standard, padding only occurs with equality and
   inequality predicates, and not with operations like 'startsWith', 'endsWith' or 'contains'.  Default is true. */
-  usesSql92CompliantStringComparison: boolean;
+  declare usesSql92CompliantStringComparison: boolean;
 
   /**
   LocalQueryComparisonOptions constructor

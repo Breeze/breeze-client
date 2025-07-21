@@ -19,15 +19,15 @@ A SaveOptions instance is used to specify the 'options' under which a save will 
 **/
 export class SaveOptions {
   /** @hidden @internal */
-  _$typeName: string; // on proto
+  declare _$typeName: string; // on proto
   /** Resource name to be used during the save - this defaults to "SaveChanges". __Read Only__ */
-  resourceName: string;
+  declare resourceName: string;
   /** The DataService to be used for this save. __Read Only__ */
-  dataService: DataService;
+  declare dataService: DataService;
   /** Whether multiple saves can be in-flight at the same time. The default is false. __Read Only__ */
-  allowConcurrentSaves: boolean;
+  declare allowConcurrentSaves: boolean;
   /** Free form value that will be sent to the server during the save. __Read Only__ */
-  tag: any;
+  declare tag: any;
 
   /** The default value whenever SaveOptions are not specified. */
   static defaultInstance = new SaveOptions({ allowConcurrentSaves: false});

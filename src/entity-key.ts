@@ -10,7 +10,7 @@ An EntityKey is an object that represents the unique identity of an entity.  Ent
 **/
 export class EntityKey {
   /** @hidden @internal */
-  _$typeName: string; // actually placed on prototype
+  declare _$typeName: string; // actually placed on prototype
   /** @hidden @internal */
   static ENTITY_KEY_DELIMITER = ":::";
   /**  The 'EntityType' that this is a key for. __Read Only__ */

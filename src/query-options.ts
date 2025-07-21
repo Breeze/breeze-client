@@ -76,13 +76,13 @@ A QueryOptions instance is used to specify the 'options' under which a query wil
 **/
 export class QueryOptions {
   /** @hidden @internal */
-  _$typeName: string;
+  declare _$typeName: string;
   /** The [[FetchStrategy]] to use with any queries. __Read Only__ */
-  fetchStrategy: FetchStrategy;
+  declare fetchStrategy: FetchStrategy;
   /** The [[MergeStrategy]] to use with any queries. __Read Only__ */
-  mergeStrategy: MergeStrategy;
+  declare mergeStrategy: MergeStrategy;
   /** Whether to include cached deleted entities in a query result (false by default). __Read Only__ */
-  includeDeleted: boolean;
+  declare includeDeleted: boolean;
 
   /**
   The default instance for use whenever QueryOptions are not specified.
