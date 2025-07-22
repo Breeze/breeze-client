@@ -377,6 +377,22 @@ describe("Old Fixed Bugs", () => {
 
   });
 
+  // Test for https://github.com/Breeze/breeze.server.net/issues/198
+  test("querying with guid array", async () => {
+    const em1 = TestFns.newEntityManager();
+    const query = new EntityQuery()
+      .from("Customers")
+      .where({ customerID: { "in": ["729DE505-EA6D-4CDF-89F6-0360AD37BDE7","CD98057F-B5C2-49F4-A235-05D155E636DF"]}});
+
+    const qr1 = await em1.executeQuery(query);
+    expect (qr1.results.length).toEqual(2);
+
+    const cust1 = qr1.results[0];
+    const id1 = cust1.getProperty("customerID");
+    expect(id1).toEqualCaseInsensitive("729DE505-EA6D-4CDF-89F6-0360AD37BDE7");
+
+  });
+
 
   // const Customer = function () {
   //   this.miscData = "asdf";
