@@ -1,4 +1,4 @@
-import { Entity, EntityQuery, EntityType, MetadataStore, Predicate, breeze, MergeStrategy, EntityState } from 'breeze-client';
+import { Entity, EntityQuery, EntityType, MetadataStore, Predicate, breeze, MergeStrategy, EntityState, QueryResult } from 'breeze-client';
 import { TestFns, skipTestIf } from './test-fns';
 
 TestFns.initServerEnv();
@@ -393,6 +393,94 @@ describe("Old Fixed Bugs", () => {
 
   });
 
+  test("executeQuery returns before in-cache entities are all attached", async function () {
+    // unable to reproduce the behavior found in Angular application.
+    // maybe it has something do to with the app clearing entities?
+    expect.hasAssertions();
+    const em = TestFns.newEntityManager();
+    // lookup queries
+    const lq1 = EntityQuery.from("Regions").where("regionID", "lt", 100); 
+    const lq2 = EntityQuery.from("Categories"); 
+    const [lr1, lr2] = await Promise.all([em.executeQuery(lq1), em.executeQuery(lq2)]);
+    expect(lr1.results).toHaveLength(4);
+    expect(lr2.results).toHaveLength(8);
+
+    const q2 = EntityQuery.from("Employees").where("employeeID", "lt", 100)
+        .expand(["employeeTerritories.territory","manager"]);
+    const q3 = EntityQuery.from("Orders").expand(["orderDetails.product.supplier"]);
+    const q4 = EntityQuery.from("Customers").expand(["orders.orderDetails.product"]);
+
+    // const [qr2, qr3] = await Promise.all([em.executeQuery(q2), em.executeQuery(q3), em.executeQuery(q4)]);
+    const [qr4, qr3, qr2] = await Promise.all([em.executeQuery(q4), em.executeQuery(q3), em.executeQuery(q2)]);
+
+    expect(qr2.results).toHaveLength(9);
+
+    const empsWithTerr = qr2.results.filter((e: any) => e.employeeTerritories.length > 0);
+    expect(empsWithTerr.length).toBeGreaterThan(7);
+
+    for (const emp of empsWithTerr) {
+      expect(emp.employeeTerritories.length).toBeGreaterThan(0);
+      for (const etr of emp.employeeTerritories) {
+        const region = etr.territory.region;
+        expect(region).not.toBeNull();
+      }
+    }
+
+    expect(qr3.results.length).toBeGreaterThan(70);
+
+    for (const order of qr3.results) {
+      for (const det of order.orderDetails) {
+        expect(det.product).not.toBeNull();
+        if (det.product.categoryId) {
+          expect(det.product.category).not.toBeNull();
+        }
+      }
+    }
+  });
+
+  test.skip("executeQuery returns before in-cache entities are all attached - with separate EM to load lookups", async function () {
+
+    expect.hasAssertions();
+    // lookup entitymanager
+    const lem = TestFns.newEntityManager();
+    // lookup queries
+    const lq1 = EntityQuery.from("Regions").where("regionID", "lt", 100); 
+    const lq2 = EntityQuery.from("Categories"); 
+    const [lr1, lr2] = await Promise.all([lem.executeQuery(lq1), lem.executeQuery(lq2)]);
+    expect(lr1.results).toHaveLength(4);
+    expect(lr2.results).toHaveLength(8);
+
+    const em = TestFns.newEntityManager();
+
+    const q2 = EntityQuery.from("Employees").where("employeeID", "lt", 100)
+        .expand(["employeeTerritories.territory","manager"]);
+    const q3 = EntityQuery.from("Orders").expand(["orderDetails.product.supplier","orderDetails.product"]);
+
+    const [qr2, qr3] = await Promise.all([em.executeQuery(q2), em.executeQuery(q3)]);
+
+    expect(qr2.results).toHaveLength(9);
+    expect(qr3.results.length).toBeGreaterThan(70);
+
+    const empsWithTerr = qr2.results.filter((e: any) => e.employeeTerritories.length > 0);
+    expect(empsWithTerr.length).toBeGreaterThan(7);
+
+    for (const emp of empsWithTerr) {
+      expect(emp.employeeTerritories.length).toBeGreaterThan(0);
+      for (const etr of emp.employeeTerritories) {
+        const region = etr.territory.region;
+        expect(region).not.toBeNull();
+      }
+    }
+
+    for (const order of qr3.results) {
+      for (const det of order.orderDetails) {
+        expect(det.product).not.toBeNull();
+        if (det.product.categoryId) {
+          expect(det.product.category).not.toBeNull();
+        }
+      }
+    }
+  });
 
   // const Customer = function () {
   //   this.miscData = "asdf";

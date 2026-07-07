@@ -19,6 +19,9 @@
         "typeRoots": [
             "./node_modules/@types"
         ],
+        "types": [
+            "jest"
+        ],
         "downlevelIteration": true,
         "importHelpers": true,
         "lib": [
