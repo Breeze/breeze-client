@@ -1,31 +1,14 @@
 # Building Breeze
 
-## Build using ng-packagr
-Run `npm run build`.  This will create files in the '\dist' dir.  The directory structure is the [Angular Package Format](https://docs.google.com/document/d/1CZC2rcpxffTDfRDs6p1cfbmKNLA6x5O-NtkJglDaBVs/preview).
+Building is performed in the two subdirectories, [build-cjs](./build-cjs/) and [build-mjs](./build-mjs/).
 
-    adapter-*/                Breeze adapter definitions (*.d.ts) for ajax, data service, model library, and uri builder
-    bundles/                  Breeze and adapter libraries in UMD
-    esm5/                     Breeze and adapter libraries as ES5 modules (separate source files)
-    esm2015/                  Breeze and adapter libraries as ES6 modules (separate source files)
-    fesm5/                    Breeze and adapter libraries as ES5 modules (combined source files)
-    fesm2015/                 Breeze and adapter libraries as ES6 modules (combined source files)
-    mixin-*/                  Breeze mixin definitions (*.d.ts) for getEntityGraph, save queuing
-    src/                      TypeScript definition files (.d.ts) for source
-    breeze-client.d.ts        TypeScript definition file (links to the files in src/) 
-    breeze-client.metadata.json      Metadata for Angular AOT
-    index.d.ts                Main entry point
-    LICENSE                   MIT
-    package.json              Package metadata
-    README.md                 Readme file
+The `build-mjs` directory builds ES2022 modules for modern browsers and JavaScript application.
 
-It will also create `breeze-client-{version}.tgz` in the main directory.  This file can then be installed in a project using
+The `build-cjs` directory builds ES5 and UMD modules for supporting older browsers, old nodejs, and script-tag deployments.
 
-    npm install ..\{path}\breeze-client-{version}.tgz
+When publishing to npm, you should build and publish from BOTH the `build-mjs` and `build-cjs` directories.
 
-> NOTE: this folder publishes `breeze-client@2.x.x-cjs`, which is tagged `cjs` in npm.  This version has the folder structure shown above.
-It is backward compatible with older applications.
-
-> NOTE: the `mjs` folder publishes `breeze-client@2.x.x`, which is tagged `mjs` in npm.  This version does not have the `bundles` or `esm5` or `fesm5` folders shown above.  It has `esm2022` and `fesm2022` folders with .mjs files.  It is suitable for newer Angular applications.
+See the README files in each directory for more info.
 
 ## Build API Docs
 Run `npm run typedoc`.  This will create a '\docs' dir. click on the 'index.html' in this folder to see the docs.

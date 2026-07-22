@@ -1,0 +1,12 @@
+{
+    "extends": "./node_modules/ng-packagr/lib/ts/conf/tsconfig.ngc.json",
+    "compilerOptions": {
+        "baseUrl": "./",
+        "paths": {
+            "@angular/*": ["./node_modules/@angular/*"],
+            "rxjs/*": ["./node_modules/rxjs/*"],
+        }
+    },
+    "include": ["../src/**/*"],
+    "exclude": ["node_modules", "dist", "temp", "**/*.spec.ts"]
+}

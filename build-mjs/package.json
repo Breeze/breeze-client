@@ -18,11 +18,11 @@
   },
   "scripts": {
     "build": "npm run clean && npm run packagr && npm pack ../dist && npm run install-to-spec",
-    "clean": "rimraf temp && rimraf ../src/*.js* && rimraf ../src/*.d.ts && rimraf ../*.d.ts && rimraf ../dist",
+    "clean": "rimraf temp && rimraf ../src/*.js* && rimraf ../src/*.d.ts && rimraf ../*.d.ts && rimraf dist && rimraf ../dist",
     "vermjs": "cd ../dist && npm --no-git-tag-version version 2.2.2-mjs",
-    "install-to-spec": "cd ../spec && npm install ../mjs/breeze-client-2.2.2.tgz",
+    "install-to-spec": "cd ../spec && npm install ../build-mjs/breeze-client-2.2.2.tgz",
     "publish": "node ../tools/unprivate.js && npm publish --tag latest ../dist && npm dist-tag add breeze-client@2.2.2 mjs",
-    "packagr": "ng-packagr -p ../ng-package.json"
+    "packagr": "ng-packagr -p ../ng-package.json -c ./tsconfig.lib.json"
   },
   "author": {
     "name": "IdeaBlade",

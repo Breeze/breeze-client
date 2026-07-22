@@ -1,0 +1,67 @@
+{
+  "name": "breeze-client",
+  "version": "2.2.2",
+  "private": true,
+  "description": "Breeze data management for JavaScript clients",
+  "repository": "https://github.com/Breeze/breeze-client.git",
+  "devDependencies": {
+    "@angular/common": "~9.1.0",
+    "@angular/compiler": "~9.1.0",
+    "@angular/compiler-cli": "~9.1.0",
+    "@angular/core": "~9.1.0",
+    "@types/node": "^12.12.26",
+    "ng-packagr": "^9.1.5",
+    "rimraf": "^3.0.2",
+    "rxjs": "^6.6.6",
+    "tslib": "^1.14.1",
+    "typescript": "^3.8.3"
+  },
+  "scripts": {
+    "build": "npm run clean && npm run packagr && rimraf ../dist/spec && npm run downlevel-dts && npm run vercjs && npm pack ../dist && npm run install-to-spec",
+    "clean": "rimraf temp && rimraf ../src/*.js* && rimraf ../src/*.d.ts && rimraf ../*.d.ts && rimraf ../dist && rimraf node_modules/breeze-client.js",
+    "install-to-spec": "cd ../spec && npm install ../build-cjs/breeze-client-2.2.2-cjs.tgz",
+    "vercjs": "cd ../dist && npm --no-git-tag-version version 2.2.2-cjs",
+    "publish": "node ../tools/unprivate.js && npm publish --tag cjs ../dist && npm dist-tag add breeze-client@2.2.2-cjs umd",
+    "downlevel-dts": "node ../node_modules/downlevel-dts/index.js ../dist ../dist",
+    "remove-dup-name": "node ../tools/remove-dup-name.js",
+    "packagr": "ng-packagr -p ../ng-package.json -c ./tsconfig.lib.json",
+    "copy-to-breezejs": "node ../tools/copy-to-breezejs.js"
+  },
+  "author": {
+    "name": "IdeaBlade",
+    "email": "jayt@ideablade.com",
+    "url": "https://www.ideablade.com/"
+  },
+  "contributors": [
+    "Jay Traband",
+    "Steve Schmitt",
+    "Marcel Good",
+    "Ward Bell"
+  ],
+  "keywords": [
+    "breeze",
+    "breezejs",
+    "spa",
+    "data binding",
+    "change tracking",
+    "query",
+    "linq",
+    "cache",
+    "graph",
+    "graphql",
+    "angular",
+    "angularjs",
+    "react",
+    "vue",
+    "aurelia",
+    "relational",
+    "orm",
+    "entity",
+    "model"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Breeze/breeze-client/issues"
+  },
+  "homepage": "https://github.com/Breeze/breeze-client#readme"
+}

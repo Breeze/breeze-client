@@ -21,6 +21,11 @@ module.exports = {
         "project": "tsconfig.json",
         "sourceType": "module"
     },
+    "exclude": [
+        "node_modules",
+        "dist",
+        "temp"
+    ],
     "plugins": [
         "@typescript-eslint",
         "@typescript-eslint/tslint"
@@ -28,19 +33,6 @@ module.exports = {
     "root": true,
     "rules": {
         "@typescript-eslint/indent": "off",
-        "@typescript-eslint/member-delimiter-style": [
-            "error",
-            {
-                "multiline": {
-                    "delimiter": "semi",
-                    "requireLast": true
-                },
-                "singleline": {
-                    "delimiter": "semi",
-                    "requireLast": false
-                }
-            }
-        ],
         "@typescript-eslint/naming-convention": [
             "error",
             {
@@ -61,11 +53,6 @@ module.exports = {
                 "avoidEscape": true
             }
         ],
-        "@typescript-eslint/semi": [
-            "error",
-            "always"
-        ],
-        "@typescript-eslint/type-annotation-spacing": "error",
         "brace-style": [
             "error",
             "1tbs",
