@@ -1,4 +1,4 @@
-﻿import { DataServiceAdapter } from './interface-registry';
+import { DataServiceAdapter } from './interface-registry';
 import { core } from './core';
 import { DataType  } from './data-type';
 import { DataService, JsonResultsAdapter, NodeContext, NodeMeta } from './data-service';
@@ -312,8 +312,8 @@ function mergeEntity(mc: MappingContext, node: any, meta: NodeMeta) {
     if (meta.extraMetadata) {
       targetEntity.entityAspect.extraMetadata = meta.extraMetadata;
     }
-    // em._attachEntityCore(targetEntity, EntityState.Unchanged, MergeStrategy.Disallowed);
-    em._attachEntityCore(targetEntity, EntityState.Unchanged, mergeStrategy);
+    // return value === targetEntity EXCEPT in the case of a merge with a self reference.
+    targetEntity = em._attachEntityCore(targetEntity, EntityState.Unchanged, mergeStrategy);
     targetEntity.entityAspect.wasLoaded = true;
     em.entityChanged.publish({ entityAction: EntityAction.AttachOnQuery, entity: targetEntity });
   }
@@ -402,6 +402,13 @@ function mergeRelatedEntities(mc: MappingContext, navigationProperty: Navigation
 function mergeRelatedEntityCore(mc: MappingContext, rawEntity: any, navigationProperty: NavigationProperty) {
   let relatedRawEntity = rawEntity[navigationProperty.nameOnServer];
   if (!relatedRawEntity) return null;
+
+  if (rawEntity.$type === relatedRawEntity.$type) {
+	  if (navigationProperty.parentType.keyProperties.every(kp => rawEntity[kp.nameOnServer] === relatedRawEntity[kp.nameOnServer])) {
+		  //the related entity is a duplicate of the parent entity, ignore it
+		  return null;
+	  }
+  }
 
   let relatedEntity = mc.visitAndMerge(relatedRawEntity, { nodeType: "navProp", navigationProperty: navigationProperty });
   return relatedEntity;
