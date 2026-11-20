@@ -1414,6 +1414,9 @@ export class EntityType {
   >      let orderDetailType = em1.metadataStore.getEntityType("OrderDetail");
   >      let companyNameProp2 = orderDetailType.getProperty("Order.Customer.CompanyName");
   >      // companyNameProp === companyNameProp2
+    This method can also walk a property path to return a property in a subtype
+  @example
+  >      let exciseTaxProp = orderDetailType.getProperty("Order/InternationalOrder.ExciseTax");
   @param [throwIfNotFound=false] {Boolean} Whether to throw an exception if not found.
   @return A DataProperty or NavigationProperty or null if not found.
   **/
@@ -1433,11 +1436,26 @@ export class EntityType {
     let parentType = this as StructuralType;
     
     const getProps = (propName: string) => { 
+      // split for casting entity property to subtype
+      let nameParts = propName.split("/");
+      propName = nameParts[0];
+      let subtype = nameParts[1];
+      
       const fn = key === null ? core.propsEq("name", "nameOnServer", propName) : core.propEq(key, propName);
       let prop = core.arrayFirst(parentType.getProperties(), fn);
       if (prop) {
         parentType = (prop instanceof NavigationProperty) ? prop.entityType : prop.dataType as ComplexType;
         // parentType = prop.isNavigationProperty ? prop.entityType : prop.dataType;
+
+        // if subtype is specified, use that next
+        if (subtype && parentType instanceof EntityType) {
+          // change parentType to subtype
+          parentType = parentType.getSubtype(subtype, throwIfNotFound);
+          if (!parentType) {
+            ok = false;
+          }
+        }
+
       } else if (throwIfNotFound) {
         throw new Error("unable to locate property: " + propName + " on entityType: " + parentType.name);
       } else {
@@ -1460,8 +1478,25 @@ export class EntityType {
         return fn(propName);
       });
     } else {
+      let parentType = this as StructuralType;
       let props = this.getPropertiesOnPath(propertyPath, false, true);
-      propNames = props!.map((prop: EntityProperty) => prop.nameOnServer);
+      
+      const getPropName = (prop: EntityProperty, index: number, array: EntityProperty[]): string => {
+        parentType = prop instanceof NavigationProperty ? prop.entityType : prop.dataType as ComplexType;
+        let propName = prop.nameOnServer;
+
+         // try getting the next property's parent
+        let nextParentType = (array[index + 1] || { parentType: parentType }).parentType;
+
+        if (nextParentType !== parentType) {
+          // we can assume this to be a subtype, use the next property's parent
+          propName = core.formatString("%1/%2.%3", propName, nextParentType.namespace, nextParentType.shortName);
+        }
+
+         return propName;
+      };
+
+      propNames = props!.map(getPropName);
     }
     return propNames.join(delimiter);
   }
@@ -1474,6 +1509,20 @@ export class EntityType {
       return DataType.parseRawValue(val, dp.dataType as DataType);
     });
     return new EntityKey(this, keyValues);
+  }
+
+  /**
+  Returns the subtype of this type by short name down thru the hierarchy.
+  @method getSubtype
+  @param shortName [String]
+  @param [throwIfNotFound=false] {Boolean} Whether to throw an exception if not found.
+  **/
+  getSubtype(shortName: string, throwIfNotFound: boolean = false): EntityType {
+    let subtype = core.arrayFirst(this.getSelfAndSubtypes(), core.propEq("shortName", shortName));
+    if (!subtype && throwIfNotFound) {
+      throw new Error(core.formatString("The entityType '%1' is not a subtype of entityType '%2'", shortName, this.name));
+    }
+    return subtype;
   }
 
   /** @hidden @internal */
